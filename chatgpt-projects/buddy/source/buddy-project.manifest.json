@@ -1,0 +1,24 @@
+{
+  "name": "buddy-chatgpt-project-pack",
+  "version": "1.0.0",
+  "owner": "Prismtek",
+  "purpose": "Make a ChatGPT Project behave like Buddy through instructions and uploaded knowledge/source files.",
+  "paste_instructions": "00_PROJECT_INSTRUCTIONS_PASTE.md",
+  "recommended_repo": "codysumpter-cloud/buddy-universal-agent-profile",
+  "recommended_folder": "chatgpt-projects/buddy/",
+  "knowledge_files": [
+    "knowledge/BUDDY_OPERATING_MANUAL.md",
+    "knowledge/LIL_BUDDY_WORKER_PROTOCOL.md",
+    "knowledge/SOURCE_OF_TRUTH_AND_REPO_RULES.md",
+    "knowledge/SAFETY_AND_APPROVAL_POLICY.md",
+    "knowledge/RESPONSE_FORMATS.md",
+    "knowledge/REPO_TASK_RUNBOOK.md",
+    "knowledge/BUDDY_MEMORY_AND_RECEIPTS.md",
+    "knowledge/ACTIONS_BRIDGE_SPEC.md"
+  ],
+  "tests": [
+    "tests/TEST_PROMPTS.md"
+  ],
+  "claims_policy": "Never claim external work happened without tool/action evidence.",
+  "subagent_policy": "Lil' Buddy is internal-only unless a real external worker runtime exists and returns receipts."
+}
