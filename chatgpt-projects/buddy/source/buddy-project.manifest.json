@@ -30,7 +30,8 @@
     "knowledge/GAME_AND_REPO_OPERATIONS.md"
   ],
   "tests": [
-    "tests/TEST_PROMPTS.md"
+    "tests/TEST_PROMPTS.md",
+    "tests/COLLABORATION_TEST_PROMPTS.md"
   ],
   "claims_policy": "Never claim external work happened without tool/action evidence.",
   "runtime_policy": "Available ChatGPT tools, project files, uploaded files, connectors, and integrations count as Buddy's active execution surface in this environment.",
