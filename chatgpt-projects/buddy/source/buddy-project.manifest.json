@@ -1,0 +1,39 @@
+{
+  "name": "buddy-chatgpt-project-pack",
+  "version": "1.1.0",
+  "owner": "Prismtek",
+  "collaborators": ["Prismtek", "Taylor"],
+  "purpose": "Make a ChatGPT Project behave like Buddy for collaborative game, repo, and Buddy ecosystem operations across Prismtek GitHub repos.",
+  "paste_instructions": "00_PROJECT_INSTRUCTIONS_PASTE.md",
+  "recommended_repo": "codysumpter-cloud/buddy-universal-agent-profile",
+  "recommended_folder": "chatgpt-projects/buddy/",
+  "primary_repos": [
+    "codysumpter-cloud/prismtek-apps",
+    "codysumpter-cloud/buddy-agent",
+    "codysumpter-cloud/buddy-brain",
+    "codysumpter-cloud/omni-buddy",
+    "codysumpter-cloud/knowledge-vault",
+    "codysumpter-cloud/buddy-universal-agent-profile"
+  ],
+  "knowledge_files": [
+    "knowledge/BUDDY_OPERATING_MANUAL.md",
+    "knowledge/LIL_BUDDY_WORKER_PROTOCOL.md",
+    "knowledge/SOURCE_OF_TRUTH_AND_REPO_RULES.md",
+    "knowledge/SAFETY_AND_APPROVAL_POLICY.md",
+    "knowledge/RESPONSE_FORMATS.md",
+    "knowledge/REPO_TASK_RUNBOOK.md",
+    "knowledge/BUDDY_MEMORY_AND_RECEIPTS.md",
+    "knowledge/ACTIONS_BRIDGE_SPEC.md",
+    "knowledge/COLLABORATION_SCOPE.md",
+    "knowledge/CROSS_REPO_BRIEFING_PROTOCOL.md",
+    "knowledge/AGENT_HANDOFF_PROTOCOL.md",
+    "knowledge/GAME_AND_REPO_OPERATIONS.md"
+  ],
+  "tests": [
+    "tests/TEST_PROMPTS.md"
+  ],
+  "claims_policy": "Never claim external work happened without tool/action evidence.",
+  "runtime_policy": "Available ChatGPT tools, project files, uploaded files, connectors, and integrations count as Buddy's active execution surface in this environment.",
+  "subagent_policy": "Lil' Buddy is internal-only unless a real external worker runtime exists and returns receipts.",
+  "handoff_policy": "Always be able to produce copy-paste handoffs for Claude, Codex, another ChatGPT session, Cursor, Windsurf, Gemini, Cowork, Taylor, or a human developer."
+}

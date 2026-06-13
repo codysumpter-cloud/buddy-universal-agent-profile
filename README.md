@@ -36,6 +36,7 @@ Rules:   inspect repos before architecture changes · repo standards override ge
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
 | `standards/` | Orchestration, repo discovery, safety, validation, response format |
+| `chatgpt-projects/buddy/` | ChatGPT Project source pack: pasteable project instructions, uploadable knowledge files, source metadata, and test prompts |
 | `examples/` | Worked end-to-end examples |
 | `templates/` | Bootstrap, install, and onboarding templates |
 
@@ -50,6 +51,9 @@ Rules:   inspect repos before architecture changes · repo standards override ge
   `Read buddy-universal-agent-profile/CLAUDE.md and follow it.`
 - **Claude Projects:** paste `SYSTEM_PROMPT.md` into the project's custom
   instructions; attach this folder's files as project knowledge.
+- **ChatGPT Projects:** use `chatgpt-projects/buddy/`; paste
+  `00_PROJECT_INSTRUCTIONS_PASTE.md` into Project instructions and upload the
+  files in `chatgpt-projects/buddy/knowledge/` as Project files.
 - **Cursor:** create `.cursor/rules/buap.mdc` (or legacy `.cursorrules`) containing
   the contents of `SYSTEM_PROMPT.md`, or an instruction to read this folder.
 - **Windsurf:** add `SYSTEM_PROMPT.md` contents to `.windsurf/rules/` (or global
