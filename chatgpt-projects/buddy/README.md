@@ -1,10 +1,10 @@
 # Buddy ChatGPT Project Pack
 
-This pack turns a ChatGPT Project into a Buddy-style operating environment using project instructions plus uploaded knowledge/source files.
+This pack turns a ChatGPT Project into a Buddy-style collaborative operations room for Prismtek and Taylor.
 
 ## What this pack is
 
-A portable behavior and source bundle for a ChatGPT Project or Custom GPT that should behave like Buddy:
+A portable behavior and source bundle for a ChatGPT Project or Custom GPT that should behave like Buddy while helping Prismtek and Taylor collaborate across games, apps, tools, and Buddy ecosystem repos:
 
 - Buddy owns the conversation with the human.
 - Lil' Buddy is an internal worker/checker model and never speaks directly.
@@ -12,10 +12,12 @@ A portable behavior and source bundle for a ChatGPT Project or Custom GPT that s
 - Repo claims require evidence.
 - Risky actions require explicit confirmation.
 - Source-of-truth order is preserved across Buddy ecosystem repos.
+- Prismtek and Taylor can ask for cross-repo briefs, status, next steps, or handoffs at any time.
+- Agent handoffs should be specific enough for Claude, Codex, another ChatGPT session, or a human to continue immediately.
 
 ## What this pack is not
 
-This does not create a real external runtime by itself. A ChatGPT Project can follow these instructions and use uploaded files as context, but real repository edits, shell execution, PR creation, browser automation, long-running memory, and autonomous workers require connected tools/actions or an external Buddy runtime.
+This does not create Buddy's external daemon by itself. A ChatGPT Project can follow these instructions and use uploaded files as context, and it should use available ChatGPT tools, connectors, and integrations as real execution surfaces. Persistent background workers and local machine runtime behavior require connected tools/actions or an external Buddy runtime.
 
 ## Install in ChatGPT Project
 
@@ -38,6 +40,22 @@ Upload these files to the ChatGPT Project as knowledge/reference files:
 - `knowledge/REPO_TASK_RUNBOOK.md`
 - `knowledge/BUDDY_MEMORY_AND_RECEIPTS.md`
 - `knowledge/ACTIONS_BRIDGE_SPEC.md`
+- `knowledge/COLLABORATION_SCOPE.md`
+- `knowledge/CROSS_REPO_BRIEFING_PROTOCOL.md`
+- `knowledge/AGENT_HANDOFF_PROTOCOL.md`
+- `knowledge/GAME_AND_REPO_OPERATIONS.md`
+
+## Primary collaboration scope
+
+This Project is for Prismtek and Taylor to collaborate across:
+
+- `codysumpter-cloud/prismtek-apps`
+- `codysumpter-cloud/buddy-agent`
+- `codysumpter-cloud/buddy-brain`
+- `codysumpter-cloud/omni-buddy`
+- `codysumpter-cloud/knowledge-vault`
+- `codysumpter-cloud/buddy-universal-agent-profile`
+- Other Prismtek/GitHub repos when named or relevant.
 
 ## Version control rule
 
