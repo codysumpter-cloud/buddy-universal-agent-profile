@@ -16,7 +16,19 @@ instructions still take precedence.
 - `asset-intake.md`
 - `readme-download-links.md`
 - `knowledge-vault-update.md`
+- `knowledge-vault-runtime-consumption.md`
 - `ai-agent-profile-build.md`
+
+## Runtime-specific companion docs
+
+For cross-repo Buddy ecosystem work, pair runbooks with:
+
+- `../linked-repos/buddy-ecosystem.repos.json`
+- `../integrations/buddy-ecosystem-runtime-map.md`
+- `../integrations/knowledge-vault-runtime.md`
+- `../integrations/buddy-brain.md`
+- `../integrations/buddy-agent.md`
+- `../integrations/omni-buddy.md`
 
 ## Standard runbook output
 
