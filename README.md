@@ -11,6 +11,10 @@ spawn processes. Where real sub-agent runtimes exist, `standards/orchestration.m
 documents how to connect them; where they don't, Lil' Buddy is emulated as a workflow
 pattern.
 
+BUAP also includes copy-paste packs for low-context chat/search tools that cannot
+read a repo, run a shell, or persist files. Those packs preserve the Buddy contract
+by forcing explicit scope, source limits, receipts, and handoff-quality answers.
+
 ## The contract in one block
 
 ```
@@ -37,6 +41,8 @@ Rules:   inspect repos before architecture changes · repo standards override ge
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
 | `standards/` | Orchestration, repo discovery, safety, validation, response format |
 | `chatgpt-projects/buddy/` | ChatGPT Project source pack: pasteable project instructions, uploadable knowledge files, source metadata, and test prompts |
+| `universal-ai-chat/` | Low-context prompt pack for any AI chat/search box, including tools that cannot read files or repos |
+| `openai-symphony-agent-pack/` | Symphony-style multi-agent role pack for conductor/section/critic orchestration |
 | `examples/` | Worked end-to-end examples |
 | `templates/` | Bootstrap, install, and onboarding templates |
 
@@ -54,6 +60,12 @@ Rules:   inspect repos before architecture changes · repo standards override ge
 - **ChatGPT Projects:** use `chatgpt-projects/buddy/`; paste
   `00_PROJECT_INSTRUCTIONS_PASTE.md` into Project instructions and upload the
   files in `chatgpt-projects/buddy/knowledge/` as Project files.
+- **Any AI chat / search box:** use `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md`
+  for full Buddy behavior, or `universal-ai-chat/SEARCH_BOX_PROMPTS.md` for short
+  prompt snippets that work in limited tools such as search-assistant answer boxes.
+- **OpenAI-style multi-agent / Symphony setup:** use
+  `openai-symphony-agent-pack/SYMPHONY_AGENT_PACK.md` and its manifest. This is a
+  BUAP orchestration pack, not a runtime dependency.
 - **Cursor:** create `.cursor/rules/buap.mdc` (or legacy `.cursorrules`) containing
   the contents of `SYSTEM_PROMPT.md`, or an instruction to read this folder.
 - **Windsurf:** add `SYSTEM_PROMPT.md` contents to `.windsurf/rules/` (or global
@@ -63,10 +75,22 @@ Rules:   inspect repos before architecture changes · repo standards override ge
   sub-agent tool — Buddy should use it for Lil' Buddy work.
 - **Gemini CLI:** point `GEMINI.md` context (root `GEMINI.md` or settings
   `contextFileName`) at this folder. Details: `GEMINI.md`.
-- **Anything else:** feed `SYSTEM_PROMPT.md` as the system prompt.
+- **Anything else:** feed `SYSTEM_PROMPT.md` as the system prompt. If the tool has a
+  tiny context window, use the universal chat/search pack instead.
 
 If a repo already has its own agent contract (e.g. buddy-brain's BMO `AGENTS.md`),
 that repo contract **takes precedence**; BUAP supplies the orchestration loop beneath it.
+
+## Universal fallback rule
+
+When an AI tool cannot use files, code, web, GitHub, or long project memory, Buddy
+must still help by:
+
+1. Asking for or restating the minimal missing context.
+2. Labeling what is verified, assumed, blocked, or needs a source.
+3. Producing copy-paste runnable prompts, commands, diffs, checklists, or handoffs.
+4. Avoiding claims that external work was completed.
+5. Keeping the user moving with the safest next concrete step.
 
 ## Versioning
 
