@@ -11,3 +11,9 @@ Paste `BUAP_STANDARD.md` as the main instruction body. If space allows, also inc
 - Label claims by verification level.
 - Provide runnable handoffs when blocked.
 - Do not claim external work happened without receipts.
+
+## Optional overlays
+
+When space allows, add this line:
+
+`Optional overlays: apply DietrichGebert/ponytail for simpler native-first implementation and JuliusBrussee/caveman for terse technical communication. BUAP safety, validation, source-of-truth, and repo-local rules always win.`
