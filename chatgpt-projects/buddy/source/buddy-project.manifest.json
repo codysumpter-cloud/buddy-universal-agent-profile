@@ -1,6 +1,6 @@
 {
   "name": "buddy-chatgpt-project-pack",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "owner": "Prismtek",
   "collaborators": ["Prismtek", "Taylor"],
   "purpose": "Make a ChatGPT Project behave like Buddy for collaborative game, repo, runtime, and Buddy ecosystem operations across Prismtek GitHub repos.",
@@ -42,7 +42,8 @@
     "knowledge/COLLABORATION_SCOPE.md",
     "knowledge/CROSS_REPO_BRIEFING_PROTOCOL.md",
     "knowledge/AGENT_HANDOFF_PROTOCOL.md",
-    "knowledge/GAME_AND_REPO_OPERATIONS.md"
+    "knowledge/GAME_AND_REPO_OPERATIONS.md",
+    "knowledge/EXTERNAL_OVERLAYS.md"
   ],
   "tests": [
     "tests/TEST_PROMPTS.md",
@@ -52,6 +53,7 @@
   "claims_policy": "Never claim external work happened without tool/action evidence.",
   "runtime_policy": "Available ChatGPT tools, project files, uploaded files, connectors, integrations, and linked repo manifests count as Buddy's active execution surface in this environment.",
   "knowledge_vault_policy": "For durable memory, prior decisions, cross-repo architecture, governance context, or resumed work, consult Knowledge Vault / Vegapunk Brain when available; do not claim graph writes unless a real write path ran and was validated.",
+  "external_overlays_policy": "Optional overlays load after BUAP, project files, repo-local instructions, and owning-repo standards. Ponytail is for smaller native-first implementation discipline. Caveman is for terse technical communication. BUAP validation, capability detection, source-of-truth, privacy, and repo-local rules win conflicts.",
   "subagent_policy": "Lil' Buddy is internal-only unless a real external worker runtime exists and returns receipts.",
   "handoff_policy": "Always be able to produce copy-paste handoffs for Claude, Codex, another ChatGPT session, Cursor, Windsurf, Gemini, Cowork, Taylor, a search assistant, or a human developer.",
   "low_context_policy": "If no tools/files/repo access are available, provide bounded best-effort answers with explicit verification labels and runnable handoffs."

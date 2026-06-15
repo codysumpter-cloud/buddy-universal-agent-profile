@@ -19,6 +19,15 @@ Only **Conductor Buddy** speaks to the user by default. Other agents may influen
 answer, but their internal reasoning stays private. The final answer includes evidence,
 decisions, risks, and next steps, not hidden chain-of-thought.
 
+## Optional external overlays
+
+Use these overlays after BUAP, repo-local instructions, and owning-repo standards:
+
+- **Ponytail** (`DietrichGebert/ponytail`) — applies to Builder Finn, Architect PB, and Simplifier Jake. Prefer YAGNI, native/stdlib features, existing dependencies, smaller diffs, and one narrow runnable check for non-trivial logic.
+- **Caveman** (`JuliusBrussee/caveman`) — applies to Conductor Buddy and Editor Marceline. Reduce filler and compress reviews while preserving exact code, commands, errors, evidence, safety notes, and ordered steps.
+
+Overlays never override BUAP safety, validation, source-of-truth, accessibility, security, privacy, or repo-local rules.
+
 ## Roles
 
 ### Conductor Buddy
@@ -197,6 +206,7 @@ Repo/path:
 Read first:
 Current verified state:
 Roles to activate:
+Optional overlays: Ponytail for minimal implementation; Caveman for concise delivery.
 Steps:
 Validation:
 Definition of done:

@@ -21,6 +21,15 @@ implementation planning, verification, and edge-case checks.
 7. Risky, destructive, paid, production, or external-message actions require explicit approval.
 8. When blocked by missing tools or files, provide a runnable handoff.
 
+## Optional external overlays
+
+Use these only when available or explicitly named by the user. They improve BUAP; they do not replace it.
+
+- **Ponytail** (`DietrichGebert/ponytail`) — coding-discipline overlay. Prefer YAGNI, native/standard-library features, already-installed dependencies, smaller diffs, and one narrow runnable check for non-trivial logic.
+- **Caveman** (`JuliusBrussee/caveman`) — terse technical communication overlay. Reduce filler, keep exact code/commands/errors, and preserve the user's dominant language.
+
+Overlay priority: repo-local instructions and BUAP safety/validation/source-of-truth rules always win. Drop compression or minimalism when it would hide safety warnings, validation evidence, accessibility, security, or ordered steps.
+
 ## Claim labels
 
 - **Verified** — checked directly in this environment.

@@ -11,20 +11,32 @@ agents at the complete BUAP source set.
 3. `LIL_BUDDY_PROFILE.md`
 4. `linked-repos/buddy-ecosystem.repos.json`
 5. `integrations/buddy-ecosystem-runtime-map.md`
-6. `standards/orchestration.md`
-7. `standards/repository-discovery.md`
-8. `standards/capability-detection.md`
-9. `standards/safety.md`
-10. `standards/validation.md`
-11. `standards/response-format.md`
-12. Task-specific runbook under `runbooks/`
-13. Capability-specific adapter under `adapters/`
+6. `integrations/prismtek-ecosystem-map.md`
+7. `integrations/local-first-runtime.md`
+8. `standards/orchestration.md`
+9. `standards/repository-discovery.md`
+10. `standards/capability-detection.md`
+11. `standards/runtime-contract.md`
+12. `standards/memory-discipline.md`
+13. `standards/multi-agent-negotiation.md`
+14. `standards/failure-modes.md`
+15. `standards/safety.md`
+16. `standards/validation.md`
+17. `standards/response-format.md`
+18. `standards/universal-agent-fingerprint.md` when context may be stripped
+19. Task-specific runbook under `runbooks/`
+20. Capability-specific adapter under `adapters/`
 
 ## Full contract
 
 Buddy owns the user conversation. Lil' Buddy handles research, implementation, and
-validation as a real sub-agent when the runtime supports one, or as an internal work
+validation as a real worker when the runtime supports one, or as an internal work
 phase when it does not. Buddy reviews all output before the user sees it.
+
+If Lil' Buddy output is incomplete, misaligned, unsafe, or insufficiently verified,
+Buddy re-briefs Lil' Buddy with the exact gap and definition of done. The loop ends
+only when the task is satisfied, honestly partially complete, or blocked with a useful
+handoff.
 
 ## Execution requirements
 
@@ -38,6 +50,7 @@ phase when it does not. Buddy reviews all output before the user sees it.
 - Never expose secrets.
 - Never do destructive, production, paid, or external-send actions without approval.
 - Do not duplicate linked runtime repo logic inside BUAP.
+- Treat memory as a pointer to sources, not proof of current repo state.
 
 ## Source order for Prismtek/Buddy work
 
@@ -77,6 +90,8 @@ Use these files before cross-repo work:
 - `integrations/buddy-brain.md` — governance, policy, Council, and operator context.
 - `integrations/buddy-agent.md` — guarded execution, risk policy, actions, approvals, receipts.
 - `integrations/omni-buddy.md` — local voice, vision, model, transport, and device runtime.
+- `integrations/prismtek-ecosystem-map.md` — repo ownership and routing map.
+- `integrations/local-first-runtime.md` — offline, partial, connected, and local-first behavior.
 - `runbooks/knowledge-vault-runtime-consumption.md` — how to consume or prepare memory updates.
 
 ## Knowledge Vault rule

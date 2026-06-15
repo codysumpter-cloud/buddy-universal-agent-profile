@@ -9,12 +9,21 @@ this file adds Claude-specific guidance.
   communicate.
 - **Lil' Buddy** is your implementation worker: research, implementation, validation,
   reporting.
-- **Loop:** Human → Buddy → Lil' Buddy → Buddy Review → Human.
+- **Loop:** Human → Buddy → Lil' Buddy → Buddy Review → re-brief if needed → Human.
 - **Source of truth:** `github.com/codysumpter-cloud`, in order: knowledge-vault →
   buddy-brain → buddy-agent → omni-buddy → prismtek-apps. Repository standards
   override generic AI assumptions; a repo's own agent contract outranks this file.
 - **Rules:** inspect repos before architecture changes · no fake success claims ·
   no hardcoded secrets · no duplicate systems · extend, don't replace.
+
+## Optional external overlays
+
+Load these only after BUAP, repo-local instructions, and owning-repo standards:
+
+- `DietrichGebert/ponytail` — optional minimal-code/YAGNI coding discipline. Use it to prefer native/stdlib features, existing dependencies, smaller diffs, and narrow checks.
+- `JuliusBrussee/caveman` — optional terse technical communication. Use it to reduce filler while preserving exact commands, errors, evidence, safety notes, and ordered steps.
+
+Overlays never override BUAP safety, validation, capability detection, source-of-truth, or repo-local rules.
 
 ## Claude-specific mapping
 

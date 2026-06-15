@@ -7,7 +7,7 @@ Gemini CLI, Cursor, Windsurf, or future frameworks — behaves as **Buddy** (use
 orchestrator) with at least one **Lil' Buddy** (implementation worker).
 
 BUAP is a **behavior/orchestration standard, not a sub-agent runtime**. It does not
-spawn processes. Where real sub-agent runtimes exist, `standards/orchestration.md`
+spawn processes. Where real worker runtimes exist, `standards/orchestration.md`
 documents how to connect them; where they don't, Lil' Buddy is emulated as a workflow
 pattern.
 
@@ -25,10 +25,10 @@ by forcing explicit scope, source limits, receipts, and handoff-quality answers.
 
 ## The contract in one block
 
-```
+```text
 Roles:   Buddy = user-facing orchestrator (intent, plan, delegate, review, communicate)
          Lil' Buddy = worker (research, implementation, validation, reporting)
-Loop:    Human → Buddy → Lil' Buddy → Buddy Review → Human
+Loop:    Human → Buddy → Lil' Buddy → Buddy Review → re-brief if needed → Human
 Truth:   github.com/codysumpter-cloud →
          knowledge-vault → buddy-brain → buddy-agent → omni-buddy → prismtek-apps
 Rules:   inspect repos before architecture changes · repo standards override generic
@@ -48,8 +48,19 @@ BUAP links to, but does not vendor or replace, the owning runtime repos:
 | Local device voice / vision / transport runtime | `codysumpter-cloud/omni-buddy` |
 | Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
 
-Read `linked-repos/buddy-ecosystem.repos.json` and `integrations/buddy-ecosystem-runtime-map.md`
-for machine-readable repo links and routing rules.
+Read `linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,
+and `integrations/prismtek-ecosystem-map.md` for machine-readable repo links and routing rules.
+
+## New resilience standards
+
+| Standard | Purpose |
+|---|---|
+| `standards/runtime-contract.md` | Defines how Buddy adapts to chat, search, repo-aware, local, and multi-agent runtimes |
+| `standards/failure-modes.md` | Defines deterministic recovery when tools, files, repos, checks, or plans fail |
+| `standards/memory-discipline.md` | Preserves continuity without treating memory as proof of current repo state |
+| `standards/multi-agent-negotiation.md` | Defines worker/council conflict resolution and iterative re-brief behavior |
+| `standards/universal-agent-fingerprint.md` | Provides a tiny identity seed for stripped prompts and low-context tools |
+| `integrations/local-first-runtime.md` | Defines offline, partially connected, and fully connected Buddy behavior |
 
 ## Folder map
 
@@ -66,9 +77,9 @@ for machine-readable repo links and routing rules.
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
-| `integrations/` | Runtime integration docs for Knowledge Vault, Buddy Brain, Buddy Agent, Omni Buddy, and ecosystem routing |
+| `integrations/` | Runtime integration docs for Knowledge Vault, Buddy Brain, Buddy Agent, Omni Buddy, local-first behavior, and ecosystem routing |
 | `audits/` | Source-backed BUAP and runtime integration audit reports |
-| `standards/` | Orchestration, repo discovery, capability detection, safety, validation, response format |
+| `standards/` | Orchestration, runtime contracts, repo discovery, capability detection, memory, failure modes, safety, validation, response format |
 | `schemas/` | Machine-readable schemas, including receipts |
 | `tests/conformance/` | Prompt/rubric suite for checking BUAP compatibility |
 | `runbooks/` | Repeatable procedures for common repo, game, docs, runtime, and agent tasks |
@@ -108,10 +119,11 @@ for machine-readable repo links and routing rules.
   `SYSTEM_PROMPT.md` contents to `.windsurf/rules/`.
 - **Cowork:** connect the repo folder and say: "Read
   buddy-universal-agent-profile/CLAUDE.md and operate under BUAP." Cowork has a real
-  sub-agent tool — Buddy should use it for Lil' Buddy work.
+  worker tool — Buddy should use it for Lil' Buddy work.
 - **Gemini CLI:** point `GEMINI.md` context (root `GEMINI.md` or settings
   `contextFileName`) at this folder. Details: `GEMINI.md`.
-- **Anything else:** pick the smallest prompt tier that fits the tool.
+- **Anything else:** pick the smallest prompt tier that fits the tool. If context is stripped,
+  use `standards/universal-agent-fingerprint.md`.
 
 If a repo already has its own agent contract (e.g. buddy-brain's BMO `AGENTS.md`),
 that repo contract **takes precedence**; BUAP supplies the orchestration loop beneath it.
@@ -122,7 +134,7 @@ When an AI tool cannot use files, code, web, GitHub, or long project memory, Bud
 must still help by:
 
 1. Asking for or restating the minimal missing context.
-2. Labeling what is verified, assumed, blocked, or needs a source.
+2. Labeling what is verified, assumed, blocked, draft-only, or needs a source.
 3. Producing copy-paste runnable prompts, commands, diffs, checklists, or handoffs.
 4. Avoiding claims that external work was completed.
 5. Keeping the user moving with the safest next concrete step.
