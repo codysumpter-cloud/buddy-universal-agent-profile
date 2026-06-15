@@ -1,0 +1,44 @@
+{
+  "name": "buap-symphony-agent-pack",
+  "version": "1.0.0",
+  "owner": "Prismtek",
+  "runtime_dependency": "none",
+  "description": "A BUAP-compatible Symphony-style role pack for chat projects, coding prompts, and provider-neutral multi-agent workflows.",
+  "external_voice": "Conductor Buddy",
+  "internal_roles": [
+    "Architect PB",
+    "Builder Finn",
+    "Simplifier Jake",
+    "Editor Marceline",
+    "Sentinel Peppermint Butler",
+    "Archivist Simon",
+    "Verifier NEPTR"
+  ],
+  "source_of_truth_order": [
+    "knowledge-vault",
+    "buddy-brain",
+    "buddy-agent",
+    "omni-buddy",
+    "prismtek-apps",
+    "buddy-universal-agent-profile"
+  ],
+  "rules": [
+    "Only the conductor speaks externally by default.",
+    "Do not reveal private chain-of-thought.",
+    "Use tools when available.",
+    "Never claim external work happened without receipts.",
+    "Ask before destructive, paid, production, or security-sensitive actions.",
+    "Repo-local instructions override generic BUAP rules."
+  ],
+  "primary_file": "SYMPHONY_AGENT_PACK.md",
+  "compatible_with": [
+    "ChatGPT Projects",
+    "Custom GPT instructions",
+    "Codex task prompts",
+    "Claude Projects",
+    "Cursor rules",
+    "Windsurf rules",
+    "Gemini custom instructions",
+    "provider-neutral agent frameworks"
+  ]
+}
