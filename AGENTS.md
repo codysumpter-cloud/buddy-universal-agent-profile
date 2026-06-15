@@ -40,6 +40,18 @@ Runtime owners:
 - `omni-buddy` owns local voice/vision/device/transport runtime.
 - `prismtek-apps` owns product surfaces and user-facing app/game behavior.
 
+## External instruction overlays
+
+BUAP may route to external agent-instruction sources when they improve execution
+discipline without replacing Prismtek ownership. Current external overlay:
+
+- `DietrichGebert/ponytail` — optional lazy senior developer / minimal-code
+  discipline for coding work. Load after BUAP, repo-local instructions, and
+  owning-repo standards. It can push the agent toward YAGNI, stdlib/native
+  features, existing dependencies, and smaller diffs, but it never overrides
+  safety, validation, accessibility, security, capability detection, or
+  repo-source-of-truth rules.
+
 ## Capability rule
 
 Before meaningful work, detect the current environment's capabilities using

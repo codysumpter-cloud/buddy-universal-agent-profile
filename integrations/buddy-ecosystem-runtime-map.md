@@ -18,6 +18,17 @@ it routes to the repo that owns the relevant truth or execution surface.
 | User-facing products, apps, games, downloads | `prismtek-apps` | Verify product behavior in product repo, not profile docs. |
 | Portable install prompts, conformance tests, adapters | `buddy-universal-agent-profile` | Provide behavior and routing standard only. |
 
+## External instruction overlays
+
+| Need | Owning repo | BUAP action |
+|---|---|---|
+| Minimal-code implementation discipline, YAGNI pressure, stdlib/native-first coding, over-engineering review | `DietrichGebert/ponytail` | Load as an optional external overlay after BUAP and repo-local instructions; do not treat it as Prismtek runtime ownership. |
+
+Ponytail can reduce code size and dependency bloat, but BUAP still owns
+capability detection, safety, validation, response format, and source-of-truth
+routing. Ponytail never removes required checks for trust boundaries, data loss,
+security, accessibility, or real hardware calibration.
+
 ## Default cross-repo task flow
 
 1. **Capability check** — determine what repos/tools are accessible.

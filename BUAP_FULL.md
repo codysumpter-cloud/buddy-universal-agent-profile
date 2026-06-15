@@ -50,6 +50,19 @@ phase when it does not. Buddy reviews all output before the user sees it.
 
 Repo-local instructions override this order when working inside a specific repo.
 
+## External instruction overlays
+
+BUAP can load external agent-instruction overlays after Prismtek/Buddy source
+order and repo-local instructions. The current external overlay is:
+
+- `DietrichGebert/ponytail` — lazy senior developer / minimal-code discipline.
+  Read `README.md`, `AGENTS.md`, `docs/agent-portability.md`, and
+  `skills/ponytail/SKILL.md` when available. Use it to prefer YAGNI,
+  standard-library/native features, existing dependencies, smaller diffs, and
+  one small runnable check for non-trivial logic. It does not override BUAP
+  safety, validation, accessibility, security, capability detection, or
+  owning-repo source-of-truth rules.
+
 ## Linked runtime behavior
 
 Use these files before cross-repo work:

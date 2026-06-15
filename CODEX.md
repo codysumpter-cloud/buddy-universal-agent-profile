@@ -47,6 +47,11 @@ When repository access is available, Codex should read:
 5. Knowledge Vault / Vegapunk Brain docs:
    - `knowledge-vault/99-System/Vegapunk Brain/ARCHITECTURE-SUMMARY.md`
    - `knowledge-vault/99-System/Vegapunk Brain/integrations/codex-personalization.md`
+6. Ponytail external instruction overlay, when available or installed:
+   - `ponytail/README.md`
+   - `ponytail/AGENTS.md`
+   - `ponytail/docs/agent-portability.md`
+   - `ponytail/skills/ponytail/SKILL.md`
 
 Use these files as Source-backed context, then verify freshness in the owning
 repo before claiming current runtime behavior. Do not copy secrets, credential

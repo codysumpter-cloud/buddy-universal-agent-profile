@@ -109,5 +109,23 @@
         "Run tests/conformance prompts against target AI environment"
       ]
     }
+  ],
+  "external_instruction_sources": [
+    {
+      "name": "ponytail",
+      "repository": "DietrichGebert/ponytail",
+      "role": "optional lazy senior developer / minimal-code instruction overlay for agentic coding work",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "docs/agent-portability.md",
+        "skills/ponytail/SKILL.md"
+      ],
+      "priority": "Load after BUAP, repo-local instructions, and owning-repo standards. Never override safety, validation, security, accessibility, capability detection, or source-of-truth rules.",
+      "validation": [
+        "node scripts/check-rule-copies.js",
+        "npm test"
+      ]
+    }
   ]
 }
