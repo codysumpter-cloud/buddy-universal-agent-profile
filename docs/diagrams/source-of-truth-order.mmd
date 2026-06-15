@@ -1,0 +1,12 @@
+flowchart LR
+  KV[knowledge-vault] --> BB[buddy-brain]
+  BB --> BA[buddy-agent]
+  BA --> OB[omni-buddy]
+  OB --> PA[prismtek-apps]
+  PA --> BUAP[buddy-universal-agent-profile]
+  Local[Repo-local instructions] -. override .-> KV
+  Local -. override .-> BB
+  Local -. override .-> BA
+  Local -. override .-> OB
+  Local -. override .-> PA
+  Local -. override .-> BUAP
