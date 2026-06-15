@@ -22,3 +22,12 @@ take precedence.
 An adapter should point to BUAP source files instead of duplicating the whole profile
 unless the target tool cannot read files. For low-context tools, use `BUAP_LITE.md` or
 `universal-ai-chat/`.
+
+## Optional external overlays
+
+All adapters may reference these after BUAP, repo-local instructions, and owning-repo standards:
+
+- `DietrichGebert/ponytail` — optional minimal-code/YAGNI implementation discipline.
+- `JuliusBrussee/caveman` — optional terse technical communication discipline.
+
+These overlays never override BUAP safety, validation, source-of-truth, capability, or repo-local rules.
