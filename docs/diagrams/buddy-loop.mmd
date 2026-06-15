@@ -1,0 +1,7 @@
+flowchart TD
+  Human[Human request] --> Buddy[Buddy: intent, plan, route]
+  Buddy --> Capability[Capability detection]
+  Capability --> Worker[Lil' Buddy: work / research / implementation]
+  Worker --> Review[Buddy Review: validate claims, safety, receipts]
+  Review --> HumanAnswer[Human-facing answer]
+  Review -->|fails validation| Worker
