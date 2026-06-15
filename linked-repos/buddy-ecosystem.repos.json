@@ -1,0 +1,113 @@
+{
+  "name": "buddy-ecosystem-linked-repos",
+  "version": "1.0.0",
+  "owner": "Prismtek",
+  "purpose": "Machine-readable linked-repo map for BUAP routing across the Buddy ecosystem.",
+  "default_source_order": [
+    "knowledge-vault",
+    "buddy-brain",
+    "buddy-agent",
+    "omni-buddy",
+    "prismtek-apps",
+    "buddy-universal-agent-profile"
+  ],
+  "repos": [
+    {
+      "name": "knowledge-vault",
+      "repository": "codysumpter-cloud/knowledge-vault",
+      "role": "durable knowledge graph, Vegapunk Brain runtime, event-sourced shared memory, searchable indexes",
+      "read_first": [
+        "99-System/Vegapunk Brain/ARCHITECTURE-SUMMARY.md",
+        "99-System/Vegapunk Brain/scripts/README.md",
+        "99-System/Vegapunk Brain/integrations/buddy-agent.md",
+        "99-System/Vegapunk Brain/integrations/buddy-brain.md"
+      ],
+      "runtime_entrypoints": [
+        "99-System/Vegapunk Brain/scripts/run-vegapunk-brain.sh",
+        "99-System/Vegapunk Brain/tools/graph_search.py",
+        "99-System/Vegapunk Brain/tools/graph_health.py",
+        "99-System/Vegapunk Brain/tools/event_ingestor.py",
+        "99-System/Vegapunk Brain/tools/event_router.py",
+        "99-System/Vegapunk Brain/tools/graph_compiler.py"
+      ],
+      "validation": [
+        "bash \"99-System/Vegapunk Brain/scripts/run-vegapunk-brain.sh\""
+      ]
+    },
+    {
+      "name": "buddy-brain",
+      "repository": "codysumpter-cloud/buddy-brain",
+      "role": "operator brain, policy, council, memory, runbooks, cross-repo coordination, skills registry",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "soul.md",
+        "memory.md",
+        "routines.md",
+        "RESPONSE_GUIDE.md",
+        "context/RUNBOOK.md"
+      ],
+      "validation": [
+        "make doctor",
+        "make runtime-doctor",
+        "make workspace-sync",
+        "make project-snapshot"
+      ]
+    },
+    {
+      "name": "buddy-agent",
+      "repository": "codysumpter-cloud/buddy-agent",
+      "role": "guarded execution boundary, Orchestrator/Worker runtime, action validation, risk policy, receipts",
+      "read_first": [
+        "README.md",
+        "docs/BUDDY_ACTION_ADAPTER.md",
+        "docs/BUDDY_FEATURE_PARITY.md"
+      ],
+      "validation": [
+        "buddy parity",
+        "buddy doctor"
+      ]
+    },
+    {
+      "name": "omni-buddy",
+      "repository": "codysumpter-cloud/omni-buddy",
+      "role": "Raspberry Pi / local multimodal voice, vision, local model, transport, and device runtime",
+      "read_first": [
+        "README.md",
+        "docs/VALIDATION_MATRIX.md",
+        "docs/K4_OPERATOR_RUNBOOK.md",
+        "OMNI_INTEGRATION_MAP.md"
+      ],
+      "validation": [
+        "./scripts/bmo_omni_doctor.sh",
+        "./scripts/run_validation_matrix.sh",
+        "python3 ./scripts/apply_runtime_profile.py dev",
+        "python3 ./scripts/apply_latency_profile.py snappy"
+      ]
+    },
+    {
+      "name": "prismtek-apps",
+      "repository": "codysumpter-cloud/prismtek-apps",
+      "role": "product surfaces, apps, games, downloads, user-facing Buddy UX",
+      "read_first": [
+        "README.md",
+        "AGENTS.md"
+      ],
+      "validation": []
+    },
+    {
+      "name": "buddy-universal-agent-profile",
+      "repository": "codysumpter-cloud/buddy-universal-agent-profile",
+      "role": "portable agent behavior profile, install packs, conformance tests, handoff and routing docs",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "BUAP_FULL.md",
+        "linked-repos/buddy-ecosystem.repos.json"
+      ],
+      "validation": [
+        "Run tests/conformance prompts against target AI environment"
+      ]
+    }
+  ]
+}
