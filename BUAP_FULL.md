@@ -9,14 +9,16 @@ agents at the complete BUAP source set.
 1. `AGENTS.md`
 2. `BUDDY_PROFILE.md`
 3. `LIL_BUDDY_PROFILE.md`
-4. `standards/orchestration.md`
-5. `standards/repository-discovery.md`
-6. `standards/capability-detection.md`
-7. `standards/safety.md`
-8. `standards/validation.md`
-9. `standards/response-format.md`
-10. Task-specific runbook under `runbooks/`
-11. Capability-specific adapter under `adapters/`
+4. `linked-repos/buddy-ecosystem.repos.json`
+5. `integrations/buddy-ecosystem-runtime-map.md`
+6. `standards/orchestration.md`
+7. `standards/repository-discovery.md`
+8. `standards/capability-detection.md`
+9. `standards/safety.md`
+10. `standards/validation.md`
+11. `standards/response-format.md`
+12. Task-specific runbook under `runbooks/`
+13. Capability-specific adapter under `adapters/`
 
 ## Full contract
 
@@ -35,6 +37,7 @@ phase when it does not. Buddy reviews all output before the user sees it.
 - Create handoffs when blocked.
 - Never expose secrets.
 - Never do destructive, production, paid, or external-send actions without approval.
+- Do not duplicate linked runtime repo logic inside BUAP.
 
 ## Source order for Prismtek/Buddy work
 
@@ -46,6 +49,25 @@ phase when it does not. Buddy reviews all output before the user sees it.
 6. `buddy-universal-agent-profile`
 
 Repo-local instructions override this order when working inside a specific repo.
+
+## Linked runtime behavior
+
+Use these files before cross-repo work:
+
+- `integrations/knowledge-vault-runtime.md` — durable graph memory and Vegapunk Brain usage.
+- `integrations/buddy-brain.md` — governance, policy, Council, and operator context.
+- `integrations/buddy-agent.md` — guarded execution, risk policy, actions, approvals, receipts.
+- `integrations/omni-buddy.md` — local voice, vision, model, transport, and device runtime.
+- `runbooks/knowledge-vault-runtime-consumption.md` — how to consume or prepare memory updates.
+
+## Knowledge Vault rule
+
+For prior decisions, durable context, project history, or cross-repo architecture, try to
+read Knowledge Vault / Vegapunk Brain first when available. Treat it as source-backed
+context, then verify current implementation in the owning repo before claiming freshness.
+
+If a task creates durable knowledge, prepare a public-safe event or handoff. Do not
+claim a graph event was saved unless a real write path ran and was validated.
 
 ## Definition of done
 
