@@ -36,6 +36,21 @@ Rules:   inspect repos before architecture changes · repo standards override ge
          no duplicate systems · extend, don't replace
 ```
 
+## Runtime routing
+
+BUAP links to, but does not vendor or replace, the owning runtime repos:
+
+| Runtime need | Owner |
+|---|---|
+| Durable graph memory / Vegapunk Brain | `codysumpter-cloud/knowledge-vault` |
+| Governance / policy / council / operator runbooks | `codysumpter-cloud/buddy-brain` |
+| Guarded execution / action risk / receipts | `codysumpter-cloud/buddy-agent` |
+| Local device voice / vision / transport runtime | `codysumpter-cloud/omni-buddy` |
+| Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
+
+Read `linked-repos/buddy-ecosystem.repos.json` and `integrations/buddy-ecosystem-runtime-map.md`
+for machine-readable repo links and routing rules.
+
 ## Folder map
 
 | Path | Purpose |
@@ -50,10 +65,13 @@ Rules:   inspect repos before architecture changes · repo standards override ge
 | `BUAP_FULL.md` | Full repo-aware operating profile |
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
+| `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
+| `integrations/` | Runtime integration docs for Knowledge Vault, Buddy Brain, Buddy Agent, Omni Buddy, and ecosystem routing |
+| `audits/` | Source-backed BUAP and runtime integration audit reports |
 | `standards/` | Orchestration, repo discovery, capability detection, safety, validation, response format |
 | `schemas/` | Machine-readable schemas, including receipts |
 | `tests/conformance/` | Prompt/rubric suite for checking BUAP compatibility |
-| `runbooks/` | Repeatable procedures for common repo, game, docs, and agent tasks |
+| `runbooks/` | Repeatable procedures for common repo, game, docs, runtime, and agent tasks |
 | `adapters/` | Tool-specific install templates |
 | `chatgpt-projects/buddy/` | ChatGPT Project source pack: pasteable project instructions, uploadable knowledge files, source metadata, and test prompts |
 | `universal-ai-chat/` | Low-context prompt pack for any AI chat/search box, including tools that cannot read files or repos |
@@ -113,6 +131,8 @@ must still help by:
 
 Use `tests/conformance/` to check whether a target AI tool actually follows BUAP.
 Use `schemas/receipt.schema.json` to record evidence for success claims.
+Use `audits/2026-06-15-buap-runtime-integration-audit.md` as the current source-backed
+runtime integration audit.
 
 ## Versioning
 
