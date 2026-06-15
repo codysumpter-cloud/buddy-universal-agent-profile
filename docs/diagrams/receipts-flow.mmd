@@ -1,0 +1,7 @@
+flowchart LR
+  Claim[Claim] --> Label[Assign claim label]
+  Label --> Evidence{Has evidence?}
+  Evidence -->|yes| Receipt[Create receipt]
+  Evidence -->|no| Unverified[Mark unverified or blocked]
+  Receipt --> Report[Final report]
+  Unverified --> Report

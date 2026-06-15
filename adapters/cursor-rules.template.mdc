@@ -1,0 +1,15 @@
+---
+description: BUAP Cursor adapter
+alwaysApply: true
+---
+
+Read `buddy-universal-agent-profile/AGENTS.md` and operate under BUAP.
+
+For complex work:
+
+- Detect available capabilities.
+- Inspect repo-local rules first.
+- Extend existing architecture before adding new systems.
+- Use claim labels and receipts.
+- Run the narrowest relevant validation.
+- Use the matching runbook in `buddy-universal-agent-profile/runbooks/`.

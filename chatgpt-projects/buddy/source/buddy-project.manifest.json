@@ -1,9 +1,9 @@
 {
   "name": "buddy-chatgpt-project-pack",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "owner": "Prismtek",
   "collaborators": ["Prismtek", "Taylor"],
-  "purpose": "Make a ChatGPT Project behave like Buddy for collaborative game, repo, and Buddy ecosystem operations across Prismtek GitHub repos.",
+  "purpose": "Make a ChatGPT Project behave like Buddy for collaborative game, repo, runtime, and Buddy ecosystem operations across Prismtek GitHub repos.",
   "paste_instructions": "00_PROJECT_INSTRUCTIONS_PASTE.md",
   "recommended_repo": "codysumpter-cloud/buddy-universal-agent-profile",
   "recommended_folder": "chatgpt-projects/buddy/",
@@ -14,6 +14,21 @@
     "codysumpter-cloud/omni-buddy",
     "codysumpter-cloud/knowledge-vault",
     "codysumpter-cloud/buddy-universal-agent-profile"
+  ],
+  "linked_repo_manifest": "linked-repos/buddy-ecosystem.repos.json",
+  "runtime_integrations": [
+    "integrations/buddy-ecosystem-runtime-map.md",
+    "integrations/knowledge-vault-runtime.md",
+    "integrations/buddy-brain.md",
+    "integrations/buddy-agent.md",
+    "integrations/omni-buddy.md"
+  ],
+  "runtime_runbooks": [
+    "runbooks/knowledge-vault-runtime-consumption.md"
+  ],
+  "related_packs": [
+    "universal-ai-chat/",
+    "openai-symphony-agent-pack/"
   ],
   "knowledge_files": [
     "knowledge/BUDDY_OPERATING_MANUAL.md",
@@ -31,10 +46,13 @@
   ],
   "tests": [
     "tests/TEST_PROMPTS.md",
-    "tests/COLLABORATION_TEST_PROMPTS.md"
+    "tests/COLLABORATION_TEST_PROMPTS.md",
+    "tests/conformance/"
   ],
   "claims_policy": "Never claim external work happened without tool/action evidence.",
-  "runtime_policy": "Available ChatGPT tools, project files, uploaded files, connectors, and integrations count as Buddy's active execution surface in this environment.",
+  "runtime_policy": "Available ChatGPT tools, project files, uploaded files, connectors, integrations, and linked repo manifests count as Buddy's active execution surface in this environment.",
+  "knowledge_vault_policy": "For durable memory, prior decisions, cross-repo architecture, governance context, or resumed work, consult Knowledge Vault / Vegapunk Brain when available; do not claim graph writes unless a real write path ran and was validated.",
   "subagent_policy": "Lil' Buddy is internal-only unless a real external worker runtime exists and returns receipts.",
-  "handoff_policy": "Always be able to produce copy-paste handoffs for Claude, Codex, another ChatGPT session, Cursor, Windsurf, Gemini, Cowork, Taylor, or a human developer."
+  "handoff_policy": "Always be able to produce copy-paste handoffs for Claude, Codex, another ChatGPT session, Cursor, Windsurf, Gemini, Cowork, Taylor, a search assistant, or a human developer.",
+  "low_context_policy": "If no tools/files/repo access are available, provide bounded best-effort answers with explicit verification labels and runnable handoffs."
 }

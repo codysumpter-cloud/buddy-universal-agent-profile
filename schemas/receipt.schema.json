@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BUAP Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claim", "status", "receipt_type", "checked_at"],
+  "properties": {
+    "claim": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["verified", "locally_verified", "source_backed", "unverified", "blocked", "assumption"]
+    },
+    "receipt_type": {
+      "type": "string",
+      "enum": ["github_pr", "github_commit", "github_branch", "github_issue", "file_path", "artifact", "command_output", "ci_run", "source_citation", "manual_check", "tool_confirmation", "blocked_reason"]
+    },
+    "url": { "type": "string" },
+    "path": { "type": "string" },
+    "command": { "type": "string" },
+    "output_summary": { "type": "string" },
+    "blocked_reason": { "type": "string" },
+    "checked_at": { "type": "string" },
+    "checked_by": { "type": "string", "default": "Buddy" },
+    "notes": { "type": "string" }
+  }
+}

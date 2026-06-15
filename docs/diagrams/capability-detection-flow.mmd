@@ -1,0 +1,13 @@
+flowchart TD
+  Start[New task] --> Check[Detect capabilities]
+  Check --> Read{Can inspect sources?}
+  Read -->|yes| Inspect[Inspect mode]
+  Read -->|no| Context[Use minimal context]
+  Inspect --> Write{Can update target?}
+  Write -->|yes| Execute[Execute mode]
+  Write -->|no| Draft[Draft mode]
+  Context --> Handoff[Handoff mode]
+  Execute --> Validate[Validate and collect receipts]
+  Draft --> Validate
+  Handoff --> Validate
+  Validate --> Report[Report labels, receipts, risks, next move]
