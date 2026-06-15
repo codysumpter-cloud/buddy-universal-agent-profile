@@ -39,6 +39,13 @@ Verified from `knowledge-vault`:
 - Current limitation: satellite repositories still need native event emitters wired
   into their task/session/release flows.
 
+Source evidence:
+
+- `knowledge-vault/99-System/Vegapunk Brain/ARCHITECTURE-SUMMARY.md`
+- `knowledge-vault/99-System/Vegapunk Brain/scripts/README.md`
+- `knowledge-vault/99-System/Vegapunk Brain/integrations/buddy-agent.md`
+- `knowledge-vault/99-System/Vegapunk Brain/integrations/buddy-brain.md`
+
 ### Buddy Agent
 
 Verified from `buddy-agent`:
@@ -52,6 +59,11 @@ Verified from `buddy-agent`:
 - Buddy Agent parity docs treat Buddy Brain, Omni Buddy, and Knowledge Vault as owned
   external surfaces with their own validation commands and boundaries.
 
+Source evidence:
+
+- `buddy-agent/docs/BUDDY_ACTION_ADAPTER.md`
+- `buddy-agent/docs/BUDDY_FEATURE_PARITY.md`
+
 ### Buddy Brain
 
 Verified from `buddy-brain`:
@@ -64,6 +76,10 @@ Verified from `buddy-brain`:
 - Its system boundary table explicitly maps `buddy-agent`, `prismtek-apps`,
   `omni-buddy`, and `knowledge-vault` roles.
 
+Source evidence:
+
+- `buddy-brain/README.md`
+
 ### Omni Buddy
 
 Verified from `omni-buddy`:
@@ -73,6 +89,10 @@ Verified from `omni-buddy`:
 - It supports Ollama, Whisper.cpp, OpenWakeWord, Piper TTS, camera vision via Moondream,
   Omni endpoint routing, local fallback, transport modes, runtime profile presets,
   latency profile presets, doctor scripts, and validation matrix checks.
+
+Source evidence:
+
+- `omni-buddy/README.md`
 
 ## BUAP gaps before this pass
 
@@ -93,7 +113,7 @@ Verified from `omni-buddy`:
 - Added `integrations/buddy-agent.md`.
 - Added `integrations/omni-buddy.md`.
 - Added `runbooks/knowledge-vault-runtime-consumption.md`.
-- Updated README, AGENTS, SYSTEM prompt, and BUAP_FULL references.
+- Updated README, AGENTS, SYSTEM prompt, BUAP_FULL, runbook index, and ChatGPT Project manifest.
 
 ## Recommendation
 
