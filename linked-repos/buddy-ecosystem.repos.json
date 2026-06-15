@@ -126,6 +126,21 @@
         "node scripts/check-rule-copies.js",
         "npm test"
       ]
+    },
+    {
+      "name": "caveman",
+      "repository": "JuliusBrussee/caveman",
+      "role": "optional terse technical communication / output compression instruction overlay for agentic work",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "INSTALL.md",
+        "skills/caveman/SKILL.md"
+      ],
+      "priority": "Load after BUAP, repo-local instructions, and owning-repo standards. Never override clarity needed for safety warnings, irreversible-action confirmations, validation evidence, ordered instructions, capability detection, or source-of-truth reporting.",
+      "validation": [
+        "node --test tests/installer/*.test.mjs"
+      ]
     }
   ]
 }

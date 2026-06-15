@@ -106,6 +106,18 @@ External instruction overlays load after BUAP and owning-repo context:
   dependencies, smaller diffs, and one small runnable check for non-trivial
   logic. It never overrides BUAP capability detection, safety, validation,
   security, accessibility, or owning-repo source-of-truth rules.
+- **Caveman** (`JuliusBrussee/caveman`) provides optional terse technical
+  communication / output compression discipline. Read
+  [`README.md`](https://github.com/JuliusBrussee/caveman/blob/main/README.md),
+  [`AGENTS.md`](https://github.com/JuliusBrussee/caveman/blob/main/AGENTS.md),
+  [`INSTALL.md`](https://github.com/JuliusBrussee/caveman/blob/main/INSTALL.md),
+  and
+  [`skills/caveman/SKILL.md`](https://github.com/JuliusBrussee/caveman/blob/main/skills/caveman/SKILL.md)
+  when available or installed. Treat Caveman as communication context: reduce
+  filler, keep technical substance, preserve exact code/commands/errors, and
+  keep the user's dominant language. Drop compression when it would obscure
+  safety warnings, irreversible-action confirmations, validation evidence, or
+  ordered multi-step instructions.
 
 ## Memory and profile boundaries
 

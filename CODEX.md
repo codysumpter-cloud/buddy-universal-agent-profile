@@ -52,6 +52,11 @@ When repository access is available, Codex should read:
    - `ponytail/AGENTS.md`
    - `ponytail/docs/agent-portability.md`
    - `ponytail/skills/ponytail/SKILL.md`
+7. Caveman external instruction overlay, when available or installed:
+   - `caveman/README.md`
+   - `caveman/AGENTS.md`
+   - `caveman/INSTALL.md`
+   - `caveman/skills/caveman/SKILL.md`
 
 Use these files as Source-backed context, then verify freshness in the owning
 repo before claiming current runtime behavior. Do not copy secrets, credential

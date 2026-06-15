@@ -43,7 +43,7 @@ Runtime owners:
 ## External instruction overlays
 
 BUAP may route to external agent-instruction sources when they improve execution
-discipline without replacing Prismtek ownership. Current external overlay:
+discipline without replacing Prismtek ownership. Current external overlays:
 
 - `DietrichGebert/ponytail` — optional lazy senior developer / minimal-code
   discipline for coding work. Load after BUAP, repo-local instructions, and
@@ -51,6 +51,12 @@ discipline without replacing Prismtek ownership. Current external overlay:
   features, existing dependencies, and smaller diffs, but it never overrides
   safety, validation, accessibility, security, capability detection, or
   repo-source-of-truth rules.
+- `JuliusBrussee/caveman` — optional terse technical communication / output
+  compression discipline. Load after BUAP, repo-local instructions, and
+  owning-repo standards. It can push the agent toward shorter responses,
+  compact reviews, commit messages, and memory compression, but it never
+  overrides clarity needed for safety warnings, irreversible-action
+  confirmations, validation evidence, or source-of-truth reporting.
 
 ## Capability rule
 

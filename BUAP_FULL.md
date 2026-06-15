@@ -53,7 +53,7 @@ Repo-local instructions override this order when working inside a specific repo.
 ## External instruction overlays
 
 BUAP can load external agent-instruction overlays after Prismtek/Buddy source
-order and repo-local instructions. The current external overlay is:
+order and repo-local instructions. Current external overlays:
 
 - `DietrichGebert/ponytail` — lazy senior developer / minimal-code discipline.
   Read `README.md`, `AGENTS.md`, `docs/agent-portability.md`, and
@@ -62,6 +62,12 @@ order and repo-local instructions. The current external overlay is:
   one small runnable check for non-trivial logic. It does not override BUAP
   safety, validation, accessibility, security, capability detection, or
   owning-repo source-of-truth rules.
+- `JuliusBrussee/caveman` — terse technical communication / output compression.
+  Read `README.md`, `AGENTS.md`, `INSTALL.md`, and `skills/caveman/SKILL.md`
+  when available. Use it to reduce filler, keep technical substance, compress
+  reviews and commit-message work, and preserve the user's dominant language.
+  Drop compression when it would obscure safety warnings, irreversible-action
+  confirmations, validation evidence, or ordered multi-step instructions.
 
 ## Linked runtime behavior
 
