@@ -4,16 +4,18 @@ This matrix maps the major BUAP surfaces so adopters can find the right file for
 
 ## Standards to prompt tiers
 
-| Standard | Lite | Standard | Full | System prompt |
-|---|---:|---:|---:|---:|
-| `standards/orchestration.md` | Summary | Summary | Required | Required |
-| `standards/capability-detection.md` | Summary | Summary | Required | Required |
-| `standards/runtime-contract.md` | Implied | Summary | Required | Summary |
-| `standards/failure-modes.md` | Implied | Summary | Required | Summary |
-| `standards/memory-discipline.md` | No | Implied | Required | Summary |
-| `standards/multi-agent-negotiation.md` | No | Implied | Required | Implied |
-| `standards/universal-agent-fingerprint.md` | Related | Related | Optional | Related |
-| `standards/validation.md` | Summary | Summary | Required | Required |
+| Standard | Kernel | Lite | Standard | Full | System prompt |
+|---|---:|---:|---:|---:|---:|
+| `standards/orchestration.md` | Summary | Summary | Summary | Required | Required |
+| `standards/capability-detection.md` | Summary | Summary | Summary | Required | Required |
+| `standards/capability-negotiation.md` | Summary | Related | Summary | Required | Summary |
+| `standards/runtime-contract.md` | Related | Implied | Summary | Required | Summary |
+| `standards/failure-modes.md` | Implied | Implied | Summary | Required | Summary |
+| `standards/memory-discipline.md` | No | No | Implied | Required | Summary |
+| `standards/multi-agent-negotiation.md` | No | No | Implied | Required | Implied |
+| `standards/multi-agent-arbitration.md` | No | No | Summary | Required | Implied |
+| `standards/universal-agent-fingerprint.md` | Related | Related | Related | Optional | Related |
+| `standards/validation.md` | Summary | Summary | Summary | Required | Required |
 
 ## Standards to adapters
 
@@ -31,21 +33,37 @@ This matrix maps the major BUAP surfaces so adopters can find the right file for
 | Standard area | Conformance coverage |
 |---|---|
 | Orchestration and re-brief loop | `tests/conformance/orchestration-loop.expected.md` |
+| Capability negotiation | `tests/conformance/capability-negotiation.expected.md` |
+| Multi-agent arbitration | `tests/conformance/multi-agent-arbitration.expected.md` |
 | Verification and receipts | `tests/conformance/README.md`, evaluator rubric when present |
 | Blocked-mode handoff | `tests/conformance/README.md` required behaviors |
-| Runtime capability selection | `tests/conformance/orchestration-loop.expected.md` |
+| Runtime capability selection | `tests/conformance/orchestration-loop.expected.md`, `tests/conformance/capability-negotiation.expected.md` |
+
+## Schemas
+
+| Need | File |
+|---|---|
+| Success/evidence receipts | `schemas/receipt.schema.json` |
+| Runtime/tool capability declarations | `schemas/capability-declaration.schema.json` |
+
+## Automation
+
+| Need | File |
+|---|---|
+| Local docs/spec check | `scripts/buap-conformance-check.mjs` |
+| GitHub Actions check | `.github/workflows/buap-conformance.yml` |
 
 ## Integrations
 
 | Need | File |
 |---|---|
-| Cross-repo owner routing | `integrations/prismtek-ecosystem-map.md` |
-| Runtime ownership | `integrations/buddy-ecosystem-runtime-map.md` |
-| Unified routing | `integrations/ecosystem-routing-spec.md` |
+| Canonical cross-repo routing | `integrations/ecosystem-routing-spec.md` |
+| Cross-repo owner overview | `integrations/prismtek-ecosystem-map.md` |
+| Runtime ownership details | `integrations/buddy-ecosystem-runtime-map.md` |
 | Local/offline/partial connectivity | `integrations/local-first-runtime.md` |
 | ChatGPT Project overlays | `chatgpt-projects/buddy/knowledge/EXTERNAL_OVERLAYS.md` |
 | Symphony multi-agent roles | `openai-symphony-agent-pack/SYMPHONY_AGENT_PACK.md` |
 
 ## Maintenance rule
 
-When a new standard, adapter, or integration is added, update this matrix in the same PR.
+When a new standard, adapter, schema, automation surface, or integration is added, update this matrix in the same PR.
