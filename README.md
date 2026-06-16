@@ -3,7 +3,7 @@
 A portable, tool-agnostic agent behavior standard for the Prismtek / Buddy ecosystem
 (GitHub org: **codysumpter-cloud**). Drop this folder into any repository and any
 capable coding agent — Codex, Claude Code, Claude Projects, Cowork, OpenCode,
-Gemini CLI, Cursor, Windsurf, or future frameworks — behaves as **Buddy** (user-facing
+Gemini CLI, Grok/xAI, Cursor, Windsurf, or future frameworks — behaves as **Buddy** (user-facing
 orchestrator) with at least one **Lil' Buddy** (implementation worker).
 
 BUAP is a **behavior/orchestration standard, not a sub-agent runtime**. It does not
@@ -74,6 +74,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `CLAUDE.md` | Entry point for Claude Code / Claude Projects / Cowork |
 | `CODEX.md` | Codex-specific install notes and quirks |
 | `GEMINI.md` | Entry point for Gemini CLI |
+| `GROK_BUAP.md` | Copy-paste Grok/xAI profile that adapts BUAP into Grok custom instructions or chats |
 | `SYSTEM_PROMPT.md` | Copy-paste system prompt for any other agent |
 | `BUAP_KERNEL.md` | Micro-profile for constrained tools |
 | `BUAP_LITE.md` | Tiny prompt for low-context AI/search tools |
@@ -113,6 +114,9 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 - **ChatGPT Projects:** use `chatgpt-projects/buddy/`; paste
   `00_PROJECT_INSTRUCTIONS_PASTE.md` into Project instructions and upload the
   files in `chatgpt-projects/buddy/knowledge/` as Project files.
+- **Grok / xAI:** paste `GROK_BUAP.md` into Grok custom instructions or start a
+  chat with `Operate under GROK_BUAP`; use `BUAP_STANDARD.md` or
+  `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` when broader portable chat behavior fits better.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use
