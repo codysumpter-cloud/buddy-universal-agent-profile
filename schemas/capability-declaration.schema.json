@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/schemas/capability-declaration.schema.json",
+  "title": "BUAP Capability Declaration",
+  "type": "object",
+  "required": ["capability", "status", "scope", "evidence"],
+  "properties": {
+    "capability": {
+      "type": "string",
+      "description": "Capability being declared, such as repo_read, repo_write, shell, web, memory, artifact, worker_runtime, external_side_effect."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["available", "partial", "unavailable", "unknown"]
+    },
+    "scope": {
+      "type": "string",
+      "description": "Repository, path, tool, runtime, or task scope where this capability applies."
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Observed tool, source, permission, command output, or user-provided proof supporting this declaration."
+    },
+    "limits": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional timestamp after which this declaration should be rechecked."
+    }
+  },
+  "additionalProperties": false
+}

@@ -19,6 +19,7 @@ by forcing explicit scope, source limits, receipts, and handoff-quality answers.
 
 | Tier | File | Use |
 |------|------|-----|
+| Kernel | `BUAP_KERNEL.md` | Micro-profile for constrained tools and stripped contexts |
 | Lite | `BUAP_LITE.md` | Tiny search boxes, quick mobile AI, short context windows |
 | Standard | `BUAP_STANDARD.md` | Normal AI chats, Custom GPTs, project instructions |
 | Full | `BUAP_FULL.md` | Repo-aware coding agents, project workspaces, implementation tasks |
@@ -48,17 +49,20 @@ BUAP links to, but does not vendor or replace, the owning runtime repos:
 | Local device voice / vision / transport runtime | `codysumpter-cloud/omni-buddy` |
 | Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
 
-Read `linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,
-and `integrations/prismtek-ecosystem-map.md` for machine-readable repo links and routing rules.
+Read `integrations/ecosystem-routing-spec.md` first for canonical routing. Use
+`linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,
+and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable links and detail.
 
-## New resilience standards
+## Resilience and negotiation standards
 
 | Standard | Purpose |
 |---|---|
 | `standards/runtime-contract.md` | Defines how Buddy adapts to chat, search, repo-aware, local, and multi-agent runtimes |
+| `standards/capability-negotiation.md` | Declares available capabilities and selects execute/inspect/draft/handoff/blocked mode |
 | `standards/failure-modes.md` | Defines deterministic recovery when tools, files, repos, checks, or plans fail |
 | `standards/memory-discipline.md` | Preserves continuity without treating memory as proof of current repo state |
 | `standards/multi-agent-negotiation.md` | Defines worker/council conflict resolution and iterative re-brief behavior |
+| `standards/multi-agent-arbitration.md` | Resolves worker/source/path disagreement with evidence-backed decisions |
 | `standards/universal-agent-fingerprint.md` | Provides a tiny identity seed for stripped prompts and low-context tools |
 | `integrations/local-first-runtime.md` | Defines offline, partially connected, and fully connected Buddy behavior |
 
@@ -71,17 +75,20 @@ and `integrations/prismtek-ecosystem-map.md` for machine-readable repo links and
 | `CODEX.md` | Codex-specific install notes and quirks |
 | `GEMINI.md` | Entry point for Gemini CLI |
 | `SYSTEM_PROMPT.md` | Copy-paste system prompt for any other agent |
+| `BUAP_KERNEL.md` | Micro-profile for constrained tools |
 | `BUAP_LITE.md` | Tiny prompt for low-context AI/search tools |
 | `BUAP_STANDARD.md` | Standard portable prompt for normal AI chats |
 | `BUAP_FULL.md` | Full repo-aware operating profile |
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
-| `integrations/` | Runtime integration docs for Knowledge Vault, Buddy Brain, Buddy Agent, Omni Buddy, local-first behavior, and ecosystem routing |
+| `integrations/` | Runtime integration docs and canonical ecosystem routing |
 | `audits/` | Source-backed BUAP and runtime integration audit reports |
-| `standards/` | Orchestration, runtime contracts, repo discovery, capability detection, memory, failure modes, safety, validation, response format |
-| `schemas/` | Machine-readable schemas, including receipts |
+| `standards/` | Orchestration, runtime contracts, capability negotiation, memory, failure modes, validation, response format |
+| `schemas/` | Machine-readable schemas, including receipts and capability declarations |
 | `tests/conformance/` | Prompt/rubric suite for checking BUAP compatibility |
+| `scripts/` | Local validation and conformance helper scripts |
+| `.github/workflows/` | CI checks for BUAP docs/spec conformance |
 | `runbooks/` | Repeatable procedures for common repo, game, docs, runtime, and agent tasks |
 | `adapters/` | Tool-specific install templates |
 | `chatgpt-projects/buddy/` | ChatGPT Project source pack: pasteable project instructions, uploadable knowledge files, source metadata, and test prompts |
@@ -106,10 +113,8 @@ and `integrations/prismtek-ecosystem-map.md` for machine-readable repo links and
 - **ChatGPT Projects:** use `chatgpt-projects/buddy/`; paste
   `00_PROJECT_INSTRUCTIONS_PASTE.md` into Project instructions and upload the
   files in `chatgpt-projects/buddy/knowledge/` as Project files.
-- **Any AI chat / search box:** use `BUAP_LITE.md` or
-  `universal-ai-chat/SEARCH_BOX_PROMPTS.md` for tiny tools, and
-  `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal
-  chats.
+- **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
+  and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use
   `openai-symphony-agent-pack/SYMPHONY_AGENT_PACK.md` and its manifest. This is a
   BUAP orchestration pack, not a runtime dependency.
@@ -143,8 +148,18 @@ must still help by:
 
 Use `tests/conformance/` to check whether a target AI tool actually follows BUAP.
 Use `schemas/receipt.schema.json` to record evidence for success claims.
-Use `audits/2026-06-15-buap-runtime-integration-audit.md` as the current source-backed
-runtime integration audit.
+Use `schemas/capability-declaration.schema.json` to record capability declarations.
+Use `docs/cross-reference-matrix.md` to confirm standards, prompt tiers, adapters,
+tests, and integrations stay aligned.
+
+Run the local docs/spec check with:
+
+```bash
+node scripts/buap-conformance-check.mjs
+```
+
+The same check runs in `.github/workflows/buap-conformance.yml` for Markdown, JSON,
+and script changes.
 
 ## Versioning
 

@@ -1,54 +1,42 @@
 # BUAP v1.1 Roadmap
 
-BUAP v1.1 should polish the v1.0 spec into a more navigable, testable, and adoption-friendly profile.
+BUAP v1.1 polishes the v1.0 spec into a more navigable, testable, and adoption-friendly profile.
 
-## 1. Cross-reference matrix
+## Implemented in the v1.1 full-upgrades branch
 
-Create and maintain a single map of:
+- Cross-reference matrix expanded for Kernel, capability negotiation, arbitration, schemas, automation, and integrations.
+- Ecosystem routing v2 introduced through `integrations/ecosystem-routing-spec.md`.
+- Capability negotiation protocol added as `standards/capability-negotiation.md`.
+- Capability declaration schema added as `schemas/capability-declaration.schema.json`.
+- BUAP minimal kernel added as `BUAP_KERNEL.md`.
+- Automated repo conformance checker added as `scripts/buap-conformance-check.mjs`.
+- GitHub Actions conformance workflow added as `.github/workflows/buap-conformance.yml`.
+- Multi-agent arbitration protocol added as `standards/multi-agent-arbitration.md`.
+- New conformance cases added for capability negotiation and arbitration.
 
-- standards to prompt tiers;
-- standards to adapters and overlays;
-- standards to conformance tests;
-- standards to integrations and runbooks.
+## Remaining v1.1 polish
 
-## 2. Ecosystem routing v2
+### 1. Adapter parity
 
-Promote `integrations/ecosystem-routing-spec.md` as the canonical routing document. Keep `buddy-ecosystem-runtime-map.md` and `prismtek-ecosystem-map.md` as focused reference docs or forwards.
+Normalize depth across any adapter templates that still rely on references instead of inline guidance.
 
-## 3. Capability negotiation protocol
+### 2. Release tag instructions
 
-Extend capability detection into a declaration/negotiation format that tools can expose or Buddy can infer:
+After the full upgrade PR merges, add tag/release instructions for `v1.0.0` and the first `v1.1.0` release candidate.
 
-- file read/write;
-- repo read/write;
-- command/check execution;
-- web/current facts;
-- persistent memory;
-- external side effects;
-- real or emulated workers.
+### 3. External evaluator harness
 
-## 4. BUAP minimal kernel adoption
+The repo now has a docs/spec checker. A future evaluator harness can run prompt cases against saved model outputs and score them with `tests/conformance/evaluator-rubric.md`.
 
-Use `BUAP_KERNEL.md` as the stable micro-profile for tiny tools, search boxes, mobile assistants, and constrained custom-instruction fields. Keep it aligned with Lite, Standard, and Full.
+### 4. Diagram updates
 
-## 5. Automated conformance runner
+Add or refresh Mermaid diagrams for:
 
-Add a script or workflow that can run conformance prompts against a target tool or saved output. Store scores and receipts in a consistent format.
+- capability negotiation;
+- arbitration flow;
+- conformance check flow;
+- ecosystem routing.
 
-## 6. Multi-agent arbitration protocol
+### 5. Repo integration receipts
 
-Extend `standards/multi-agent-negotiation.md` with formal arbitration examples:
-
-- worker disagreement;
-- source conflict;
-- safety conflict;
-- incomplete validation;
-- user intent versus repo convention.
-
-## 7. Documentation polish
-
-- Add standard-to-test links to each standard.
-- Normalize adapter depth where possible.
-- Reduce duplicated routing language.
-- Give overlays one canonical home and thin references elsewhere.
-- Add v1.0.0 release tag instructions after the release is cut.
+Add example receipts showing BUAP installed into Codex, Claude, ChatGPT Project, Cursor, Windsurf, and Gemini contexts.
