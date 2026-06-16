@@ -27,6 +27,7 @@ This matrix maps the major BUAP surfaces so adopters can find the right file for
 | `adapters/custom-gpt-instructions.template.md` | `BUAP_STANDARD.md` | Lightweight overlay sentence when space allows |
 | `adapters/chatgpt-project-instructions.template.md` | `chatgpt-projects/buddy/00_PROJECT_INSTRUCTIONS_PASTE.md` | Uses project knowledge file for overlays |
 | `adapters/windsurf-rules.template.md` | `AGENTS.md` | Optional overlays after BUAP/repo-local rules |
+| `GROK_BUAP.md` | `BUAP_STANDARD.md` + Grok/xAI identity overlay | Keeps Grok as the named runtime while preserving BUAP roles, claim labels, capability negotiation, and safety rules |
 
 ## Standards to tests
 
@@ -63,6 +64,7 @@ This matrix maps the major BUAP surfaces so adopters can find the right file for
 | Local/offline/partial connectivity | `integrations/local-first-runtime.md` |
 | ChatGPT Project overlays | `chatgpt-projects/buddy/knowledge/EXTERNAL_OVERLAYS.md` |
 | Symphony multi-agent roles | `openai-symphony-agent-pack/SYMPHONY_AGENT_PACK.md` |
+| Grok/xAI copy-paste profile | `GROK_BUAP.md` |
 
 ## Maintenance rule
 
