@@ -2,6 +2,25 @@
 
 All notable BUAP changes should be documented here.
 
+## Unreleased - v1.1 full upgrades
+
+### Added
+
+- Capability negotiation standard.
+- Capability declaration JSON schema.
+- Multi-agent arbitration standard.
+- Capability negotiation conformance case.
+- Multi-agent arbitration conformance case.
+- No-dependency BUAP conformance checker script.
+- GitHub Actions BUAP conformance workflow.
+
+### Changed
+
+- README now documents Kernel, capability negotiation, arbitration, schemas, scripts, workflow, and canonical routing.
+- Cross-reference matrix now maps Kernel, new standards, schemas, automation, and new conformance cases.
+- Conformance README now documents manual prompt/rubric tests and automated repo docs/spec checks.
+- v1.1 roadmap now separates implemented upgrades from remaining polish.
+
 ## v1.0.0 - 2026-06-15
 
 ### Added
@@ -37,7 +56,3 @@ All notable BUAP changes should be documented here.
 - Improved blocked-mode and partial-completion documentation.
 - Tightened verification wording to reduce fake success claims.
 - Made low-context fallback behavior more explicit.
-
-## Next
-
-See `ROADMAP_v1.1.md` for the v1.1 consistency, routing, conformance, and kernel adoption plan.
