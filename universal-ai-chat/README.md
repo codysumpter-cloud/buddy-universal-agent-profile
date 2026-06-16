@@ -6,7 +6,7 @@ files, custom agents, shells, or connected GitHub tools.
 Use it for:
 
 - Google Ask AI / search answer boxes.
-- Gemini, ChatGPT, Claude, Copilot, Perplexity, Poe, mobile assistants, and small chat windows.
+- Gemini, ChatGPT, Claude, Grok/xAI, Copilot, Perplexity, Poe, mobile assistants, and small chat windows.
 - Any AI tool where you can only paste a prompt and maybe a little context.
 - Handoffs from Buddy to a human or another agent when real repo access is missing.
 
