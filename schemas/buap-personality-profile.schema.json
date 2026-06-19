@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/schemas/buap-personality-profile.schema.json",
+  "title": "BUAP Personality Profile Pack",
+  "description": "Reusable personality templates that can be assigned to Buddy or Lil Buddy slots.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_pack_id", "name", "version", "profiles"],
+  "properties": {
+    "profile_pack_id": {"type": "string", "maxLength": 120},
+    "name": {"type": "string", "maxLength": 160},
+    "version": {"type": "string", "maxLength": 40},
+    "source": {"type": "string", "maxLength": 240},
+    "description": {"type": "string", "maxLength": 500},
+    "stats_scale": {"type": "string", "maxLength": 40},
+    "stats": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "templates_can_apply_to": {
+      "type": "array",
+      "items": {"enum": ["buddy", "lil_buddy"]}
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "display_name", "role", "personality", "best_for", "stats", "moves", "passive", "default_slot_recommendation"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "display_name": {"type": "string", "maxLength": 80},
+          "role": {"type": "string", "maxLength": 120},
+          "personality": {"type": "string", "maxLength": 500},
+          "best_for": {"type": "array", "items": {"type": "string", "maxLength": 100}},
+          "stats": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["focus", "creativity", "memory", "speed", "logic", "empathy", "discipline", "charm"],
+            "properties": {
+              "focus": {"type": "integer", "minimum": 1, "maximum": 10},
+              "creativity": {"type": "integer", "minimum": 1, "maximum": 10},
+              "memory": {"type": "integer", "minimum": 1, "maximum": 10},
+              "speed": {"type": "integer", "minimum": 1, "maximum": 10},
+              "logic": {"type": "integer", "minimum": 1, "maximum": 10},
+              "empathy": {"type": "integer", "minimum": 1, "maximum": 10},
+              "discipline": {"type": "integer", "minimum": 1, "maximum": 10},
+              "charm": {"type": "integer", "minimum": 1, "maximum": 10}
+            }
+          },
+          "moves": {"type": "array", "minItems": 1, "items": {"type": "string", "maxLength": 100}},
+          "passive": {"type": "string", "maxLength": 100},
+          "default_slot_recommendation": {"enum": ["buddy", "lil_buddy", "buddy_or_lil_buddy"]}
+        }
+      }
+    },
+    "help_me_choose": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["intent", "profile_id"],
+        "properties": {
+          "intent": {"type": "string", "maxLength": 160},
+          "profile_id": {"type": "string", "pattern": "^[a-z0-9-]+$"}
+        }
+      }
+    }
+  }
+}
