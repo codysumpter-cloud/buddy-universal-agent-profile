@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/schemas/buap-personalization.schema.json",
+  "title": "BUAP Personalization Profile",
+  "description": "Portable personalization profile for BUAP agents, Siri adapters, app intents, and chat surfaces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "user_display_name",
+    "buddy_display_name",
+    "first_run_personalization_complete"
+  ],
+  "properties": {
+    "user_display_name": {
+      "type": "string",
+      "description": "Name or handle the assistant should use for the user.",
+      "maxLength": 80
+    },
+    "buddy_display_name": {
+      "type": "string",
+      "description": "User-selected visible name for the Buddy persona.",
+      "maxLength": 80
+    },
+    "buddy_voice_style": {
+      "type": "string",
+      "description": "Short label for the preferred visible tone/style.",
+      "default": "friendly-practical",
+      "maxLength": 80
+    },
+    "buddy_personality_notes": {
+      "type": "array",
+      "description": "Non-sensitive user-approved style notes for the Buddy persona.",
+      "items": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "default": []
+    },
+    "preferred_response_depth": {
+      "type": "string",
+      "enum": ["brief", "adaptive", "thorough"],
+      "default": "adaptive"
+    },
+    "preferred_followup_style": {
+      "type": "string",
+      "enum": ["none", "one_useful_next_step", "ask_when_blocked"],
+      "default": "one_useful_next_step"
+    },
+    "first_run_personalization_complete": {
+      "type": "boolean",
+      "description": "True only when both user_display_name and buddy_display_name are known."
+    },
+    "memory_scope": {
+      "type": "string",
+      "enum": ["device", "account", "session", "none"],
+      "default": "session"
+    },
+    "memory_policy_confirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "last_confirmed_at": {
+      "type": "string",
+      "description": "Date the personalization values were last confirmed, formatted YYYY-MM-DD.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  }
+}
