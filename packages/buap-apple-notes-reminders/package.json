@@ -1,0 +1,34 @@
+{
+  "name": "@prismtek/buap-apple-notes-reminders",
+  "version": "0.1.0",
+  "private": true,
+  "description": "macOS-only Apple Notes and Reminders helper for BUAP agents, driven through osascript/AppleScript.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "smoke": "npm run build && node scripts/smoke.mjs",
+    "prepare": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "os": [
+    "darwin"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

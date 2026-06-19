@@ -123,3 +123,12 @@ and apply the diff manually in the editor.
 If `/buap run` reports that terminal is unavailable, the ACP client did not
 advertise `clientCapabilities.terminal === true`. Run the command manually in a
 terminal for now.
+
+## Apple Notes & Reminders (macOS only)
+
+`/buap notes`, `/buap add-note`, `/buap reminders`, and `/buap add-reminder` work
+only on macOS — they drive Apple Notes/Reminders through `osascript`. On non-macOS
+hosts they return a clear "macOS-only" message. The first call triggers a macOS
+Automation permission prompt for the host app (Terminal/Xcode/ACP client); grant it
+under System Settings → Privacy & Security → Automation. The create commands ask for
+ACP permission before writing. Details: `docs/apple-notes-reminders.md`.

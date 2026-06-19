@@ -73,6 +73,10 @@ KnowledgeVault search:
   - `/buap git status`
   - `/buap git diff path=README.md`
   - `/buap search-vault query="meeting"`
+  - `/buap notes [limit=20]` (macOS only) — list Apple Notes
+  - `/buap add-note title="Idea" body="details"` (macOS only, permission-gated) — create an Apple Note
+  - `/buap reminders` (macOS only) — list pending Apple Reminders
+  - `/buap add-reminder title="Call Cody" dueDate="2026-07-01"` (macOS only, permission-gated) — create an Apple Reminder
   - `/buap mcp`
   - `/buap mcp invoke server="..." tool="..." payload="..."` (blocked planning response)
 
@@ -177,5 +181,7 @@ Use `/buap profiles` to list available BMO council profiles.
 - `/buap apply` calls `session/request_permission` and writes only via `fs/write_text_file` after the user allows.
 - `/buap run` calls `session/request_permission` and uses `command` + `args[]` through ACP `terminal/create` (no shell string interpolation).
 - `/buap search-vault` is read-only and searches local KnowledgeVault titles/excerpts.
+- `/buap notes` and `/buap reminders` are **macOS only** (driven by `osascript`) and read-only.
+- `/buap add-note` and `/buap add-reminder` are **macOS only** and call `session/request_permission` before creating anything; without an ACP permission channel they refuse. See `../../docs/apple-notes-reminders.md`.
 - Git helpers are read-only `status` and `diff` commands.
 - MCP server configs passed by the ACP client are reported; `/buap mcp invoke` returns a blocked planning response until ACP/MCP capability and permission handling is implemented.

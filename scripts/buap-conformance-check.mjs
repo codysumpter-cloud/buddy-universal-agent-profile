@@ -38,7 +38,11 @@ const requiredFiles = [
   'scripts/build-vault-index.mjs',
   'plugins/buap/.codex-plugin/plugin.json',
   'plugins/buap/hooks.json',
-  'tests/plugin-codex.acceptance.md'
+  'tests/plugin-codex.acceptance.md',
+  'packages/buap-apple-notes-reminders/package.json',
+  'packages/buap-apple-notes-reminders/src/index.ts',
+  'packages/buap-apple-notes-reminders/scripts/smoke.mjs',
+  'docs/apple-notes-reminders.md'
 ];
 
 const requiredText = [
@@ -52,7 +56,10 @@ const requiredText = [
   ['docs/cross-reference-matrix.md', 'standards/capability-negotiation.md'],
   ['docs/cross-reference-matrix.md', 'tests/conformance/capability-negotiation.expected.md'],
   ['integrations/ecosystem-routing-spec.md', 'canonical routing spec'],
-  ['tests/conformance/README.md', 'conformance']
+  ['tests/conformance/README.md', 'conformance'],
+  ['packages/buap-acp-agent/src/runtime.ts', 'buap add-note'],
+  ['packages/buap-acp-agent/src/runtime.ts', 'buap add-reminder'],
+  ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders']
 ];
 
 const failures = [];

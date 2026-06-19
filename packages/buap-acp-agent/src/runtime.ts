@@ -9,6 +9,13 @@ import {
   type VaultIndex,
   type VaultHit
 } from "@prismtek/buap-knowledge-vault";
+import {
+  listNotes,
+  createNote,
+  listReminders,
+  createReminder,
+  isSupported as appleIsSupported
+} from "@prismtek/buap-apple-notes-reminders";
 
 const execFileAsync = promisify(execFile);
 
@@ -100,6 +107,10 @@ const RUNTIME_COMMANDS = [
   { name: "buap git status", description: "Show read-only Git status." },
   { name: "buap git diff", description: "Show read-only Git diff.", input: { hint: "[path=README.md]" } },
   { name: "buap search-vault", description: "Search the local KnowledgeVault notes.", input: { hint: 'query="meeting"' } },
+  { name: "buap notes", description: "List Apple Notes (macOS only).", input: { hint: "[limit=20]" } },
+  { name: "buap add-note", description: "Create an Apple Note after permission (macOS only).", input: { hint: 'title="Idea" body="details"' } },
+  { name: "buap reminders", description: "List pending Apple Reminders (macOS only)." },
+  { name: "buap add-reminder", description: "Create an Apple Reminder after permission (macOS only).", input: { hint: 'title="Call Cody" dueDate="2026-07-01"' } },
   { name: "buap mcp", description: "Show MCP server config passed by the ACP client." },
   { name: "buap mcp invoke", description: "Prepare an MCP invocation plan (currently blocked).", input: { hint: 'server="github" tool="search" payload="{}"' } }
 ];
@@ -128,7 +139,7 @@ function assertSafeRelativePath(workspace: string, requested: string): string {
 
 function parseKeyValues(input: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
+  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query|title|body|dueDate|limit)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(input))) result[match[1]] = match[3] ?? match[4] ?? match[5] ?? "";
   return result;
@@ -413,6 +424,131 @@ async function searchKnowledgeVault(args: RuntimeArgs): Promise<string> {
   ].join("\n");
 }
 
+function appleSnippet(value: string): string {
+  const collapsed = value.replace(/\s+/g, " ").trim();
+  if (!collapsed) return "(empty)";
+  return collapsed.length > 120 ? `${collapsed.slice(0, 117)}...` : collapsed;
+}
+
+function appleUnsupportedResponse(action: string): string {
+  return [
+    `Buddy could not ${action}: the Apple Notes/Reminders integration is macOS-only and this host is not macOS.`,
+    "",
+    "Run the ACP agent on macOS with Automation permission for Notes and Reminders."
+  ].join("\n");
+}
+
+function appleErrorResponse(action: string, error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return [`Buddy could not ${action}.`, "", "```text", message, "```"].join("\n");
+}
+
+async function listNotesCommand(args: RuntimeArgs): Promise<string> {
+  if (!appleIsSupported()) return appleUnsupportedResponse("list Apple Notes");
+  const values = parseKeyValues(args.text);
+  const limit = Math.max(1, Number(values.limit || 20));
+  try {
+    const notes = await listNotes(limit);
+    if (notes.length === 0) return "No Apple Notes found within the requested limit.";
+    return [
+      `Lil Buddy listed ${notes.length} Apple Note(s) (limit ${limit}).`,
+      "",
+      notes.map((note) => `- **${note.title || "(untitled)"}** — ${appleSnippet(note.body)}`).join("\n")
+    ].join("\n");
+  } catch (error) {
+    return appleErrorResponse("list Apple Notes", error);
+  }
+}
+
+async function listRemindersCommand(args: RuntimeArgs): Promise<string> {
+  if (!appleIsSupported()) return appleUnsupportedResponse("list Apple Reminders");
+  try {
+    const reminders = await listReminders();
+    if (reminders.length === 0) return "No pending Apple Reminders.";
+    return [
+      `Lil Buddy listed ${reminders.length} pending Apple Reminder(s).`,
+      "",
+      reminders
+        .map((reminder) => `- **${reminder.title || "(untitled)"}**${reminder.dueDate ? ` — due ${reminder.dueDate}` : ""}`)
+        .join("\n")
+    ].join("\n");
+  } catch (error) {
+    return appleErrorResponse("list Apple Reminders", error);
+  }
+}
+
+async function addNoteCommand(args: RuntimeArgs): Promise<string> {
+  if (!appleIsSupported()) return appleUnsupportedResponse("create an Apple Note");
+  const values = parseKeyValues(args.text);
+  const title = values.title?.trim();
+  const body = values.body ?? "";
+  if (!title) {
+    return ["Add-note needs `title=`.", "", "```text", '/buap add-note title="Idea" body="details"', "```"].join("\n");
+  }
+  if (!args.session || !args.client) {
+    return "Creating an Apple Note is blocked because this ACP client bridge is unavailable, so Buddy cannot request permission. Run inside an ACP client.";
+  }
+  const toolCallId = randomId("note");
+  const allowed = await requestToolPermission(args, toolCallId, `Create Apple Note: ${title}`, "execute", { app: "Notes", title, body });
+  if (!allowed) return `Create note blocked: permission was not granted for "${title}".`;
+  try {
+    await createNote(title, body);
+    sendToolCallUpdate(args, toolCallId, { status: "completed", rawOutput: { app: "Notes", title } });
+    return `Created Apple Note "${title}" after permission.`;
+  } catch (error) {
+    sendToolCallUpdate(args, toolCallId, {
+      status: "failed",
+      content: [{ type: "content", content: { type: "text", text: `Apple Note creation failed for "${title}".` } }],
+      rawOutput: { error: error instanceof Error ? error.message : String(error) }
+    });
+    return appleErrorResponse("create the Apple Note", error);
+  }
+}
+
+function parseDueDate(raw: string | undefined): { ok: true; value?: Date } | { ok: false } {
+  if (!raw || !raw.trim()) return { ok: true, value: undefined };
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw.trim());
+  if (!match) return { ok: false };
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 9, 0, 0, 0);
+  if (Number.isNaN(date.getTime())) return { ok: false };
+  return { ok: true, value: date };
+}
+
+async function addReminderCommand(args: RuntimeArgs): Promise<string> {
+  if (!appleIsSupported()) return appleUnsupportedResponse("create an Apple Reminder");
+  const values = parseKeyValues(args.text);
+  const title = values.title?.trim();
+  if (!title) {
+    return ["Add-reminder needs `title=`.", "", "```text", '/buap add-reminder title="Call Cody" dueDate="2026-07-01"', "```"].join("\n");
+  }
+  const due = parseDueDate(values.dueDate);
+  if (!due.ok) {
+    return ['`dueDate` must be `YYYY-MM-DD` (e.g. dueDate="2026-07-01"). No reminder was created.'].join("\n");
+  }
+  if (!args.session || !args.client) {
+    return "Creating an Apple Reminder is blocked because this ACP client bridge is unavailable, so Buddy cannot request permission. Run inside an ACP client.";
+  }
+  const toolCallId = randomId("reminder");
+  const allowed = await requestToolPermission(args, toolCallId, `Create Apple Reminder: ${title}`, "execute", {
+    app: "Reminders",
+    title,
+    dueDate: due.value ? due.value.toISOString() : null
+  });
+  if (!allowed) return `Create reminder blocked: permission was not granted for "${title}".`;
+  try {
+    await createReminder(title, due.value);
+    sendToolCallUpdate(args, toolCallId, { status: "completed", rawOutput: { app: "Reminders", title, dueDate: due.value?.toISOString() ?? null } });
+    return `Created Apple Reminder "${title}"${due.value ? ` due ${values.dueDate}` : ""} after permission.`;
+  } catch (error) {
+    sendToolCallUpdate(args, toolCallId, {
+      status: "failed",
+      content: [{ type: "content", content: { type: "text", text: `Apple Reminder creation failed for "${title}".` } }],
+      rawOutput: { error: error instanceof Error ? error.message : String(error) }
+    });
+    return appleErrorResponse("create the Apple Reminder", error);
+  }
+}
+
 async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
   if (!args.session || !args.client) return "Run is blocked because this ACP client bridge is unavailable.";
   if (!terminalSupported(args.client)) return "Run is blocked because the ACP client did not advertise terminal support.";
@@ -504,6 +640,10 @@ function renderHelp(): string {
     "- `/buap git status` — read-only git status",
     "- `/buap git diff [path=README.md]` — read-only git diff",
     "- `/buap search-vault query=\"meeting\"` — search local KnowledgeVault note titles and excerpts",
+    "- `/buap notes [limit=20]` — list Apple Notes (macOS only)",
+    "- `/buap add-note title=\"Idea\" body=\"details\"` — request permission and create an Apple Note (macOS only)",
+    "- `/buap reminders` — list pending Apple Reminders (macOS only)",
+    "- `/buap add-reminder title=\"Call Cody\" dueDate=\"2026-07-01\"` — request permission and create an Apple Reminder (macOS only)",
     "- `/buap mcp` — show MCP server config passed by the ACP client",
     "- `/buap mcp invoke server=\"...\" tool=\"...\" payload=\"{}\"` — currently reports a blocked MCP invocation plan",
     "",
@@ -521,6 +661,10 @@ export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeRe
   if (lower.includes("/buap ask")) return { handled: true, response: await modelAnswer(args) };
   if (lower.includes("/buap git status") || lower.includes("/buap git diff")) return { handled: true, response: await gitReadOnly(args) };
   if (lower.includes("/buap search-vault")) return { handled: true, response: await searchKnowledgeVault(args) };
+  if (lower.includes("/buap add-note")) return { handled: true, response: await addNoteCommand(args) };
+  if (lower.includes("/buap notes")) return { handled: true, response: await listNotesCommand(args) };
+  if (lower.includes("/buap add-reminder")) return { handled: true, response: await addReminderCommand(args) };
+  if (lower.includes("/buap reminders")) return { handled: true, response: await listRemindersCommand(args) };
   if (lower.includes("/buap mcp")) return { handled: true, response: renderMcpStatus(args) };
   return { handled: false, response: "" };
 }

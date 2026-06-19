@@ -88,6 +88,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `.claude-plugin/marketplace.json` | Plugin marketplace manifest so BUAP installs via `/plugin install buap@buap` |
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
 | `packages/buap-knowledge-vault/` | Local KnowledgeVault Markdown index/search helper |
+| `packages/buap-apple-notes-reminders/` | macOS-only Apple Notes/Reminders helper (osascript) used by the ACP agent |
 | `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
 | `integrations/` | Runtime integration docs and canonical ecosystem routing |
