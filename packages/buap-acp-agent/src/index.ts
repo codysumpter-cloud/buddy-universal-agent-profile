@@ -4,11 +4,19 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import {
+  handleRuntimeCommand,
+  type LoadedBuap,
+  type PersonalizationState,
+  type Profile,
+  type ProfilePack,
+  type SessionState
+} from "./runtime.js";
 
 const PROTOCOL_VERSION = 1;
 const AGENT_NAME = "buap-acp-agent";
 const AGENT_TITLE = "Buddy Universal Agent Profile";
-const AGENT_VERSION = "0.1.0";
+const AGENT_VERSION = "0.2.0";
 
 const REQUIRED_BUAP_FILES = [
   "XCODE_ACP_BUAP.md",
@@ -26,42 +34,6 @@ type JsonRpcMessage = {
   id?: RequestId;
   method?: string;
   params?: Record<string, unknown>;
-};
-
-type PersonalizationState = {
-  user_display_name?: string;
-  buddy_display_name?: string;
-  lil_buddy_display_name?: string;
-  buddy_profile_id: string;
-  lil_buddy_profile_id: string;
-  selected_profile_pack_id: string;
-  updated_at?: string;
-};
-
-type SessionState = {
-  sessionId: string;
-  cwd?: string;
-  mcpServers: unknown[];
-  createdAt: string;
-};
-
-type Profile = {
-  id: string;
-  display_name?: string;
-  role?: string;
-  best_for?: string[];
-  default_slot_recommendation?: string;
-};
-
-type ProfilePack = {
-  profile_pack_id?: string;
-  profiles?: Profile[];
-};
-
-type LoadedBuap = {
-  repoRoot: string;
-  files: Record<string, string>;
-  profilePack: ProfilePack;
 };
 
 const sessions = new Map<string, SessionState>();
@@ -101,8 +73,8 @@ async function loadBuap(): Promise<LoadedBuap> {
 
 function defaultPersonalization(profilePack: ProfilePack): PersonalizationState {
   return {
-    buddy_profile_id: "bmo",
-    lil_buddy_profile_id: "finn",
+    buddy_profile_id: process.env.BUAP_DEFAULT_BUDDY_PROFILE || "bmo",
+    lil_buddy_profile_id: process.env.BUAP_DEFAULT_LIL_BUDDY_PROFILE || "finn",
     selected_profile_pack_id: profilePack.profile_pack_id ?? "bmo-council-v1"
   };
 }
@@ -121,7 +93,7 @@ async function loadPersonalization(profilePack: ProfilePack): Promise<Personaliz
   try {
     const raw = await fs.readFile(configuredPath, "utf8");
     return { ...fallback, ...(JSON.parse(raw) as Partial<PersonalizationState>) };
-  } catch (error) {
+  } catch {
     return fallback;
   }
 }
@@ -251,6 +223,16 @@ function renderOnline(state: PersonalizationState, profilePack: ProfilePack): st
     `Main Buddy: ${state.buddy_display_name ?? "Buddy"} (${buddyProfile})`,
     `Lil Buddy: ${state.lil_buddy_display_name ?? "Lil Buddy"} (${lilBuddyProfile})`,
     "",
+    "Try these commands:",
+    "",
+    "- `/buap help`",
+    "- `/buap read path=README.md`",
+    "- `/buap patch path=README.md find=\"old\" replace=\"new\"`",
+    "- `/buap ask prompt=\"summarize this repo\"`",
+    "- `/buap git status`",
+    "- `/buap git diff path=README.md`",
+    "- `/buap mcp`",
+    "",
     "Lil Buddy report:",
     "",
     "```json",
@@ -261,14 +243,17 @@ function renderOnline(state: PersonalizationState, profilePack: ProfilePack): st
         actions_taken: [
           "loaded BUAP prompt files",
           "loaded BMO council profile pack",
-          "negotiated ACP session lifecycle"
+          "negotiated ACP session lifecycle",
+          "enabled guarded runtime commands"
         ],
         evidence: REQUIRED_BUAP_FILES,
         risks_or_permissions: [
-          "This first package does not bypass editor file, terminal, MCP, source-control, or permission boundaries.",
-          "Tool execution should be added only through ACP client capabilities."
+          "File reads are workspace-confined.",
+          "Patch command proposes diffs only; it does not write to disk.",
+          "Git commands are read-only status/diff helpers.",
+          "MCP execution is reported but not invoked until explicit capability handling is added."
         ],
-        next_recommended_command: "Wire an LLM/tool backend behind Buddy and route file operations through ACP client capabilities."
+        next_recommended_command: "/buap help"
       },
       null,
       2
@@ -280,7 +265,9 @@ function renderOnline(state: PersonalizationState, profilePack: ProfilePack): st
 async function renderPromptResponse(
   text: string,
   state: PersonalizationState,
-  profilePack: ProfilePack
+  profilePack: ProfilePack,
+  buap: LoadedBuap,
+  session?: SessionState
 ): Promise<{ response: string; state: PersonalizationState }> {
   const commandState = applyPersonalizationCommand(text, state, profilePack);
   if (commandState) {
@@ -299,8 +286,13 @@ async function renderPromptResponse(
     return { state, response: renderProfileList(profilePack) };
   }
 
-  if (!hasFirstRunNames(state)) {
+  if (!hasFirstRunNames(state) && !text.trim().toLowerCase().includes("/buap help")) {
     return { state, response: renderFirstRun(profilePack) };
+  }
+
+  const runtime = await handleRuntimeCommand({ text, state, profilePack, buap, session });
+  if (runtime.handled) {
+    return { state, response: runtime.response };
   }
 
   return { state, response: renderOnline(state, profilePack) };
@@ -358,8 +350,17 @@ async function handleMessage(
           _meta: {
             buap: {
               profile: "XCODE_ACP_BUAP.md",
-              defaultBuddyProfile: "bmo",
-              defaultLilBuddyProfile: "finn"
+              defaultBuddyProfile: process.env.BUAP_DEFAULT_BUDDY_PROFILE || "bmo",
+              defaultLilBuddyProfile: process.env.BUAP_DEFAULT_LIL_BUDDY_PROFILE || "finn",
+              runtimeCommands: [
+                "/buap help",
+                "/buap read",
+                "/buap patch",
+                "/buap ask",
+                "/buap git status",
+                "/buap git diff",
+                "/buap mcp"
+              ]
             }
           }
         },
@@ -399,7 +400,8 @@ async function handleMessage(
 
     case "session/prompt": {
       const sessionId = String(message.params?.sessionId ?? "");
-      if (!sessions.has(sessionId)) {
+      const session = sessions.get(sessionId);
+      if (!session) {
         sendError(message.id, -32001, `Unknown ACP session: ${sessionId}`);
         return;
       }
@@ -421,6 +423,11 @@ async function handleMessage(
             status: hasFirstRunNames(personalization.value) ? "completed" : "pending"
           },
           {
+            content: "Route workspace actions through guarded BUAP runtime commands",
+            priority: "high",
+            status: "completed"
+          },
+          {
             content: "Stay inside ACP client capabilities for file, terminal, MCP, and source-control operations",
             priority: "high",
             status: "completed"
@@ -428,7 +435,13 @@ async function handleMessage(
         ]
       });
 
-      const rendered = await renderPromptResponse(promptText, personalization.value, buap.profilePack);
+      const rendered = await renderPromptResponse(
+        promptText,
+        personalization.value,
+        buap.profilePack,
+        buap,
+        session
+      );
       personalization.value = rendered.state;
 
       sendSessionUpdate(sessionId, {
@@ -450,7 +463,13 @@ async function handleMessage(
         loadedFiles: Object.keys(buap.files),
         profilePack: buap.profilePack.profile_pack_id,
         personalization: personalization.value,
-        clientCapabilities
+        clientCapabilities,
+        sessions: [...sessions.values()].map((session) => ({
+          sessionId: session.sessionId,
+          cwd: session.cwd,
+          mcpServerCount: session.mcpServers.length,
+          createdAt: session.createdAt
+        }))
       });
       return;
     }
@@ -474,7 +493,7 @@ async function main(): Promise<void> {
     let message: JsonRpcMessage;
     try {
       message = JSON.parse(trimmed) as JsonRpcMessage;
-    } catch (error) {
+    } catch {
       sendError(null, -32700, "Parse error: ACP stdio messages must be newline-delimited JSON-RPC");
       return;
     }
