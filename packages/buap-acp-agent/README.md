@@ -30,6 +30,22 @@ This package now includes the first guarded Buddy runtime layer: ACP session lif
   - `/buap git diff path=README.md`
   - `/buap mcp`
 
+## Prepared next upgrade
+
+The next ACP actions upgrade is specified in:
+
+```text
+packages/buap-acp-agent/docs/permissioned-actions-upgrade.md
+packages/buap-acp-agent/tests/permissioned-actions.acceptance.md
+```
+
+It defines the next implementation pass for:
+
+- `/buap apply` using ACP permission + client file API
+- `/buap run` using ACP permission + client process API
+- command discovery after `session/new`
+- MCP action requests remaining blocked until policy is wired
+
 ## Local setup
 
 From this package folder:
@@ -102,8 +118,4 @@ Use `/buap profiles` to list available BMO council profiles.
 - Patch command generates a diff proposal only; it does not write to disk.
 - Git helpers are read-only `status` and `diff` commands.
 - MCP server configs passed by the ACP client are reported, not executed.
-- Destructive actions remain blocked until explicit ACP/editor permission handling is implemented.
-
-## Next implementation step
-
-Add ACP-native permission requests and editor-mediated apply/write flows so Buddy can ask Xcode before applying patches, running tests, invoking MCP tools, or making source-control changes.
+- File-change and process-backed actions are prepared as the next explicit implementation pass.
