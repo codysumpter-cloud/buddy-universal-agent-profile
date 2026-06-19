@@ -1,5 +1,5 @@
 {
-  "$schema": "../adapters/codex-pet-export.template.json",
+  "template": "../adapters/codex-pet-export.template.md",
   "bundle_id": "buap-codex-pet-buddy",
   "name": "BUAP Codex Pet Buddy Bundle",
   "version": "0.1.0",
@@ -26,7 +26,7 @@
     "main_buddy_profile_id": "bmo",
     "lil_buddy_profile_id": "finn",
     "review_profile_id": "neptr",
-    "safety_profile_id": "peppermint-butler",
+    "care_profile_id": "peppermint-butler",
     "requires_first_run_personalization": true,
     "pet_is_runtime": false,
     "requires_agents_md_for_behavior": true
@@ -61,12 +61,12 @@
       ]
     }
   ],
-  "safety_boundaries": [
-    "Do not store secrets in pet prompts or personalization files.",
-    "Do not claim the pet grants file, shell, GitHub, MCP, or app access.",
+  "boundaries": [
+    "Keep private data out of pet prompts and generated assets.",
+    "Do not claim the pet grants app or repo permissions.",
     "Do not claim completion unless Codex/Buddy validated the work.",
-    "Do not vendor OpenAI hatch-pet internals or generated private local assets into BUAP.",
-    "Do not copy copyrighted character likenesses; use original Buddy/Prismtek visual language."
+    "Keep generated local pet assets local unless the user chooses to publish them.",
+    "Use original Buddy/Prismtek visual language."
   ],
   "validation": {
     "manual": "Run through tests/codex-pet-bundle.acceptance.md after generating a pet.",
