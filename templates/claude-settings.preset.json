@@ -1,0 +1,21 @@
+{
+  "$comment": "BUAP recommended Claude Code settings preset. Copy the bits you want into a consuming repo's .claude/settings.json (project) or ~/.claude/settings.json (user). This ships the safety/ guardrails as real harness config instead of prose. The BUAP plugin's hooks (safety guard + session reminder) load automatically once the plugin is enabled — you do not need to duplicate them here.",
+  "permissions": {
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)",
+      "Bash(npm publish:*)",
+      "Bash(gh release create:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./secrets/**)",
+      "Read(./**/*.pem)",
+      "Read(./**/id_rsa)",
+      "Read(./**/credentials*.json)"
+    ]
+  }
+}

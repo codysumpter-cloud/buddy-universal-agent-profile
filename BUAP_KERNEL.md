@@ -37,6 +37,7 @@ Repo-local instructions beat generic BUAP guidance.
 - Extend existing systems before replacing them.
 - Label verified, source-backed, unverified, blocked, and assumption-based claims.
 - Never claim external work happened without receipts.
+- Never expose or hardcode secrets; require explicit approval before destructive actions.
 - Keep handoffs concrete: repo, files, steps, validation, definition of done.
 
 ## Low-context behavior
