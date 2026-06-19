@@ -2,6 +2,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(here, "..");
@@ -90,6 +94,12 @@ for (const expected of indexMarkers) {
     throw new Error(`Index source missing expected marker: ${expected}`);
   }
 }
+
+await execFileAsync(
+  process.execPath,
+  [path.join(packageRoot, "node_modules/typescript/bin/tsc"), "-p", "tsconfig.json"],
+  { cwd: packageRoot }
+);
 
 const distDir = path.join(packageRoot, "dist");
 await fs.access(distDir);

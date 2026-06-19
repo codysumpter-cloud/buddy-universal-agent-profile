@@ -1,8 +1,12 @@
 # BUAP ACP Permissioned Actions Upgrade
 
-This document prepares the next BUAP ACP agent upgrade after the guarded runtime command layer.
+This document describes the ACP permissioned-actions upgrade implemented on top of
+the guarded runtime command layer.
 
-The current package can read workspace files, propose patches, route model prompts, inspect read-only Git status/diff, and report MCP session context. The next implementation should add ACP-native permission-gated actions for editor-mediated file writes and terminal-backed checks.
+The package can read workspace files, propose patches, route model prompts, inspect
+read-only Git status/diff, report MCP session context, ask for ACP permissions,
+write through the client filesystem, run checks through the client terminal, and
+advertise supported slash commands.
 
 ## ACP surfaces to use
 
@@ -15,7 +19,7 @@ Use these ACP v1 protocol surfaces, not ad-hoc prompts:
 - `terminal/create`, `terminal/output`, `terminal/wait_for_exit`, and `terminal/release` when `clientCapabilities.terminal === true`.
 - `available_commands_update` after `session/new` so clients can expose slash commands.
 
-## Commands to add
+## Implemented commands
 
 ### `/buap apply`
 
@@ -107,7 +111,7 @@ After every `session/new`, send:
 
 ## Acceptance checks
 
-Add or update package smoke tests so they verify these markers exist:
+The package smoke test verifies these markers exist in source and compiled output:
 
 - `session/request_permission`
 - `fs/write_text_file`
