@@ -19,6 +19,7 @@
     "smoke:launch": "npm run build && node scripts/local-smoke-check.mjs"
   },
   "dependencies": {
+    "@prismtek/buap-apple-notes-reminders": "file:../buap-apple-notes-reminders",
     "@prismtek/buap-knowledge-vault": "file:../buap-knowledge-vault"
   },
   "engines": {
