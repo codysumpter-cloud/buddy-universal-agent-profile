@@ -4,6 +4,26 @@ Local stdio Agent Client Protocol server for loading BUAP into Xcode or any ACP-
 
 This package now implements the next ACP permissioned actions upgrade on top of the guarded Buddy runtime layer: ACP session lifecycle, BUAP loading, Buddy/Lil Buddy personalization, workspace-safe file reads, patch proposals, permission-gated editor-mediated writes, permission-gated terminal runs, read-only Git helpers, MCP context reporting, slash command advertisement after `session/new`, and an optional OpenAI-compatible model backend.
 
+## Start here
+
+For a fresh Mac or first Xcode/ACP setup, use:
+
+```text
+packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md
+```
+
+For environment variables, start from:
+
+```text
+packages/buap-acp-agent/examples/xcode-acp-env.example
+```
+
+For a local launch smoke test after building, run:
+
+```bash
+npm run smoke:launch
+```
+
 ## What it supports
 
 - newline-delimited JSON-RPC over stdio
@@ -65,6 +85,7 @@ From this package folder:
 npm install
 npm run smoke
 npm run build
+npm run smoke:launch
 ```
 
 Run the agent directly:
