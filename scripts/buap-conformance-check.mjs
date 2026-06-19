@@ -31,7 +31,11 @@ const requiredFiles = [
   'integrations/ecosystem-routing-spec.md',
   'tools/buap-doctor.mjs',
   'tools/buap-local-bootstrap.mjs',
-  'docs/local-buap-doctor-and-bootstrap.md'
+  'docs/local-buap-doctor-and-bootstrap.md',
+  'docs/knowledge-vault-search.md',
+  'packages/buap-knowledge-vault/package.json',
+  'packages/buap-knowledge-vault/src/index.ts',
+  'scripts/build-vault-index.mjs'
 ];
 
 const requiredText = [

@@ -38,6 +38,12 @@ Guide:
 ../../docs/local-buap-doctor-and-bootstrap.md
 ```
 
+KnowledgeVault search:
+
+```text
+../../docs/knowledge-vault-search.md
+```
+
 ## What it supports
 
 - newline-delimited JSON-RPC over stdio
@@ -66,6 +72,7 @@ Guide:
   - `/buap run cmd="npm" args="test"` (permission-gated, ACP `terminal/create` + `terminal/wait_for_exit` + `terminal/output` + `terminal/release`)
   - `/buap git status`
   - `/buap git diff path=README.md`
+  - `/buap search-vault query="meeting"`
   - `/buap mcp`
   - `/buap mcp invoke server="..." tool="..." payload="..."` (blocked planning response)
 
@@ -132,10 +139,12 @@ BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
+KNOWLEDGE_VAULT_PATH=/absolute/path/to/knowledge-vault
 ```
 
 `BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process. `BUAP_TERMINAL_OUTPUT_LIMIT` controls the byte cap passed to `terminal/create`.
 `BUAP_CLIENT_REQUEST_TIMEOUT_MS` controls how long the agent waits for editor responses to ACP client requests such as `session/request_permission`, `fs/write_text_file`, and terminal calls.
+`KNOWLEDGE_VAULT_PATH` points `/buap search-vault` at a local KnowledgeVault checkout. It defaults to `~/Prismtek/knowledge-vault`.
 
 ## Optional model backend
 
@@ -167,5 +176,6 @@ Use `/buap profiles` to list available BMO council profiles.
 - `/buap patch` generates a diff proposal only; it does not write to disk.
 - `/buap apply` calls `session/request_permission` and writes only via `fs/write_text_file` after the user allows.
 - `/buap run` calls `session/request_permission` and uses `command` + `args[]` through ACP `terminal/create` (no shell string interpolation).
+- `/buap search-vault` is read-only and searches local KnowledgeVault titles/excerpts.
 - Git helpers are read-only `status` and `diff` commands.
 - MCP server configs passed by the ACP client are reported; `/buap mcp invoke` returns a blocked planning response until ACP/MCP capability and permission handling is implemented.

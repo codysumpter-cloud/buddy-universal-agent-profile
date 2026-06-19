@@ -2,6 +2,13 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import os from "node:os";
+import {
+  buildIndex,
+  searchIndex,
+  type VaultIndex,
+  type VaultHit
+} from "@prismtek/buap-knowledge-vault";
 
 const execFileAsync = promisify(execFile);
 
@@ -92,9 +99,13 @@ const RUNTIME_COMMANDS = [
   { name: "buap run", description: "Ask permission, then run through ACP terminal/create.", input: { hint: 'cmd="npm" args="test"' } },
   { name: "buap git status", description: "Show read-only Git status." },
   { name: "buap git diff", description: "Show read-only Git diff.", input: { hint: "[path=README.md]" } },
+  { name: "buap search-vault", description: "Search the local KnowledgeVault notes.", input: { hint: 'query="meeting"' } },
   { name: "buap mcp", description: "Show MCP server config passed by the ACP client." },
   { name: "buap mcp invoke", description: "Prepare an MCP invocation plan (currently blocked).", input: { hint: 'server="github" tool="search" payload="{}"' } }
 ];
+
+let cachedVaultPath = "";
+let cachedVaultIndex: VaultIndex | null = null;
 
 export function availableCommands(): Array<Record<string, unknown>> {
   return RUNTIME_COMMANDS;
@@ -117,7 +128,7 @@ function assertSafeRelativePath(workspace: string, requested: string): string {
 
 function parseKeyValues(input: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
+  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(input))) result[match[1]] = match[3] ?? match[4] ?? match[5] ?? "";
   return result;
@@ -337,6 +348,71 @@ async function gitReadOnly(args: RuntimeArgs): Promise<string> {
   return [`Lil Buddy ran read-only \`${title}\` in \`${workspace}\`.`, "", "```text", stdout || stderr || "(no output)", "```"].join("\n");
 }
 
+function knowledgeVaultPath(): string {
+  return path.resolve(
+    process.env.KNOWLEDGE_VAULT_PATH ||
+      path.join(os.homedir(), "Prismtek", "knowledge-vault")
+  );
+}
+
+async function loadVaultIndex(): Promise<{ vaultPath: string; index: VaultIndex }> {
+  const vaultPath = knowledgeVaultPath();
+  if (!cachedVaultIndex || cachedVaultPath !== vaultPath) {
+    cachedVaultIndex = await buildIndex(vaultPath);
+    cachedVaultPath = vaultPath;
+  }
+  return { vaultPath, index: cachedVaultIndex };
+}
+
+function renderVaultHit(hit: VaultHit): string {
+  return `- **${hit.title}** — \`${hit.path}\`\n  ${hit.snippet || "(no excerpt)"}`;
+}
+
+async function searchKnowledgeVault(args: RuntimeArgs): Promise<string> {
+  const values = parseKeyValues(args.text);
+  const query = values.query || stripCommandPrefix(args.text, "/buap search-vault");
+  if (!query.trim()) {
+    return [
+      "KnowledgeVault search needs `query=`.",
+      "",
+      "Example:",
+      "",
+      "```text",
+      "/buap search-vault query=\"meeting\"",
+      "```"
+    ].join("\n");
+  }
+
+  const { vaultPath, index } = await loadVaultIndex();
+  const hits = searchIndex(index, query).slice(0, 5);
+  const report = {
+    status: "done",
+    summary: `Searched KnowledgeVault for ${query}.`,
+    actions_taken: ["built or reused local in-memory vault index", "searched note titles and excerpts"],
+    evidence: hits.map((hit) => ({ path: hit.path, title: hit.title })),
+    risks_or_permissions: [
+      "Read-only local search.",
+      "No files were written.",
+      "Search is limited to the configured KnowledgeVault path."
+    ],
+    next_recommended_command: hits.length ? "Open the returned path in Obsidian, or refine the search query." : "/buap search-vault query=\"Buddy\""
+  };
+
+  return [
+    `Lil Buddy searched KnowledgeVault at \`${vaultPath}\` for \`${query}\`.`,
+    `Indexed notes: ${index.entries.length}`,
+    `Hits returned: ${hits.length}`,
+    "",
+    hits.length ? hits.map(renderVaultHit).join("\n") : "No matches found.",
+    "",
+    "Lil Buddy report:",
+    "",
+    "```json",
+    JSON.stringify(report, null, 2),
+    "```"
+  ].join("\n");
+}
+
 async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
   if (!args.session || !args.client) return "Run is blocked because this ACP client bridge is unavailable.";
   if (!terminalSupported(args.client)) return "Run is blocked because the ACP client did not advertise terminal support.";
@@ -427,6 +503,7 @@ function renderHelp(): string {
     "- `/buap ask prompt=\"...\"` — ask the configured model backend, or get backend setup instructions",
     "- `/buap git status` — read-only git status",
     "- `/buap git diff [path=README.md]` — read-only git diff",
+    "- `/buap search-vault query=\"meeting\"` — search local KnowledgeVault note titles and excerpts",
     "- `/buap mcp` — show MCP server config passed by the ACP client",
     "- `/buap mcp invoke server=\"...\" tool=\"...\" payload=\"{}\"` — currently reports a blocked MCP invocation plan",
     "",
@@ -443,6 +520,7 @@ export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeRe
   if (lower.includes("/buap run")) return { handled: true, response: await runTerminalCommand(args) };
   if (lower.includes("/buap ask")) return { handled: true, response: await modelAnswer(args) };
   if (lower.includes("/buap git status") || lower.includes("/buap git diff")) return { handled: true, response: await gitReadOnly(args) };
+  if (lower.includes("/buap search-vault")) return { handled: true, response: await searchKnowledgeVault(args) };
   if (lower.includes("/buap mcp")) return { handled: true, response: renderMcpStatus(args) };
   return { handled: false, response: "" };
 }
