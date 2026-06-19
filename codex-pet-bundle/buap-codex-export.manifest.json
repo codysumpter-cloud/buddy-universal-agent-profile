@@ -1,0 +1,76 @@
+{
+  "$schema": "../adapters/codex-pet-export.template.json",
+  "bundle_id": "buap-codex-pet-buddy",
+  "name": "BUAP Codex Pet Buddy Bundle",
+  "version": "0.1.0",
+  "status": "adapter_contract",
+  "owner": "codysumpter-cloud/buddy-universal-agent-profile",
+  "description": "Repo-backed export bundle for generating a Buddy-style Codex custom pet and wiring Codex AGENTS.md instructions to BUAP.",
+  "upstream_features": {
+    "codex_app_pets": "Codex App optional animated companions toggled by /pet or Appearance > Pets.",
+    "hatch_pet_skill": "Codex skill used to create custom pets from prompts or project context.",
+    "agents_md": "Codex instruction file mechanism for repo and personal instructions.",
+    "ollama_codex": "Optional model-provider path for Codex CLI/App via Ollama local or cloud models."
+  },
+  "entrypoints": {
+    "adapter": "../CODEX_PET_BUAP.md",
+    "readme": "README.md",
+    "hatch_prompt": "BUDDY_CODEX_PET_PROMPT.md",
+    "agents_template": "AGENTS.md.template",
+    "personality_map": "codex-pet-personality-map.json",
+    "minimal_prompt": "../examples/codex-pet-hatch-prompt.txt",
+    "acceptance_tests": "../tests/codex-pet-bundle.acceptance.md"
+  },
+  "default_configuration": {
+    "visible_pet_name": "Buddy",
+    "main_buddy_profile_id": "bmo",
+    "lil_buddy_profile_id": "finn",
+    "review_profile_id": "neptr",
+    "safety_profile_id": "peppermint-butler",
+    "requires_first_run_personalization": true,
+    "pet_is_runtime": false,
+    "requires_agents_md_for_behavior": true
+  },
+  "install_modes": [
+    {
+      "id": "codex-app-hatch-pet",
+      "name": "Codex App custom pet",
+      "commands_or_actions": [
+        "$skill-installer hatch-pet",
+        "Force Reload Skills from Codex command menu",
+        "$hatch-pet create a Codex pet using codex-pet-bundle/BUDDY_CODEX_PET_PROMPT.md",
+        "/pet"
+      ]
+    },
+    {
+      "id": "repo-agents-md",
+      "name": "Repo behavior instructions",
+      "commands_or_actions": [
+        "Copy or merge codex-pet-bundle/AGENTS.md.template into the repo root AGENTS.md",
+        "Keep repo-specific instructions above BUAP when they are more specific",
+        "Reference buddy-universal-agent-profile/AGENTS.md instead of duplicating the full BUAP contract"
+      ]
+    },
+    {
+      "id": "ollama-codex-app",
+      "name": "Optional Ollama-backed Codex App",
+      "commands_or_actions": [
+        "ollama launch codex-app",
+        "Open Codex App and select/run the target repo",
+        "Keep BUAP AGENTS.md loaded; Ollama changes model provider only"
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "Do not store secrets in pet prompts or personalization files.",
+    "Do not claim the pet grants file, shell, GitHub, MCP, or app access.",
+    "Do not claim completion unless Codex/Buddy validated the work.",
+    "Do not vendor OpenAI hatch-pet internals or generated private local assets into BUAP.",
+    "Do not copy copyrighted character likenesses; use original Buddy/Prismtek visual language."
+  ],
+  "validation": {
+    "manual": "Run through tests/codex-pet-bundle.acceptance.md after generating a pet.",
+    "docs_only": true,
+    "runtime_side_effects": false
+  }
+}
