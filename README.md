@@ -3,11 +3,11 @@
 A portable, tool-agnostic agent behavior standard for the Prismtek / Buddy ecosystem
 (GitHub org: **codysumpter-cloud**). Drop this folder into any repository and any
 capable coding agent — Codex, Claude Code, Claude Projects, Cowork, OpenCode,
-Gemini CLI, Grok/xAI, Cursor, Windsurf, or future frameworks — behaves as **Buddy** (user-facing
+Gemini CLI, Grok/xAI, Cursor, Windsurf, Xcode/ACP clients, Siri/App Intents hosts, or future frameworks — behaves as **Buddy** (user-facing
 orchestrator) with at least one **Lil' Buddy** (implementation worker).
 
-BUAP is a **behavior/orchestration standard, not a sub-agent runtime**. It does not
-spawn processes. Where real worker runtimes exist, `standards/orchestration.md`
+BUAP is a **behavior/orchestration standard, not a sub-agent runtime** by default. It does not
+spawn processes unless a host package explicitly implements a runtime adapter. Where real worker runtimes exist, `standards/orchestration.md`
 documents how to connect them; where they don't, Lil' Buddy is emulated as a workflow
 pattern.
 
@@ -75,6 +75,8 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `CODEX.md` | Codex-specific install notes and quirks |
 | `GEMINI.md` | Entry point for Gemini CLI |
 | `GROK_BUAP.md` | Copy-paste Grok/xAI profile that adapts BUAP into Grok custom instructions or chats |
+| `SIRI_BUAP.md` | Siri/App Intents adapter profile |
+| `XCODE_ACP_BUAP.md` | Xcode / Agent Client Protocol adapter profile |
 | `SYSTEM_PROMPT.md` | Copy-paste system prompt for any other agent |
 | `BUAP_KERNEL.md` | Micro-profile for constrained tools |
 | `BUAP_LITE.md` | Tiny prompt for low-context AI/search tools |
@@ -82,6 +84,8 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `BUAP_FULL.md` | Full repo-aware operating profile |
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
+| `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
+| `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
 | `integrations/` | Runtime integration docs and canonical ecosystem routing |
 | `audits/` | Source-backed BUAP and runtime integration audit reports |
@@ -117,6 +121,11 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 - **Grok / xAI:** paste `GROK_BUAP.md` into Grok custom instructions or start a
   chat with `Operate under GROK_BUAP`; use `BUAP_STANDARD.md` or
   `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` when broader portable chat behavior fits better.
+- **Siri / App Intents hosts:** start with `SIRI_BUAP.md`, `README_SIRI.md`, and
+  `integrations/apple-siri-app-intents.md`.
+- **Xcode / ACP clients:** build `packages/buap-acp-agent/` and point the client at
+  `node packages/buap-acp-agent/dist/index.js`. Details: `XCODE_ACP_BUAP.md` and
+  `integrations/xcode-acp-import.md`.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use
