@@ -1,8 +1,8 @@
 {
   "name": "@prismtek/buap-acp-agent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Local stdio Agent Client Protocol server that loads BUAP and exposes Buddy/Lil Buddy personalization for Xcode and ACP clients.",
+  "description": "Local stdio Agent Client Protocol server that loads BUAP and exposes Buddy/Lil Buddy personalization, guarded workspace tools, and model backend routing for Xcode and ACP clients.",
   "type": "module",
   "bin": {
     "buap-acp-agent": "dist/index.js"
