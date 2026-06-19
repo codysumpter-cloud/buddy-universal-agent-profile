@@ -32,9 +32,24 @@ Expected result:
 BUAP ACP smoke check passed
 ```
 
+For a repo-level local readiness check, run:
+
+```bash
+cd ~/Prismtek/buddy-universal-agent-profile
+node tools/buap-doctor.mjs
+node tools/buap-doctor.mjs --full
+```
+
 ## 3. Recommended environment
 
 Use absolute paths so the editor can launch the agent from any working directory.
+
+You can print these defaults and create the default personalization file with:
+
+```bash
+cd ~/Prismtek/buddy-universal-agent-profile
+node tools/buap-local-bootstrap.mjs
+```
 
 ```bash
 export BUAP_REPO_ROOT="$HOME/Prismtek/buddy-universal-agent-profile"
