@@ -60,8 +60,10 @@ const runtimeMarkers = [
   "/buap ask",
   "/buap git status",
   "/buap git diff",
+  "/buap search-vault",
   "/buap mcp",
   "/buap mcp invoke",
+  "@prismtek/buap-knowledge-vault",
   "session/request_permission",
   "fs/write_text_file",
   "terminal/create",
@@ -114,6 +116,7 @@ const distMarkers = [
   ["runtime", distRuntime, "terminal/output"],
   ["runtime", distRuntime, "/buap apply"],
   ["runtime", distRuntime, "/buap run"],
+  ["runtime", distRuntime, "/buap search-vault"],
   ["runtime", distRuntime, "/buap mcp invoke"],
   ["index", distIndex, "available_commands_update"],
   ["index", distIndex, "advertisedCommands"]
@@ -135,6 +138,7 @@ const advertised = [
   "buap run",
   "buap git status",
   "buap git diff",
+  "buap search-vault",
   "buap mcp",
   "buap mcp invoke"
 ];

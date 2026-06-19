@@ -8,6 +8,7 @@ BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
+KNOWLEDGE_VAULT_PATH=/Users/prismtek/Prismtek/knowledge-vault
 
 # Optional OpenAI-compatible backend for /buap ask.
 # BUAP_MODEL_BACKEND=openai-compatible

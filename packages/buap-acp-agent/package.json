@@ -18,6 +18,9 @@
     "smoke": "node scripts/smoke.mjs",
     "smoke:launch": "npm run build && node scripts/local-smoke-check.mjs"
   },
+  "dependencies": {
+    "@prismtek/buap-knowledge-vault": "file:../buap-knowledge-vault"
+  },
   "engines": {
     "node": ">=20"
   },

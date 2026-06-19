@@ -61,6 +61,7 @@ BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
+KNOWLEDGE_VAULT_PATH=/absolute/path/to/knowledge-vault
 ```
 
 For `/buap ask`, optionally configure an OpenAI-compatible model backend:
@@ -87,6 +88,7 @@ After first-run personalization, the ACP agent supports these slash commands. Th
 /buap run cmd="npm" args="test"                          # permission-gated, terminal/create
 /buap git status
 /buap git diff path=README.md
+/buap search-vault query="meeting"                       # read-only local KnowledgeVault search
 /buap mcp
 /buap mcp invoke server="github" tool="search" payload="{}"   # blocked planning response
 ```

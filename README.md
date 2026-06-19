@@ -85,6 +85,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
+| `packages/buap-knowledge-vault/` | Local KnowledgeVault Markdown index/search helper |
 | `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
 | `integrations/` | Runtime integration docs and canonical ecosystem routing |
@@ -128,6 +129,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
   `integrations/xcode-acp-import.md`.
   For local verification and first-run setup, see
   `docs/local-buap-doctor-and-bootstrap.md`.
+  For local KnowledgeVault search, see `docs/knowledge-vault-search.md`.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use
