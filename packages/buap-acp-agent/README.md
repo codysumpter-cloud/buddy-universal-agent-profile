@@ -2,7 +2,7 @@
 
 Local stdio Agent Client Protocol server for loading BUAP into Xcode or any ACP-compatible editor/client.
 
-This is the first runnable BUAP ACP package. It intentionally starts conservative: it handles ACP session lifecycle, loads BUAP files, performs the Buddy/Lil Buddy personalization handshake, and reports capability boundaries. It does not yet wire a production LLM backend or mutate files on its own.
+This package now includes the first guarded Buddy runtime layer: ACP session lifecycle, BUAP loading, Buddy/Lil Buddy personalization, workspace-safe file reads, patch proposals, read-only Git helpers, MCP context reporting, and an optional OpenAI-compatible model backend.
 
 ## What it supports
 
@@ -21,6 +21,14 @@ This is the first runnable BUAP ACP package. It intentionally starts conservativ
   - `lil_buddy_display_name`
   - `buddy_profile_id`
   - `lil_buddy_profile_id`
+- guarded runtime commands:
+  - `/buap help`
+  - `/buap read path=README.md`
+  - `/buap patch path=README.md find="old" replace="new"`
+  - `/buap ask prompt="summarize this repo"`
+  - `/buap git status`
+  - `/buap git diff path=README.md`
+  - `/buap mcp`
 
 ## Local setup
 
@@ -56,10 +64,27 @@ Optional environment:
 
 ```bash
 BUAP_REPO_ROOT=/absolute/path/to/buddy-universal-agent-profile
+BUAP_WORKSPACE_ROOT=/absolute/path/to/workspace
 BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
+BUAP_MAX_READ_BYTES=20000
+BUAP_GIT_TIMEOUT_MS=10000
 ```
 
-`BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process.
+`BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process.
+
+## Optional model backend
+
+The local runtime works without a model. To route `/buap ask` to an OpenAI-compatible `/chat/completions` endpoint, set:
+
+```bash
+BUAP_MODEL_BACKEND=openai-compatible
+BUAP_MODEL_BASE_URL=https://api.openai.com/v1
+BUAP_MODEL_NAME=gpt-4.1-mini
+BUAP_MODEL_API_KEY=...
+BUAP_MODEL_TEMPERATURE=0.2
+```
+
+The backend can also point at a local or private OpenAI-compatible gateway.
 
 ## First-run command
 
@@ -71,12 +96,14 @@ When the agent asks for setup, reply:
 
 Use `/buap profiles` to list available BMO council profiles.
 
-## Current limitations
+## Safety behavior
 
-- No production LLM backend is wired yet.
-- No file writes, terminal execution, MCP calls, Git commits, or source-control operations are performed directly.
-- Tool execution should be added through ACP client capabilities, never by bypassing editor permissions.
+- File reads are workspace-confined and block path traversal.
+- Patch command generates a diff proposal only; it does not write to disk.
+- Git helpers are read-only `status` and `diff` commands.
+- MCP server configs passed by the ACP client are reported, not executed.
+- Destructive actions remain blocked until explicit ACP/editor permission handling is implemented.
 
 ## Next implementation step
 
-Wire this package to the actual Buddy runtime/model backend and add ACP-safe adapters for file reads, patch proposals, terminal commands, MCP servers, and source-control actions.
+Add ACP-native permission requests and editor-mediated apply/write flows so Buddy can ask Xcode before applying patches, running tests, invoking MCP tools, or making source-control changes.
