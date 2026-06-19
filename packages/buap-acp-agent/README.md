@@ -96,9 +96,11 @@ BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
 BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
+BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
 ```
 
 `BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process. `BUAP_TERMINAL_OUTPUT_LIMIT` controls the byte cap passed to `terminal/create`.
+`BUAP_CLIENT_REQUEST_TIMEOUT_MS` controls how long the agent waits for editor responses to ACP client requests such as `session/request_permission`, `fs/write_text_file`, and terminal calls.
 
 ## Optional model backend
 

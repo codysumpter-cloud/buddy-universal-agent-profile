@@ -12,6 +12,7 @@ All markers referenced here are verified by `packages/buap-acp-agent/scripts/smo
 - [x] Handles `reject_once`, `reject_always`, and `cancelled` outcomes as blocked/failed.
 - [x] Emits `tool_call_update` with status `completed` only after client write succeeds.
 - [x] Emits diff content using ACP tool-call diff content fields.
+- [x] Sends real JSON-RPC client requests and waits for the matching permission/write response.
 - [x] On capability absence, returns a clearly worded blocked response that points at `/buap patch` as the safe fallback.
 
 ## `/buap run`
@@ -21,6 +22,7 @@ All markers referenced here are verified by `packages/buap-acp-agent/scripts/smo
 - [x] Calls `session/request_permission` before `terminal/create`.
 - [x] Embeds returned terminal ID in tool-call content.
 - [x] Calls `terminal/wait_for_exit`, `terminal/output`, and `terminal/release`.
+- [x] Releases the ACP terminal even if wait/output handling fails after terminal creation.
 - [x] Marks non-zero exit as failed.
 - [x] On capability absence, returns a clearly worded blocked response.
 

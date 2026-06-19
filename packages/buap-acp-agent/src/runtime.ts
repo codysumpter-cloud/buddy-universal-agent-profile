@@ -65,6 +65,10 @@ type RuntimeResult = {
 };
 
 type PermissionOutcome =
+  | "allow_once"
+  | "reject_once"
+  | "reject_always"
+  | "cancelled"
   | { outcome?: "cancelled" }
   | { outcome?: "selected"; optionId?: string };
 
@@ -154,6 +158,16 @@ function terminalSupported(client?: AcpClientBridge): boolean {
   return client?.clientCapabilities?.terminal === true;
 }
 
+function permissionAllowed(result: unknown): boolean {
+  const record = result && typeof result === "object" ? (result as Record<string, unknown>) : {};
+  const outcome = (record.outcome ?? result) as PermissionOutcome | undefined;
+  if (outcome === "allow_once") return true;
+  if (typeof outcome === "object") {
+    return outcome.outcome === "selected" && outcome.optionId === "allow-once";
+  }
+  return false;
+}
+
 function sendToolCall(args: RuntimeArgs, toolCallId: string, update: Record<string, unknown>): void {
   if (!args.session || !args.client) return;
   args.client.sendSessionUpdate(args.session.sessionId, { sessionUpdate: "tool_call", toolCallId, ...update });
@@ -167,15 +181,15 @@ function sendToolCallUpdate(args: RuntimeArgs, toolCallId: string, update: Recor
 async function requestToolPermission(args: RuntimeArgs, toolCallId: string, title: string, kind: string, rawInput: Record<string, unknown>): Promise<boolean> {
   if (!args.session || !args.client) return false;
   sendToolCall(args, toolCallId, { title, kind, status: "pending", rawInput });
-  const result = (await args.client.requestClient("session/request_permission", {
+  const result = await args.client.requestClient("session/request_permission", {
     sessionId: args.session.sessionId,
     toolCall: { toolCallId, title, kind, status: "pending", rawInput },
     options: [
       { optionId: "allow-once", name: "Allow once", kind: "allow_once" },
       { optionId: "reject-once", name: "Reject", kind: "reject_once" }
     ]
-  })) as { outcome?: PermissionOutcome };
-  const allowed = result.outcome?.outcome === "selected" && result.outcome.optionId === "allow-once";
+  });
+  const allowed = permissionAllowed(result);
   if (!allowed) {
     sendToolCallUpdate(args, toolCallId, {
       status: "failed",
@@ -339,9 +353,14 @@ async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
   const created = (await args.client.requestClient("terminal/create", { sessionId: args.session.sessionId, command, args: commandArgs, cwd: workspace, outputByteLimit: Number(process.env.BUAP_TERMINAL_OUTPUT_LIMIT || 1048576) })) as TerminalCreateResult;
   if (!created.terminalId) throw new Error("ACP terminal/create did not return a terminalId.");
   sendToolCallUpdate(args, toolCallId, { content: [{ type: "terminal", terminalId: created.terminalId }] });
-  const exit = (await args.client.requestClient("terminal/wait_for_exit", { sessionId: args.session.sessionId, terminalId: created.terminalId })) as TerminalWaitResult;
-  const output = (await args.client.requestClient("terminal/output", { sessionId: args.session.sessionId, terminalId: created.terminalId })) as TerminalOutputResult;
-  await args.client.requestClient("terminal/release", { sessionId: args.session.sessionId, terminalId: created.terminalId });
+  let exit: TerminalWaitResult = {};
+  let output: TerminalOutputResult = {};
+  try {
+    exit = (await args.client.requestClient("terminal/wait_for_exit", { sessionId: args.session.sessionId, terminalId: created.terminalId })) as TerminalWaitResult;
+    output = (await args.client.requestClient("terminal/output", { sessionId: args.session.sessionId, terminalId: created.terminalId })) as TerminalOutputResult;
+  } finally {
+    await args.client.requestClient("terminal/release", { sessionId: args.session.sessionId, terminalId: created.terminalId });
+  }
   const ok = (exit.exitCode ?? output.exitStatus?.exitCode ?? 0) === 0;
   sendToolCallUpdate(args, toolCallId, { status: ok ? "completed" : "failed", rawOutput: { exit, output } });
   return [`Terminal command completed: \`${command} ${commandArgs.join(" ")}\`.`, "", "```text", output.output || "(no output)", "```", "", `Exit: ${JSON.stringify(exit)}${output.truncated ? " (output truncated)" : ""}`].join("\n");

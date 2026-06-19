@@ -36,10 +36,21 @@ type JsonRpcMessage = {
   id?: RequestId;
   method?: string;
   params?: Record<string, unknown>;
+  result?: unknown;
+  error?: { code?: number; message?: string };
 };
 
 const sessions = new Map<string, SessionState>();
 let clientCapabilities: Record<string, unknown> = {};
+let nextClientRequestId = 1;
+const pendingClientRequests = new Map<
+  RequestId,
+  {
+    resolve(value: unknown): void;
+    reject(error: Error): void;
+    timeout: NodeJS.Timeout;
+  }
+>();
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -52,14 +63,7 @@ function buildClientBridge(session: SessionState): AcpClientBridge {
       sendSessionUpdate(sessionId, update);
     },
     async requestClient(method, params) {
-      sendSessionUpdate(session.sessionId, {
-        sessionUpdate: "client_request",
-        method,
-        params
-      });
-      throw new Error(
-        `ACP client method "${method}" is not implemented by the editor bridge in this build. Lil Buddy did not call it.`
-      );
+      return requestClient(method, params, session.sessionId);
     }
   };
 }
@@ -328,6 +332,42 @@ function send(message: unknown): void {
   process.stdout.write(JSON.stringify(message) + "\n");
 }
 
+function requestClient(method: string, params: Record<string, unknown>, sessionId: string): Promise<unknown> {
+  const id = `client_${nextClientRequestId++}`;
+  const timeoutMs = Number(process.env.BUAP_CLIENT_REQUEST_TIMEOUT_MS || 300000);
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      pendingClientRequests.delete(id);
+      reject(new Error(`ACP client method "${method}" timed out for session ${sessionId}.`));
+    }, timeoutMs);
+
+    pendingClientRequests.set(id, { resolve, reject, timeout });
+    send({ jsonrpc: "2.0", id, method, params });
+  });
+}
+
+function handleClientResponse(message: JsonRpcMessage): boolean {
+  if (message.method || message.id === undefined || message.id === null) return false;
+  const pending = pendingClientRequests.get(message.id);
+  if (!pending) return false;
+
+  pendingClientRequests.delete(message.id);
+  clearTimeout(pending.timeout);
+
+  if (message.error) {
+    pending.reject(
+      new Error(
+        `ACP client request ${String(message.id)} failed: ${message.error.message ?? "unknown error"}`
+      )
+    );
+  } else {
+    pending.resolve(message.result);
+  }
+
+  return true;
+}
+
 function sendResponse(id: RequestId | undefined, result: unknown): void {
   if (id === undefined) return;
   send({ jsonrpc: "2.0", id, result });
@@ -523,6 +563,8 @@ async function main(): Promise<void> {
       sendError(null, -32700, "Parse error: ACP stdio messages must be newline-delimited JSON-RPC");
       return;
     }
+
+    if (handleClientResponse(message)) return;
 
     void handleMessage(message, buap, personalization).catch((error: unknown) => {
       const text = error instanceof Error ? error.message : String(error);

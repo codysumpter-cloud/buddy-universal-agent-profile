@@ -48,6 +48,7 @@ BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
 BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
+BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
 ```
 
 For `/buap ask`, optionally configure an OpenAI-compatible model backend:
@@ -86,6 +87,7 @@ After first-run personalization, the ACP agent supports these slash commands. Th
 - `fs/write_text_file` (when `clientCapabilities.fs.writeTextFile === true`) for `/buap apply`. Workspace writes never use Node `fs.writeFile`.
 - `terminal/create`, `terminal/wait_for_exit`, `terminal/output`, `terminal/release` (when `clientCapabilities.terminal === true`) for `/buap run`. Uses `command` + `args[]` only, never `sh -c`.
 - `available_commands_update` broadcast right after every `session/new`.
+- JSON-RPC client request/response tracking for permission, file, and terminal calls. `BUAP_CLIENT_REQUEST_TIMEOUT_MS` controls the wait for editor replies.
 
 ## BUAP files loaded by the package
 

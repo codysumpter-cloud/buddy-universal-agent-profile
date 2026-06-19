@@ -80,7 +80,10 @@ const indexMarkers = [
   "session/close",
   "session/cancel",
   "initialize",
-  "advertisedCommands"
+  "advertisedCommands",
+  "pendingClientRequests",
+  "requestClient(method",
+  "handleClientResponse"
 ];
 for (const expected of indexMarkers) {
   if (!indexSource.includes(expected)) {
