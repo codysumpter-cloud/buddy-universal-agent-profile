@@ -20,6 +20,7 @@ const requiredPackageFiles = [
   "package.json",
   "tsconfig.json",
   "src/index.ts",
+  "src/runtime.ts",
   "README.md"
 ];
 
@@ -43,6 +44,21 @@ const profileIds = new Set((profilePack.profiles ?? []).map((profile) => profile
 for (const expected of ["bmo", "finn"]) {
   if (!profileIds.has(expected)) {
     throw new Error(`Missing expected profile: ${expected}`);
+  }
+}
+
+const runtimeSource = await fs.readFile(path.join(packageRoot, "src/runtime.ts"), "utf8");
+for (const expected of [
+  "/buap read",
+  "/buap patch",
+  "/buap ask",
+  "/buap git status",
+  "/buap git diff",
+  "/buap mcp",
+  "BUAP_MODEL_BACKEND=openai-compatible"
+]) {
+  if (!runtimeSource.includes(expected)) {
+    throw new Error(`Runtime source missing expected marker: ${expected}`);
   }
 }
 
