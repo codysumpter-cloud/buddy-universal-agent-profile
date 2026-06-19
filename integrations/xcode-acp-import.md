@@ -18,19 +18,25 @@ For BUAP, ACP should carry:
 
 ## Local runnable package
 
-This branch includes the BUAP ACP agent package:
+The BUAP ACP agent package lives at:
 
 ```text
 packages/buap-acp-agent/
 ```
 
-From that folder:
+Fresh local setup and smoke instructions live at:
+
+```text
+packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md
+```
+
+From the package folder:
 
 ```bash
 npm install
 npm run smoke
 npm run build
-node dist/index.js
+npm run smoke:launch
 ```
 
 For local Xcode/ACP import before publishing, point the client command at:
@@ -39,7 +45,13 @@ For local Xcode/ACP import before publishing, point the client command at:
 node /absolute/path/to/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
 ```
 
-Optional environment:
+Optional environment starts from:
+
+```text
+packages/buap-acp-agent/examples/xcode-acp-env.example
+```
+
+Core variables:
 
 ```bash
 BUAP_REPO_ROOT=/absolute/path/to/buddy-universal-agent-profile
