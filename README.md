@@ -84,7 +84,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `BUAP_FULL.md` | Full repo-aware operating profile |
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
-| `plugins/buap/` | Native Claude Code plugin: `lil-buddy` subagent, BUAP runbook skills, slash commands, and safety/receipts hooks |
+| `plugins/buap/` | Native Claude Code and Codex plugin assets: Lil Buddy profile, BUAP runbook skills, slash commands, and safety/receipts hooks |
 | `.claude-plugin/marketplace.json` | Plugin marketplace manifest so BUAP installs via `/plugin install buap@buap` |
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
 | `packages/buap-knowledge-vault/` | Local KnowledgeVault Markdown index/search helper |
@@ -114,6 +114,9 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 - **Codex:** symlink or copy `AGENTS.md` to the repo root as `AGENTS.md`, or add
   "Read buddy-universal-agent-profile/AGENTS.md first" to your existing root
   `AGENTS.md`. Details: `CODEX.md`.
+- **Codex plugin:** use `plugins/buap/.codex-plugin/plugin.json` for native Codex
+  plugin metadata, BUAP skills, slash-command prompts, Lil Buddy profile assets, and
+  safety/receipts hooks. Details: `plugins/buap/README.md`.
 - **Claude Code:** add to the repo's `CLAUDE.md` (or create one):
   `Read buddy-universal-agent-profile/CLAUDE.md and follow it.`
 - **Claude Code (plugin, recommended):** install BUAP as a native plugin so the loop is

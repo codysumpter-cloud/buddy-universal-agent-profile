@@ -65,6 +65,27 @@ if (marketplace && Array.isArray(marketplace.plugins)) {
 }
 checkJson("plugins/buap/.claude-plugin/plugin.json", ["name", "version", "description"]);
 
+const codexPlugin = checkJson("plugins/buap/.codex-plugin/plugin.json", [
+  "name",
+  "version",
+  "description",
+  "author",
+  "skills",
+  "interface"
+]);
+if (codexPlugin) {
+  if (codexPlugin.name !== "buap") failures.push("Codex plugin name must be buap");
+  if (codexPlugin.hooks) failures.push("Codex plugin manifest should not declare unsupported hooks field; use plugins/buap/hooks.json");
+  for (const key of ["displayName", "shortDescription", "longDescription", "developerName", "category", "capabilities"]) {
+    if (!(key in (codexPlugin.interface ?? {}))) {
+      failures.push(`Codex plugin interface missing required key: ${key}`);
+    }
+  }
+  if (codexPlugin.skills && !exists(path.join("plugins/buap", codexPlugin.skills))) {
+    failures.push(`Codex plugin skills path missing: ${codexPlugin.skills}`);
+  }
+}
+
 const hooks = checkJson("plugins/buap/hooks/hooks.json", ["hooks"]);
 if (hooks?.hooks) {
   for (const [event, entries] of Object.entries(hooks.hooks)) {
@@ -73,6 +94,21 @@ if (hooks?.hooks) {
         const m = /\$\{CLAUDE_PLUGIN_ROOT\}\/(\S+?)["']/.exec(h.command ?? "");
         if (m && !exists(path.join("plugins/buap", m[1]))) {
           failures.push(`${event} hook references missing script: ${m[1]}`);
+        }
+      }
+    }
+  }
+}
+
+const codexHooks = checkJson("plugins/buap/hooks.json", ["hooks"]);
+if (codexHooks?.hooks) {
+  for (const [event, entries] of Object.entries(codexHooks.hooks)) {
+    for (const entry of entries) {
+      for (const h of entry.hooks ?? []) {
+        const command = h.command ?? "";
+        const m = /node\s+\.\/(.+?\.mjs)\b/.exec(command);
+        if (m && !exists(path.join("plugins/buap", m[1]))) {
+          failures.push(`${event} Codex hook references missing script: ${m[1]}`);
         }
       }
     }
