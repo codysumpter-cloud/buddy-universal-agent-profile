@@ -24,6 +24,20 @@ For a local launch smoke test after building, run:
 npm run smoke:launch
 ```
 
+Repo-level doctor/bootstrap helpers:
+
+```bash
+node ../../tools/buap-doctor.mjs
+node ../../tools/buap-doctor.mjs --full
+node ../../tools/buap-local-bootstrap.mjs
+```
+
+Guide:
+
+```text
+../../docs/local-buap-doctor-and-bootstrap.md
+```
+
 ## What it supports
 
 - newline-delimited JSON-RPC over stdio

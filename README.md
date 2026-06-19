@@ -126,6 +126,8 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 - **Xcode / ACP clients:** build `packages/buap-acp-agent/` and point the client at
   `node packages/buap-acp-agent/dist/index.js`. Details: `XCODE_ACP_BUAP.md` and
   `integrations/xcode-acp-import.md`.
+  For local verification and first-run setup, see
+  `docs/local-buap-doctor-and-bootstrap.md`.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use

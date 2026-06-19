@@ -28,7 +28,10 @@ const requiredFiles = [
   'tests/conformance/capability-negotiation.expected.md',
   'tests/conformance/multi-agent-arbitration.expected.md',
   'docs/cross-reference-matrix.md',
-  'integrations/ecosystem-routing-spec.md'
+  'integrations/ecosystem-routing-spec.md',
+  'tools/buap-doctor.mjs',
+  'tools/buap-local-bootstrap.mjs',
+  'docs/local-buap-doctor-and-bootstrap.md'
 ];
 
 const requiredText = [
