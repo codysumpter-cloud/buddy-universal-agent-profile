@@ -2,15 +2,15 @@
   "$schema": "https://cdn.agentclientprotocol.com/registry/v1/latest/agent.schema.json",
   "id": "buddy-universal-agent-profile",
   "name": "Buddy Universal Agent Profile",
-  "version": "0.1.0",
-  "description": "BUAP-compatible ACP coding agent adapter for Xcode and ACP clients, with Buddy/Lil Buddy orchestration and personalization.",
+  "version": "0.2.0",
+  "description": "BUAP-compatible ACP coding agent adapter for Xcode and ACP clients, with Buddy/Lil Buddy orchestration, personalization, guarded workspace tools, and model backend routing.",
   "repository": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
   "website": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
   "authors": ["Prismtek / Buddy ecosystem"],
   "license": "proprietary",
   "distribution": {
     "npx": {
-      "package": "@prismtek/buap-acp-agent@0.1.0",
+      "package": "@prismtek/buap-acp-agent@0.2.0",
       "args": [],
       "env": {
         "BUAP_SURFACE": "xcode-acp",
