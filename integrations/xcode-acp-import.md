@@ -16,12 +16,42 @@ For BUAP, ACP should carry:
 - Markdown user-facing responses
 - patch/diff-oriented coding outputs
 
-## BUAP files to load
+## Local runnable package
 
-A BUAP ACP agent should load these in order:
+This branch includes the first BUAP ACP agent package:
+
+```text
+packages/buap-acp-agent/
+```
+
+From that folder:
+
+```bash
+npm install
+npm run smoke
+npm run build
+node dist/index.js
+```
+
+For local Xcode/ACP import before publishing, point the client command at:
+
+```bash
+node /absolute/path/to/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
+```
+
+Optional environment:
+
+```bash
+BUAP_REPO_ROOT=/absolute/path/to/buddy-universal-agent-profile
+BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
+```
+
+## BUAP files loaded by the package
+
+The ACP agent loads these in order:
 
 1. `XCODE_ACP_BUAP.md`
-2. `BUAP_FULL.md` or `BUAP_STANDARD.md`
+2. `BUAP_FULL.md`
 3. `personalization/PERSONALIZATION_HANDSHAKE.md`
 4. `personalization/BUDDY_LIL_BUDDY_PROFILE_SELECTION.md`
 5. `personalization/bmo-council-personality-profiles.json`
@@ -35,7 +65,7 @@ Start from:
 adapters/xcode-acp-agent.template.json
 ```
 
-Before publishing/importing, replace the placeholder package name with a real ACP server package that exposes the BUAP agent over the transport expected by the client.
+The template now points at `@prismtek/buap-acp-agent@0.1.0`. Keep using the local command above until the package is published or made available through your preferred private package registry.
 
 ## Safety contract
 
