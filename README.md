@@ -84,6 +84,8 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `BUAP_FULL.md` | Full repo-aware operating profile |
 | `BUDDY_PROFILE.md` | Full Buddy role specification |
 | `LIL_BUDDY_PROFILE.md` | Full Lil' Buddy role specification |
+| `plugins/buap/` | Native Claude Code plugin: `lil-buddy` subagent, BUAP runbook skills, slash commands, and safety/receipts hooks |
+| `.claude-plugin/marketplace.json` | Plugin marketplace manifest so BUAP installs via `/plugin install buap@buap` |
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
 | `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
@@ -113,6 +115,15 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
   `AGENTS.md`. Details: `CODEX.md`.
 - **Claude Code:** add to the repo's `CLAUDE.md` (or create one):
   `Read buddy-universal-agent-profile/CLAUDE.md and follow it.`
+- **Claude Code (plugin, recommended):** install BUAP as a native plugin so the loop is
+  structural, not just prose — a real `lil-buddy` worker subagent, BUAP runbooks as skills,
+  `/buap-audit` and `/buap-handoff` commands, and safety/receipts hooks:
+  ```
+  /plugin marketplace add codysumpter-cloud/buddy-universal-agent-profile
+  /plugin install buap@buap
+  ```
+  Details: `plugins/buap/README.md`. For repo-wide permission/secret-read guardrails, copy
+  `templates/claude-settings.preset.json` into the consuming repo's `.claude/settings.json`.
 - **Claude Projects:** paste `SYSTEM_PROMPT.md` or `BUAP_STANDARD.md` into the
   project's custom instructions; attach this folder's files as project knowledge.
 - **ChatGPT Projects:** use `chatgpt-projects/buddy/`; paste
@@ -170,10 +181,12 @@ tests, and integrations stay aligned.
 Run the local docs/spec check with:
 
 ```bash
-node scripts/buap-conformance-check.mjs
+node scripts/buap-conformance-check.mjs   # required files + key text
+node scripts/buap-lint.mjs                 # plugin manifests, agent/skill frontmatter,
+                                           # repo-wide relative links, prompt-tier invariants
 ```
 
-The same check runs in `.github/workflows/buap-conformance.yml` for Markdown, JSON,
+Both checks run in `.github/workflows/buap-conformance.yml` for Markdown, JSON, plugin,
 and script changes.
 
 ## Versioning

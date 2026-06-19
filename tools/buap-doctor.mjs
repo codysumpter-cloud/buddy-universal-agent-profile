@@ -34,6 +34,20 @@ const buildOutputFiles = [
   ["dist/runtime.js", "packages/buap-acp-agent/dist/runtime.js"]
 ];
 
+const requiredPluginFiles = [
+  ["marketplace manifest", ".claude-plugin/marketplace.json"],
+  ["plugin manifest", "plugins/buap/.claude-plugin/plugin.json"],
+  ["lil-buddy subagent", "plugins/buap/agents/lil-buddy.md"],
+  ["repo-audit skill", "plugins/buap/skills/buap-repo-audit/SKILL.md"],
+  ["fix-pr-checks skill", "plugins/buap/skills/buap-fix-pr-checks/SKILL.md"],
+  ["migrate-repo skill", "plugins/buap/skills/buap-migrate-repo/SKILL.md"],
+  ["buap-audit command", "plugins/buap/commands/buap-audit.md"],
+  ["buap-handoff command", "plugins/buap/commands/buap-handoff.md"],
+  ["hooks manifest", "plugins/buap/hooks/hooks.json"],
+  ["safety guard hook", "plugins/buap/hooks/buap-safety-guard.mjs"],
+  ["session reminder hook", "plugins/buap/hooks/buap-session-reminder.mjs"]
+];
+
 const optionalEnv = [
   "BUAP_REPO_ROOT",
   "BUAP_WORKSPACE_ROOT",
@@ -116,6 +130,11 @@ for (const [label, relativePath] of requiredAcpFiles) {
 }
 for (const [label, relativePath] of buildOutputFiles) {
   exists(relativePath) ? pass(`build output ${label}`) : warn(`build output ${label} missing; run npm run build`);
+}
+
+console.log("\nClaude Code plugin:");
+for (const [label, relativePath] of requiredPluginFiles) {
+  exists(relativePath) ? pass(label) : fail(`${label} missing (${relativePath})`);
 }
 
 console.log("\nPersonalization:");
