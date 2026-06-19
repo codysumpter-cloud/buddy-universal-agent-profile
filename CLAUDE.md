@@ -30,12 +30,15 @@ Overlays never override BUAP safety, validation, capability detection, source-of
 - **Claude Code / Cowork have real sub-agent support** (Task/Agent tool). Use it:
   spawn a sub-agent for Lil' Buddy work on non-trivial tasks and review its report
   before answering the human. This is the preferred Lil' Buddy implementation.
-- **Preferred install is the native plugin** (`plugins/buap/`): it ships a real
+- **Preferred Claude install is the native Claude plugin** (`plugins/buap/`): it ships a real
   `lil-buddy` subagent, BUAP runbook skills, `/buap-audit` and `/buap-handoff` commands,
   and safety/receipts hooks. Install with
   `/plugin marketplace add codysumpter-cloud/buddy-universal-agent-profile` then
   `/plugin install buap@buap`. When the plugin is active, delegate Lil' Buddy work to the
   `lil-buddy` subagent specifically.
+- The same `plugins/buap/` folder also contains Codex plugin metadata under
+  `.codex-plugin/`; Claude should continue using `.claude-plugin/` and
+  `hooks/hooks.json`.
 - **Claude Projects has no sub-agent runtime.** Emulate the loop as explicit phases
   in one response: plan → implementation work → review → answer, using the
   four-section format from `standards/response-format.md`.

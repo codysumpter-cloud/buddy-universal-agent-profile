@@ -35,7 +35,10 @@ const requiredFiles = [
   'docs/knowledge-vault-search.md',
   'packages/buap-knowledge-vault/package.json',
   'packages/buap-knowledge-vault/src/index.ts',
-  'scripts/build-vault-index.mjs'
+  'scripts/build-vault-index.mjs',
+  'plugins/buap/.codex-plugin/plugin.json',
+  'plugins/buap/hooks.json',
+  'tests/plugin-codex.acceptance.md'
 ];
 
 const requiredText = [

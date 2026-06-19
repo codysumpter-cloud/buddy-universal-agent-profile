@@ -36,16 +36,20 @@ const buildOutputFiles = [
 
 const requiredPluginFiles = [
   ["marketplace manifest", ".claude-plugin/marketplace.json"],
-  ["plugin manifest", "plugins/buap/.claude-plugin/plugin.json"],
+  ["Claude plugin manifest", "plugins/buap/.claude-plugin/plugin.json"],
+  ["Codex plugin manifest", "plugins/buap/.codex-plugin/plugin.json"],
   ["lil-buddy subagent", "plugins/buap/agents/lil-buddy.md"],
   ["repo-audit skill", "plugins/buap/skills/buap-repo-audit/SKILL.md"],
   ["fix-pr-checks skill", "plugins/buap/skills/buap-fix-pr-checks/SKILL.md"],
   ["migrate-repo skill", "plugins/buap/skills/buap-migrate-repo/SKILL.md"],
   ["buap-audit command", "plugins/buap/commands/buap-audit.md"],
   ["buap-handoff command", "plugins/buap/commands/buap-handoff.md"],
-  ["hooks manifest", "plugins/buap/hooks/hooks.json"],
+  ["Claude hooks manifest", "plugins/buap/hooks/hooks.json"],
+  ["Codex hooks manifest", "plugins/buap/hooks.json"],
   ["safety guard hook", "plugins/buap/hooks/buap-safety-guard.mjs"],
-  ["session reminder hook", "plugins/buap/hooks/buap-session-reminder.mjs"]
+  ["session reminder hook", "plugins/buap/hooks/buap-session-reminder.mjs"],
+  ["Codex safety guard hook", "plugins/buap/hooks/buap-codex-safety-guard.mjs"],
+  ["Codex session reminder hook", "plugins/buap/hooks/buap-codex-session-reminder.mjs"]
 ];
 
 const optionalEnv = [

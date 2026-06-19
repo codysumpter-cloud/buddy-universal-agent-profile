@@ -48,6 +48,19 @@ The doctor reports optional environment variables as warnings, not failures. It
 prints only whether `BUAP_MODEL_API_KEY` is set or missing; it never prints the
 secret value.
 
+## Codex plugin
+
+BUAP also ships a local Codex plugin manifest at:
+
+```text
+plugins/buap/.codex-plugin/plugin.json
+```
+
+The plugin includes BUAP runbook skills, slash-command prompt files, Lil Buddy profile
+assets, and Codex hook config at `plugins/buap/hooks.json`. Use the Codex plugin
+installation flow for local plugins or a marketplace entry that points at
+`plugins/buap/`.
+
 ## Run local bootstrap
 
 ```bash

@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|shell|exec_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/buap-codex-safety-guard.mjs"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/buap-codex-session-reminder.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

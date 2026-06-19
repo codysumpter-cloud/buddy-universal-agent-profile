@@ -1,0 +1,43 @@
+{
+  "name": "buap",
+  "version": "1.0.0",
+  "description": "Buddy Universal Agent Profile for Codex. Adds BUAP runbook skills, slash-command prompts, Lil Buddy worker profile assets, and safety plus receipts hooks.",
+  "author": {
+    "name": "Cody Sumpter",
+    "url": "https://github.com/codysumpter-cloud"
+  },
+  "homepage": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
+  "repository": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
+  "license": "MIT",
+  "keywords": [
+    "buap",
+    "buddy",
+    "codex",
+    "orchestration",
+    "safety",
+    "runbooks"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "BUAP",
+    "shortDescription": "Buddy/Lil Buddy workflow discipline for Codex",
+    "longDescription": "BUAP packages the Buddy Universal Agent Profile for Codex with runbook skills, slash-command prompts, Lil Buddy profile assets, and hooks that reinforce safety, claim labels, and receipts.",
+    "developerName": "Prismtek",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
+    "privacyPolicyURL": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/blob/main/safety/private-data-handling.md",
+    "termsOfServiceURL": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/blob/main/safety/README.md",
+    "defaultPrompt": [
+      "Run a BUAP repo audit with receipts",
+      "Create a BUAP handoff for this branch",
+      "Fix PR checks using BUAP discipline"
+    ],
+    "brandColor": "#14B8A6",
+    "screenshots": []
+  }
+}
