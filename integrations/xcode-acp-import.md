@@ -47,6 +47,7 @@ BUAP_WORKSPACE_ROOT=/absolute/path/to/workspace
 BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
 BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
+BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 ```
 
 For `/buap ask`, optionally configure an OpenAI-compatible model backend:
@@ -60,18 +61,31 @@ BUAP_MODEL_API_KEY=...
 
 ## Runtime commands
 
-After first-run personalization, the ACP agent supports:
+After first-run personalization, the ACP agent supports these slash commands. The full set is also broadcast via `session/update` `available_commands_update` immediately after every `session/new`:
 
 ```text
 /buap help
 /buap profiles
+/buap personalize user="Cody" buddy="Buddy" lil_buddy="Finn" buddy_profile=bmo lil_buddy_profile=finn
 /buap read path=README.md
 /buap patch path=README.md find="old" replace="new"
+/buap apply path=README.md find="old" replace="new"     # permission-gated, fs/write_text_file
 /buap ask prompt="summarize this workspace"
+/buap run cmd="npm" args="test"                          # permission-gated, terminal/create
 /buap git status
 /buap git diff path=README.md
 /buap mcp
+/buap mcp invoke server="github" tool="search" payload="{}"   # blocked planning response
 ```
+
+## ACP surfaces used by the upgrade
+
+- `session/update` `tool_call` / `tool_call_update` for `/buap apply` and `/buap run`.
+- `session/request_permission` before any file write or terminal command.
+- `fs/read_text_file` (when `clientCapabilities.fs.readTextFile === true`) for `/buap read` and `/buap patch`.
+- `fs/write_text_file` (when `clientCapabilities.fs.writeTextFile === true`) for `/buap apply`. Workspace writes never use Node `fs.writeFile`.
+- `terminal/create`, `terminal/wait_for_exit`, `terminal/output`, `terminal/release` (when `clientCapabilities.terminal === true`) for `/buap run`. Uses `command` + `args[]` only, never `sh -c`.
+- `available_commands_update` broadcast right after every `session/new`.
 
 ## BUAP files loaded by the package
 
@@ -96,4 +110,4 @@ The template now points at `@prismtek/buap-acp-agent@0.2.0`. Keep using the loca
 
 ## Safety contract
 
-Xcode/editor permissions are the hard boundary. Lil Buddy can act inside granted capabilities only. Buddy still owns the final answer and must ask before risky changes. The current package intentionally proposes patches instead of writing files and keeps Git helpers read-only until ACP-native permission requests and editor-mediated apply/write flows are implemented.
+Xcode/editor permissions are the hard boundary. Lil Buddy acts only inside capabilities the editor actually granted. `clientCapabilities.fs.writeTextFile` and `clientCapabilities.terminal` are checked at runtime; when a capability is missing, the command returns a clearly worded blocked response that points at the safe fallback (for example `/buap patch` instead of `/buap apply`). MCP server configs passed by the ACP client are reported; `/buap mcp invoke` remains a blocked planning response until MCP-over-ACP transport and explicit ACP/MCP permission handling are implemented.

@@ -79,14 +79,17 @@ type TerminalWaitResult = { exitCode?: number | null; signal?: string | null };
 
 const RUNTIME_COMMANDS = [
   { name: "buap help", description: "Show BUAP ACP runtime commands." },
+  { name: "buap profiles", description: "List BMO council personality profiles." },
+  { name: "buap personalize", description: "Save Buddy/Lil Buddy/user names and profiles.", input: { hint: 'user="Cody" buddy="Buddy" lil_buddy="Finn" buddy_profile=bmo lil_buddy_profile=finn' } },
   { name: "buap read", description: "Read a workspace file safely.", input: { hint: "path=README.md [max_bytes=20000]" } },
-  { name: "buap patch", description: "Prepare a diff proposal without writing files.", input: { hint: "path=README.md find=\"old\" replace=\"new\"" } },
-  { name: "buap apply", description: "Ask permission, then write through ACP fs/write_text_file.", input: { hint: "path=README.md find=\"old\" replace=\"new\"" } },
-  { name: "buap run", description: "Ask permission, then run through ACP terminal/create.", input: { hint: "cmd=\"npm\" args=\"test\"" } },
-  { name: "buap ask", description: "Ask the configured model backend.", input: { hint: "prompt=\"summarize this workspace\"" } },
+  { name: "buap patch", description: "Prepare a diff proposal without writing files.", input: { hint: 'path=README.md find="old" replace="new"' } },
+  { name: "buap apply", description: "Ask permission, then write through ACP fs/write_text_file.", input: { hint: 'path=README.md find="old" replace="new"' } },
+  { name: "buap ask", description: "Ask the configured model backend.", input: { hint: 'prompt="summarize this workspace"' } },
+  { name: "buap run", description: "Ask permission, then run through ACP terminal/create.", input: { hint: 'cmd="npm" args="test"' } },
   { name: "buap git status", description: "Show read-only Git status." },
   { name: "buap git diff", description: "Show read-only Git diff.", input: { hint: "[path=README.md]" } },
-  { name: "buap mcp", description: "Show MCP server config passed by the ACP client." }
+  { name: "buap mcp", description: "Show MCP server config passed by the ACP client." },
+  { name: "buap mcp invoke", description: "Prepare an MCP invocation plan (currently blocked).", input: { hint: 'server="github" tool="search" payload="{}"' } }
 ];
 
 export function availableCommands(): Array<Record<string, unknown>> {
@@ -347,7 +350,48 @@ async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
 function renderMcpStatus(args: RuntimeArgs): string {
   const servers = args.session?.mcpServers ?? [];
   const values = parseKeyValues(args.text);
-  if (args.text.toLowerCase().includes("/buap mcp invoke")) return ["MCP invocation is not executed yet.", "", "Lil Buddy report:", "", "```json", JSON.stringify({ status: "blocked", summary: "MCP server config is visible from ACP session context, but MCP-over-ACP invocation is not wired in this package yet.", requested: { server: values.server, tool: values.tool, payload: values.payload }, actions_taken: ["inspected ACP session MCP server config", "blocked direct MCP execution"], evidence: servers, risks_or_permissions: ["Direct MCP tool calls can mutate external systems; this requires explicit ACP/MCP permission handling first."], next_recommended_command: "/buap mcp" }, null, 2), "```"].join("\n");
+  const lower = args.text.toLowerCase();
+  if (lower.includes("/buap mcp invoke")) {
+    const report = {
+      status: "blocked",
+      summary: "MCP server config is visible from ACP session context, but MCP-over-ACP invocation is not wired in this package yet.",
+      actions_taken: [
+        "inspected ACP session MCP server config",
+        "blocked direct MCP execution pending explicit ACP/MCP permission handling"
+      ],
+      evidence: servers,
+      requested: { server: values.server || null, tool: values.tool || null, payload: values.payload || null },
+      risks_or_permissions: [
+        "Direct MCP tool calls can mutate external systems.",
+        "Requires explicit ACP/MCP capability detection, session/request_permission integration, and per-tool transport policy."
+      ],
+      reason_blocked: "MCP-over-ACP transport and permission policy are not implemented in this agent.",
+      next_implementation_requirement:
+        "Wire ACP fs/terminal-style permission flow for MCP tool calls, validate the requested server against session MCP config, and only then route through the chosen MCP transport.",
+      next_recommended_command: "/buap mcp"
+    };
+    return [
+      "MCP invocation is not executed yet.",
+      "",
+      "Lil Buddy report:",
+      "",
+      "```json",
+      JSON.stringify(report, null, 2),
+      "```",
+      "",
+      "Requested:",
+      "",
+      "```json",
+      JSON.stringify({ server: values.server || null, tool: values.tool || null, payload: values.payload || null }, null, 2),
+      "```",
+      "",
+      "Available session MCP servers:",
+      "",
+      "```json",
+      JSON.stringify({ count: servers.length, servers }, null, 2),
+      "```"
+    ].join("\n");
+  }
   return ["ACP session MCP context:", "", "```json", JSON.stringify({ count: servers.length, servers }, null, 2), "```", "", "Direct MCP tool execution should be added only after ACP/MCP capability and permission handling is wired."].join("\n");
 }
 

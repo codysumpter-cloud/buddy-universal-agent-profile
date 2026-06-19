@@ -2,13 +2,13 @@
 
 Local stdio Agent Client Protocol server for loading BUAP into Xcode or any ACP-compatible editor/client.
 
-This package now includes the first guarded Buddy runtime layer: ACP session lifecycle, BUAP loading, Buddy/Lil Buddy personalization, workspace-safe file reads, patch proposals, read-only Git helpers, MCP context reporting, and an optional OpenAI-compatible model backend.
+This package now implements the next ACP permissioned actions upgrade on top of the guarded Buddy runtime layer: ACP session lifecycle, BUAP loading, Buddy/Lil Buddy personalization, workspace-safe file reads, patch proposals, permission-gated editor-mediated writes, permission-gated terminal runs, read-only Git helpers, MCP context reporting, slash command advertisement after `session/new`, and an optional OpenAI-compatible model backend.
 
 ## What it supports
 
 - newline-delimited JSON-RPC over stdio
 - `initialize`
-- `session/new`
+- `session/new` (emits `session/update` `available_commands_update` advertising every `/buap ...` command)
 - `session/prompt`
 - `session/cancel`
 - `session/close`
@@ -23,28 +23,39 @@ This package now includes the first guarded Buddy runtime layer: ACP session lif
   - `lil_buddy_profile_id`
 - guarded runtime commands:
   - `/buap help`
+  - `/buap profiles`
+  - `/buap personalize user="..." buddy="..." lil_buddy="..." buddy_profile=bmo lil_buddy_profile=finn`
   - `/buap read path=README.md`
   - `/buap patch path=README.md find="old" replace="new"`
-  - `/buap ask prompt="summarize this repo"`
+  - `/buap apply path=README.md find="old" replace="new"` (permission-gated, editor-mediated `fs/write_text_file`)
+  - `/buap ask prompt="..."`
+  - `/buap run cmd="npm" args="test"` (permission-gated, ACP `terminal/create` + `terminal/wait_for_exit` + `terminal/output` + `terminal/release`)
   - `/buap git status`
   - `/buap git diff path=README.md`
   - `/buap mcp`
+  - `/buap mcp invoke server="..." tool="..." payload="..."` (blocked planning response)
 
-## Prepared next upgrade
+## ACP surfaces wired by the upgrade
 
-The next ACP actions upgrade is specified in:
+- `session/update` `tool_call` / `tool_call_update` for `/buap apply` and `/buap run`.
+- `session/request_permission` before every file write or terminal command.
+- `fs/read_text_file` (when advertised by the client) for `/buap read` and `/buap patch`.
+- `fs/write_text_file` (when advertised by the client) for `/buap apply`. Workspace file writes never use Node `fs.writeFile`.
+- `terminal/create`, `terminal/wait_for_exit`, `terminal/output`, `terminal/release` (when advertised by the client) for `/buap run`. Uses `command` + `args[]`, never `sh -c`.
+- `available_commands_update` broadcast right after every `session/new`.
 
-```text
-packages/buap-acp-agent/docs/permissioned-actions-upgrade.md
-packages/buap-acp-agent/tests/permissioned-actions.acceptance.md
-```
+## Capability handling
 
-It defines the next implementation pass for:
+`/buap apply` refuses unless `clientCapabilities.fs.writeTextFile === true`. `/buap run` refuses unless `clientCapabilities.terminal === true`. Both still appear in `available_commands_update` so editors can advertise them, but the command handlers return a clearly worded blocked response when the capability is missing and point to `/buap patch` (for apply) or the current git/smoke commands (for run) as safe fallbacks.
 
-- `/buap apply` using ACP permission + client file API
-- `/buap run` using ACP permission + client process API
-- command discovery after `session/new`
-- MCP action requests remaining blocked until policy is wired
+## MCP policy
+
+`/buap mcp invoke` does not call any MCP tool. The blocked Lil Buddy report lists:
+
+- requested server, tool, and payload;
+- available session MCP server config;
+- reason it is blocked ("MCP-over-ACP transport and permission policy are not implemented in this agent.");
+- next implementation requirement.
 
 ## Local setup
 
@@ -84,9 +95,10 @@ BUAP_WORKSPACE_ROOT=/absolute/path/to/workspace
 BUAP_PERSONALIZATION_FILE=/absolute/path/to/.buap/personalization.json
 BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
+BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 ```
 
-`BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process.
+`BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process. `BUAP_TERMINAL_OUTPUT_LIMIT` controls the byte cap passed to `terminal/create`.
 
 ## Optional model backend
 
@@ -115,7 +127,8 @@ Use `/buap profiles` to list available BMO council profiles.
 ## Safety behavior
 
 - File reads are workspace-confined and block path traversal.
-- Patch command generates a diff proposal only; it does not write to disk.
+- `/buap patch` generates a diff proposal only; it does not write to disk.
+- `/buap apply` calls `session/request_permission` and writes only via `fs/write_text_file` after the user allows.
+- `/buap run` calls `session/request_permission` and uses `command` + `args[]` through ACP `terminal/create` (no shell string interpolation).
 - Git helpers are read-only `status` and `diff` commands.
-- MCP server configs passed by the ACP client are reported, not executed.
-- File-change and process-backed actions are prepared as the next explicit implementation pass.
+- MCP server configs passed by the ACP client are reported; `/buap mcp invoke` returns a blocked planning response until ACP/MCP capability and permission handling is implemented.

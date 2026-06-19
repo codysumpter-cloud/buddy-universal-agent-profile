@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import {
   handleRuntimeCommand,
+  availableCommands,
+  type AcpClientBridge,
   type LoadedBuap,
   type PersonalizationState,
   type Profile,
@@ -38,6 +40,29 @@ type JsonRpcMessage = {
 
 const sessions = new Map<string, SessionState>();
 let clientCapabilities: Record<string, unknown> = {};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function buildClientBridge(session: SessionState): AcpClientBridge {
+  return {
+    clientCapabilities,
+    sendSessionUpdate(sessionId, update) {
+      sendSessionUpdate(sessionId, update);
+    },
+    async requestClient(method, params) {
+      sendSessionUpdate(session.sessionId, {
+        sessionUpdate: "client_request",
+        method,
+        params
+      });
+      throw new Error(
+        `ACP client method "${method}" is not implemented by the editor bridge in this build. Lil Buddy did not call it.`
+      );
+    }
+  };
+}
 
 function dirnameFromImportMeta(): string {
   return path.dirname(fileURLToPath(import.meta.url));
@@ -290,7 +315,8 @@ async function renderPromptResponse(
     return { state, response: renderFirstRun(profilePack) };
   }
 
-  const runtime = await handleRuntimeCommand({ text, state, profilePack, buap, session });
+  const client = session ? buildClientBridge(session) : undefined;
+  const runtime = await handleRuntimeCommand({ text, state, profilePack, buap, session, client });
   if (runtime.handled) {
     return { state, response: runtime.response };
   }
@@ -352,15 +378,11 @@ async function handleMessage(
               profile: "XCODE_ACP_BUAP.md",
               defaultBuddyProfile: process.env.BUAP_DEFAULT_BUDDY_PROFILE || "bmo",
               defaultLilBuddyProfile: process.env.BUAP_DEFAULT_LIL_BUDDY_PROFILE || "finn",
-              runtimeCommands: [
-                "/buap help",
-                "/buap read",
-                "/buap patch",
-                "/buap ask",
-                "/buap git status",
-                "/buap git diff",
-                "/buap mcp"
-              ]
+              advertisedCommands: availableCommands().map((command) => command.name),
+              capabilityAdvertisement: {
+                method: "session/update",
+                sessionUpdate: "available_commands_update"
+              }
             }
           }
         },
@@ -381,6 +403,10 @@ async function handleMessage(
         cwd: typeof message.params?.cwd === "string" ? message.params.cwd : undefined,
         mcpServers: Array.isArray(message.params?.mcpServers) ? message.params.mcpServers : [],
         createdAt: new Date().toISOString()
+      });
+      sendSessionUpdate(sessionId, {
+        sessionUpdate: "available_commands_update",
+        availableCommands: availableCommands()
       });
       sendResponse(message.id, { sessionId });
       return;
