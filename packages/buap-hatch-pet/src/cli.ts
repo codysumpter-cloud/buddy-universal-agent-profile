@@ -3,8 +3,14 @@ import os from "node:os";
 import path from "node:path";
 import {
   detectAseprite,
+  detectAsepriteExtensionReference,
   detectLibreSprite,
+  detectPixelLabAdapter,
+  detectPixelLabMcp,
   verifyPetArtifact,
+  PIXELLAB_ASEPRITE_EXTENSION_PATH,
+  PIXELLAB_LIBRESPRITE_ADAPTER_PATH,
+  PIXELLAB_MCP_CONFIG_PATH,
   type SpriteToolStatus
 } from "./index.js";
 
@@ -44,22 +50,47 @@ function renderTool(label: string, commandName: string, status: SpriteToolStatus
 }
 
 async function renderDoctor(): Promise<string> {
-  const [libreSprite, aseprite] = await Promise.all([detectLibreSprite(), detectAseprite()]);
+  const [libreSprite, aseprite, pixelLabMcp, pixelLabAdapter, asepriteExtension] = await Promise.all([
+    detectLibreSprite(),
+    detectAseprite(),
+    detectPixelLabMcp(),
+    detectPixelLabAdapter(),
+    detectAsepriteExtensionReference()
+  ]);
   return [
     "BUAP Hatch-Pet Doctor",
     "",
     "Modes:",
     "- host-hatch-pet: preferred, Codex host runs official $hatch-pet.",
     "- manual-handoff: BUAP returns the exact host prompt and verify command.",
-    "- pixel-art-fallback: Pixellab.ai generation plus LibreSprite/Aseprite repair/export tooling.",
+    "- pixellab-libresprite-fallback: Pixellab.ai (Pixflux) generation plus LibreSprite/Aseprite repair/export tooling.",
     "",
     "Sprite tooling:",
     ...renderTool("LibreSprite", "libresprite", libreSprite),
     ...renderTool("Aseprite", "aseprite", aseprite),
     "",
+    "PixelLab + LibreSprite fallback:",
+    `PixelLab MCP config: ${pixelLabMcp.configPresent ? "present" : "missing"}`,
+    `PixelLab MCP config path: ${PIXELLAB_MCP_CONFIG_PATH}`,
+    `PixelLab MCP entry: ${pixelLabMcp.mcpEntry}`,
+    "Token safety: secrets redacted; config contents not printed",
+    "API probe: skipped, would spend credits",
+    `LibreSprite PixelLab JS adapter: ${pixelLabAdapter.present ? "present" : "missing"}`,
+    `LibreSprite PixelLab JS adapter path: ${PIXELLAB_LIBRESPRITE_ADAPTER_PATH}`,
+    "Adapter capabilities: balance check, Pixflux image generation",
+    `Aseprite PixelLab extension reference: ${asepriteExtension.present ? "present" : "missing"}`,
+    `Aseprite PixelLab extension reference path: ${PIXELLAB_ASEPRITE_EXTENSION_PATH}`,
+    "Runtime note: Lua-based Aseprite code; reference only for LibreSprite",
+    "",
+    "BUAP profile pairing:",
+    "Buddy profile: bmo",
+    "Lil Buddy profile: finn",
+    "Lil Buddy is the implementation worker",
+    "",
     "Fallback safety:",
-    "- Pixellab.ai can generate Buddy/Lil Buddy art when available in the Codex host.",
+    "- Pixellab.ai (Pixflux) can generate Buddy/Lil Buddy art when available in the Codex host.",
     "- LibreSprite/Aseprite can repair, slice, validate, and export spritesheets.",
+    "- The doctor never calls the PixelLab API and never spends credits.",
     "- Codex pet packaging remains gated by verifyPetArtifact(); do not claim success until pet.json and a spritesheet/atlas exist."
   ].join("\n");
 }

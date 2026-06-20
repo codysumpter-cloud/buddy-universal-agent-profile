@@ -146,8 +146,11 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
   For local verification and first-run setup, see
   `docs/local-buap-doctor-and-bootstrap.md`.
   For local KnowledgeVault search, see `docs/knowledge-vault-search.md`.
-  For Codex-host pet hatching through `/buap hatch-pet`, see
-  `docs/hatch-pet-integration.md`.
+  For Codex-host pet hatching through `/buap hatch-pet`, including the
+  `pixellab-libresprite-fallback` mode (PixelLab MCP config at
+  `/Users/prismtek/.codex/config.toml`, the LibreSprite `PixelLab.js` adapter, and the
+  LibreSprite CLI), see `docs/hatch-pet-integration.md`. The doctor never calls the
+  PixelLab API and never spends credits.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use

@@ -16,6 +16,9 @@ Exports:
 - `verifyPetArtifact(petDir)`
 - `detectLibreSprite()`
 - `detectAseprite()`
+- `detectPixelLabMcp()`
+- `detectPixelLabAdapter()`
+- `detectAsepriteExtensionReference()`
 
 Install hatch-pet in a Codex host if needed:
 
@@ -79,3 +82,31 @@ Discovered LibreSprite batch/export options include:
 --frame-range from,to
 --save-as <filename>
 ```
+
+## PixelLab + LibreSprite fallback
+
+`node dist/cli.js doctor` also reports the `pixellab-libresprite-fallback`
+toolchain. The doctor detects each capability by existence only — it never calls
+the PixelLab API and never spends credits (`API probe: skipped, would spend
+credits`).
+
+- PixelLab MCP config: `/Users/prismtek/.codex/config.toml`. Read only for safe
+  lowercase substrings (`pixellab`, `pixflux`, `mcp`) to set
+  `PixelLab MCP entry: present|missing|unknown`. Config contents and tokens are
+  never printed — secrets redacted. Generation allowance is verified manually.
+- LibreSprite JS adapter:
+  `/Users/prismtek/Library/Application Support/LibreSprite/scripts/PixelLab.js`.
+  Supports a balance check and Pixflux image generation.
+- Aseprite PixelLab extension reference:
+  `/Users/prismtek/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension`.
+  Lua-based Aseprite code; reference only for LibreSprite, not an active runtime.
+- LibreSprite CLI: `/Applications/LibreSprite.app/Contents/MacOS/libresprite`.
+
+Hatch workflow modes, in order: `host-hatch-pet` → `manual-handoff` →
+`pixellab-libresprite-fallback`.
+
+## BUAP profile pairing
+
+This repo locks Buddy profile = `bmo` and Lil Buddy profile = `finn`; Lil Buddy is
+the implementation worker. The doctor prints these as `Buddy profile: bmo` and
+`Lil Buddy profile: finn`.

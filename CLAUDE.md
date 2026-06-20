@@ -47,6 +47,29 @@ Overlays never override BUAP safety, validation, capability detection, source-of
   `@buddy-universal-agent-profile/CLAUDE.md` or a plain "read this file first"
   instruction.
 
+## BUAP active profile pairing
+
+For this repo the BUAP pairing is locked:
+
+- Buddy = `bmo` (BMO-style: playful, warm, curious, practical, friendly).
+- Lil Buddy = `finn` (Finn-style: brave, action-oriented, direct, loyal, persistent).
+- Lil Buddy is the implementation worker.
+
+Operational rule: when a session has no configured Buddy/Lil Buddy profile pairing,
+ask the user to select one before locking in. In this repo, default to Buddy=`bmo` /
+Lil Buddy=`finn` rather than re-prompting. See
+`personalization/BUDDY_LIL_BUDDY_PROFILE_SELECTION.md`.
+
+In Claude Code with the BUAP plugin active, Lil Buddy is a true subagent. Plain node
+tooling has no subagent runtime, so `tools/buap-doctor.mjs` reports Lil Buddy as an
+emulated worker pattern (true subagent in Claude Code plugin).
+
+The hatch-pet `pixellab-libresprite-fallback` mode is documented in
+`docs/hatch-pet-integration.md`. Its doctor detects the local PixelLab MCP config,
+the LibreSprite `PixelLab.js` adapter, the reference-only Aseprite extension, and the
+LibreSprite CLI by existence only — it never calls the PixelLab API and never spends
+credits, and never prints config contents or tokens.
+
 ## Read next
 
 `BUDDY_PROFILE.md`, `LIL_BUDDY_PROFILE.md`, `standards/`, `examples/`.

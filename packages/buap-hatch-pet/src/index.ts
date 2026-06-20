@@ -41,6 +41,38 @@ export interface SpriteToolStatus {
   notes: string[];
 }
 
+export interface PixelLabMcpStatus {
+  configPresent: boolean;
+  mcpEntry: "present" | "missing" | "unknown";
+}
+
+export interface PixelLabAdapterStatus {
+  present: boolean;
+}
+
+export interface AsepriteExtensionReferenceStatus {
+  present: boolean;
+}
+
+const PIXELLAB_MCP_CONFIG_PATH = path.join(os.homedir(), ".codex", "config.toml");
+const PIXELLAB_LIBRESPRITE_ADAPTER_PATH = path.join(
+  os.homedir(),
+  "Library",
+  "Application Support",
+  "LibreSprite",
+  "scripts",
+  "PixelLab.js"
+);
+const PIXELLAB_ASEPRITE_EXTENSION_PATH = path.join(
+  os.homedir(),
+  "Library",
+  "Application Support",
+  "LibreSprite",
+  "PixelLab-Aseprite-extension"
+);
+
+export { PIXELLAB_MCP_CONFIG_PATH, PIXELLAB_LIBRESPRITE_ADAPTER_PATH, PIXELLAB_ASEPRITE_EXTENSION_PATH };
+
 const SPRITESHEET_CANDIDATES = [
   "spritesheet.webp",
   "spritesheet.png",
@@ -197,6 +229,44 @@ export async function detectAseprite(): Promise<SpriteToolStatus> {
     bundleExecutables: ["aseprite", "Aseprite"],
     label: "Aseprite"
   });
+}
+
+/**
+ * Detect the local PixelLab MCP config without ever returning or logging file
+ * contents or tokens. The config is read only to test for safe lowercase
+ * substrings that indicate a PixelLab MCP entry. No PixelLab API call is made.
+ */
+export async function detectPixelLabMcp(): Promise<PixelLabMcpStatus> {
+  const configPresent = await fileExists(PIXELLAB_MCP_CONFIG_PATH);
+  if (!configPresent) {
+    return { configPresent: false, mcpEntry: "missing" };
+  }
+  let mcpEntry: PixelLabMcpStatus["mcpEntry"] = "unknown";
+  try {
+    const raw = await fs.readFile(PIXELLAB_MCP_CONFIG_PATH, "utf8");
+    const lower = raw.toLowerCase();
+    const hasPixelLab = lower.includes("pixellab") || lower.includes("pixflux");
+    const hasMcp = lower.includes("mcp");
+    if (hasPixelLab && hasMcp) {
+      mcpEntry = "present";
+    } else if (hasPixelLab || hasMcp) {
+      // A marker exists but not a confident PixelLab-under-MCP pairing.
+      mcpEntry = "unknown";
+    } else {
+      mcpEntry = "missing";
+    }
+  } catch {
+    mcpEntry = "unknown";
+  }
+  return { configPresent, mcpEntry };
+}
+
+export async function detectPixelLabAdapter(): Promise<PixelLabAdapterStatus> {
+  return { present: await fileExists(PIXELLAB_LIBRESPRITE_ADAPTER_PATH) };
+}
+
+export async function detectAsepriteExtensionReference(): Promise<AsepriteExtensionReferenceStatus> {
+  return { present: await fileExists(PIXELLAB_ASEPRITE_EXTENSION_PATH) };
 }
 
 function petsRoot(outputDir?: string): string {
