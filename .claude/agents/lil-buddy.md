@@ -1,0 +1,1 @@
+../../plugins/buap/agents/lil-buddy.md
