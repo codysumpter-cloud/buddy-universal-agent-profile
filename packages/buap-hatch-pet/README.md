@@ -1,25 +1,31 @@
 # @prismtek/buap-hatch-pet
 
-Permission-safe wrapper for the official OpenAI `hatch-pet` skill used by the
-BUAP ACP agent.
+Host-aware planning and verification helpers for the official OpenAI
+`hatch-pet` skill.
 
-The wrapper installs or refreshes the skill with:
+This package does **not** run `npx skills run`. The current local `skills` CLI may
+support `add` and `use`, but it does not advertise a non-interactive `run`
+command. BUAP therefore prepares a Codex-host prompt and verifies generated files
+after the host skill runs.
 
-```bash
-npx skills add https://github.com/openai/skills --skill hatch-pet --agent codex --yes
+Exports:
+
+- `buildBuddyPetConcept(request)`
+- `buildHatchPetHostPrompt(request)`
+- `planHatchPet(request)`
+- `verifyPetArtifact(petDir)`
+- `detectLibreSprite()`
+- `detectAseprite()`
+
+Install hatch-pet in a Codex host if needed:
+
+```text
+$skill-installer hatch-pet
 ```
 
-If the installed `skills` CLI supports non-interactive execution, it runs:
-
-```bash
-npx skills run hatch-pet --concept "<concept>" --name "<optional name>"
-```
-
-The current local `skills` CLI may provide `add` and `use` but not `run`. In that
-case the wrapper returns a clear blocked error instead of claiming a pet was
-generated. After successful live execution it locates the generated `pet.json` under
-`${CODEX_HOME:-$HOME/.codex}/pets/` and returns the pet display name plus package
-path.
+Then paste the host prompt returned by `planHatchPet()` into a Codex chat where
+`$hatch-pet` is loaded. After hatching, verify the package under
+`${CODEX_HOME:-$HOME/.codex}/pets/<pet-id>/`.
 
 ## Smoke test
 
@@ -29,11 +35,47 @@ npm run build
 npm run smoke
 ```
 
-`npm run smoke` imports the wrapper only. Live generation is opt-in:
+`npm run smoke` checks the planner and verifies a temporary fake pet artifact. It
+does not install skills, call image generation, or write to the real Codex pets
+directory.
+
+## Sprite Tool Doctor
 
 ```bash
-BUAP_HATCH_PET_LIVE=1 npm run smoke
+node dist/cli.js doctor
+node dist/cli.js sprite-tool doctor
 ```
 
-Live generation can install skills, call image generation, and write pet files.
-It also requires a `skills` CLI/runtime that supports non-interactive skill runs.
+The doctor checks:
+
+- LibreSprite app presence.
+- LibreSprite executable path inside the app bundle even when `libresprite` is not
+  on `PATH`.
+- LibreSprite `--help` behavior.
+- Aseprite app/CLI presence.
+
+On this Mac, LibreSprite is installed at `/Applications/LibreSprite.app` and the
+CLI executable is:
+
+```text
+/Applications/LibreSprite.app/Contents/MacOS/libresprite
+```
+
+If it is not on `PATH`, use the direct command or add an alias:
+
+```bash
+alias libresprite="/Applications/LibreSprite.app/Contents/MacOS/libresprite"
+```
+
+Discovered LibreSprite batch/export options include:
+
+```text
+--batch
+--script <filename>
+--sheet <filename.png>
+--data <filename.json>
+--format json-hash|json-array
+--sheet-type horizontal|vertical|rows|columns|packed
+--frame-range from,to
+--save-as <filename>
+```

@@ -45,6 +45,7 @@ const requiredFiles = [
   'docs/apple-notes-reminders.md',
   'packages/buap-hatch-pet/package.json',
   'packages/buap-hatch-pet/src/index.ts',
+  'packages/buap-hatch-pet/src/cli.ts',
   'packages/buap-hatch-pet/scripts/smoke.mjs',
   'docs/hatch-pet-integration.md'
 ];
@@ -65,8 +66,17 @@ const requiredText = [
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-reminder'],
   ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap hatch-pet'],
-  ['packages/buap-hatch-pet/src/index.ts', 'hatchPet'],
-  ['docs/hatch-pet-integration.md', '/buap hatch-pet']
+  ['packages/buap-acp-agent/src/runtime.ts', 'hatch-pet verify'],
+  ['packages/buap-hatch-pet/src/index.ts', 'planHatchPet'],
+  ['packages/buap-hatch-pet/src/index.ts', 'verifyPetArtifact'],
+  ['packages/buap-hatch-pet/src/index.ts', 'detectLibreSprite'],
+  ['packages/buap-hatch-pet/src/cli.ts', 'Sprite tooling'],
+  ['docs/hatch-pet-integration.md', '/buap hatch-pet'],
+  ['docs/hatch-pet-integration.md', 'host-hatch-pet'],
+  ['docs/hatch-pet-integration.md', 'manual-handoff'],
+  ['docs/hatch-pet-integration.md', 'pixel-art-fallback'],
+  ['tools/buap-doctor.mjs', 'pixel-art-fallback'],
+  ['tools/buap-doctor.mjs', 'LibreSprite executable']
 ];
 
 const failures = [];

@@ -83,7 +83,9 @@ Codex pet hatching:
   - `/buap add-note title="Idea" body="details"` (macOS only, permission-gated) — create an Apple Note
   - `/buap reminders` (macOS only) — list pending Apple Reminders
   - `/buap add-reminder title="Call Cody" dueDate="2026-07-01"` (macOS only, permission-gated) — create an Apple Reminder
-  - `/buap hatch-pet concept="tiny teal robot helper" [name="Buddy"]` — permission-gated Codex pet generation through the official `hatch-pet` skill
+  - `/buap hatch-pet profile="buddy" name="Buddy"` — prepare a Codex-host hatch-pet handoff from the active Buddy profile
+  - `/buap hatch-pet profile="lil-buddy" name="Lil Buddy"` — prepare a Codex-host hatch-pet handoff from the active Lil Buddy worker profile
+  - `/buap hatch-pet verify name="Buddy"` — verify generated pet files after the host skill runs
   - `/buap mcp`
   - `/buap mcp invoke server="..." tool="..." payload="..."` (blocked planning response)
 
@@ -151,14 +153,11 @@ BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
 KNOWLEDGE_VAULT_PATH=/absolute/path/to/knowledge-vault
-BUAP_HATCH_PET_TIMEOUT_MS=1800000
-BUAP_HATCH_PET_LIVE=0
 ```
 
 `BUAP_REPO_ROOT` is useful when the command is launched from outside this repo. `BUAP_WORKSPACE_ROOT` provides a fallback workspace if the ACP session does not include `cwd`. `BUAP_PERSONALIZATION_FILE` enables local personalization persistence. Without it, personalization is held in memory for the current agent process. `BUAP_TERMINAL_OUTPUT_LIMIT` controls the byte cap passed to `terminal/create`.
 `BUAP_CLIENT_REQUEST_TIMEOUT_MS` controls how long the agent waits for editor responses to ACP client requests such as `session/request_permission`, `fs/write_text_file`, and terminal calls.
 `KNOWLEDGE_VAULT_PATH` points `/buap search-vault` at a local KnowledgeVault checkout. It defaults to `~/Prismtek/knowledge-vault`.
-`BUAP_HATCH_PET_TIMEOUT_MS` controls the live skill wrapper timeout. `BUAP_HATCH_PET_LIVE=1` is only used by the hatch-pet package smoke test; normal ACP use always requires `session/request_permission`.
 
 ## Optional model backend
 
@@ -193,6 +192,6 @@ Use `/buap profiles` to list available BMO council profiles.
 - `/buap search-vault` is read-only and searches local KnowledgeVault titles/excerpts.
 - `/buap notes` and `/buap reminders` are **macOS only** (driven by `osascript`) and read-only.
 - `/buap add-note` and `/buap add-reminder` are **macOS only** and call `session/request_permission` before creating anything; without an ACP permission channel they refuse. See `../../docs/apple-notes-reminders.md`.
-- `/buap hatch-pet` calls `session/request_permission` before installing/running the external `hatch-pet` skill. The default package smoke test imports only; live generation requires `BUAP_HATCH_PET_LIVE=1`. See `../../docs/hatch-pet-integration.md`.
+- `/buap hatch-pet` does not generate pets directly. It requires confirmed BUAP personalization, returns a Codex-host `$hatch-pet` prompt, and provides `/buap hatch-pet verify name="..."` for artifact checks. See `../../docs/hatch-pet-integration.md`.
 - Git helpers are read-only `status` and `diff` commands.
 - MCP server configs passed by the ACP client are reported; `/buap mcp invoke` returns a blocked planning response until ACP/MCP capability and permission handling is implemented.
