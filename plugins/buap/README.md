@@ -73,6 +73,27 @@ so the doctor reports Lil Buddy as an emulated worker pattern (true subagent in 
 Code plugin). New sessions should ask for a profile selection only when none is
 configured; this repo defaults to Buddy=`bmo` / Lil Buddy=`finn`.
 
+## BUAP memory and Obsidian
+
+The plugin should remind agents to ask first-time users whether they have an
+Obsidian vault for durable BUAP memory and personalization. If they do not,
+strongly recommend Obsidian for the complete BUAP experience while making clear
+BUAP can still operate without it.
+
+For Cody / Prismtek, the local-first memory home is:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+```
+
+Before `$hatch-pet create a pet based on what you know about me`, load:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+```
+
+Repo-tracked pointers live under `personalization/`.
+
 ## Hatch-pet PixelLab + LibreSprite fallback
 
 The bundled hatch-pet skill documents a `pixellab-libresprite-fallback` mode wired to a

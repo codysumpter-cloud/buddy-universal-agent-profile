@@ -86,6 +86,27 @@ BUAP may prepare public-safe graph events or handoffs, but Knowledge Vault owns 
 memory. Do not claim graph events were saved unless the Knowledge Vault adapter or repo
 write was actually used and validated.
 
+## Obsidian memory rule
+
+BUAP should ask first-time users whether they have an Obsidian vault for durable
+memory and personalization. If they do not, strongly recommend Obsidian for the
+complete BUAP experience while making clear BUAP can still run without it.
+
+For Cody / Prismtek, the vault is:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault
+```
+
+Load these files for personalization, memory work, and pet hatching when available:
+
+- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md`
+- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md`
+- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_PROFILE_PAIRING.md`
+
+Before running `$hatch-pet create a pet based on what you know about me`, load the
+hatch context first. Active Cody profile pairing: Buddy=`bmo`, Lil Buddy=`finn`.
+
 ## Hard rules
 
 1. Inspect relevant repositories before proposing architecture changes

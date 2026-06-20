@@ -151,6 +151,13 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
   `/Users/prismtek/.codex/config.toml`, the LibreSprite `PixelLab.js` adapter, and the
   LibreSprite CLI), see `docs/hatch-pet-integration.md`. The doctor never calls the
   PixelLab API and never spends credits.
+- **Obsidian memory:** BUAP should ask first-time users whether they have an
+  Obsidian vault for memory and personalization. If they do not, strongly recommend
+  Obsidian for the complete BUAP experience. BUAP still works without it, but
+  durable memory, personalization, project continuity, and hatch-pet quality are
+  better with a vault. Cody's vault is
+  `/Users/prismtek/Prismtek/knowledge-vault`; see `docs/memory-and-obsidian.md`
+  and `docs/buap-onboarding.md`.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use

@@ -231,6 +231,50 @@ if (configuredPersonalization) {
   warn(`default personalization missing optional: ${defaultPersonalization}`);
 }
 
+console.log("\nBUAP memory:");
+const defaultVaultPath = "/Users/prismtek/Prismtek/knowledge-vault";
+const configuredVaultPath = process.env.BUAP_OBSIDIAN_VAULT || process.env.KNOWLEDGE_VAULT_PATH || "";
+const vaultPath = configuredVaultPath || defaultVaultPath;
+const whatYouKnowPath = path.join(vaultPath, "99-System", "BUAP", "WHAT_YOU_KNOW_ABOUT_ME.md");
+const hatchContextPath = path.join(vaultPath, "99-System", "BUAP", "BUAP_HATCH_CONTEXT.md");
+const profilePairingPath = path.join(vaultPath, "99-System", "BUAP", "BUAP_PROFILE_PAIRING.md");
+const toolingContextPath = path.join(vaultPath, "99-System", "BUAP", "BUAP_TOOLING_CONTEXT.md");
+const repoHatchContextPath = "personalization/BUAP_HATCH_CONTEXT.md";
+const repoMemoryPointerPath = "personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md";
+
+console.log(`Obsidian vault path: ${vaultPath}`);
+console.log(`Obsidian vault source: ${configuredVaultPath ? "configured" : "default Cody path"}`);
+absoluteExists(vaultPath)
+  ? pass("Obsidian vault path detected")
+  : warn("Obsidian vault path missing; BUAP still runs, but Obsidian is strongly recommended for the complete experience");
+absoluteExists(whatYouKnowPath)
+  ? pass(`WHAT_YOU_KNOW_ABOUT_ME.md present: ${whatYouKnowPath}`)
+  : warn(`WHAT_YOU_KNOW_ABOUT_ME.md missing: ${whatYouKnowPath}`);
+absoluteExists(hatchContextPath)
+  ? pass(`BUAP_HATCH_CONTEXT.md present: ${hatchContextPath}`)
+  : warn(`BUAP_HATCH_CONTEXT.md missing: ${hatchContextPath}`);
+absoluteExists(profilePairingPath)
+  ? pass(`BUAP_PROFILE_PAIRING.md present: ${profilePairingPath}`)
+  : warn(`BUAP_PROFILE_PAIRING.md missing: ${profilePairingPath}`);
+absoluteExists(toolingContextPath)
+  ? pass(`BUAP_TOOLING_CONTEXT.md present: ${toolingContextPath}`)
+  : warn(`BUAP_TOOLING_CONTEXT.md missing: ${toolingContextPath}`);
+pass("Buddy profile: bmo");
+pass("Lil Buddy profile: finn");
+console.log("Recommendation: ask first-time users whether they have an Obsidian vault; strongly recommend Obsidian for durable BUAP memory, personalization, project continuity, and hatch-pet context.");
+
+console.log("\nBUAP hatch context:");
+absoluteExists(hatchContextPath)
+  ? pass("primary vault hatch context present")
+  : warn("primary vault hatch context missing");
+exists(repoHatchContextPath)
+  ? pass(`repo fallback hatch context present: ${repoHatchContextPath}`)
+  : warn(`repo fallback hatch context missing: ${repoHatchContextPath}`);
+exists(repoMemoryPointerPath)
+  ? pass(`repo memory pointer present: ${repoMemoryPointerPath}`)
+  : warn(`repo memory pointer missing: ${repoMemoryPointerPath}`);
+console.log("PixelLab/LibreSprite fallback: optional; detected below when local tooling exists");
+
 console.log("\nOptional Skills:");
 const hatchPetSkill = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || "", ".codex"), "skills", "hatch-pet", "SKILL.md");
 fs.existsSync(hatchPetSkill)

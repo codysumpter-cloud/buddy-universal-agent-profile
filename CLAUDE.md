@@ -70,6 +70,23 @@ the LibreSprite `PixelLab.js` adapter, the reference-only Aseprite extension, an
 LibreSprite CLI by existence only — it never calls the PixelLab API and never spends
 credits, and never prints config contents or tokens.
 
+## BUAP memory and hatch context
+
+Ask first-time users whether they have an Obsidian vault for BUAP memory and
+personalization. If not, strongly recommend Obsidian for the complete BUAP
+experience. BUAP can still run without it, but durable memory, personalization,
+project continuity, and pet hatching are better with a vault.
+
+For Cody / Prismtek, load local-first memory from:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+```
+
+Before `$hatch-pet create a pet based on what you know about me`, load the hatch
+context first and use Buddy=`bmo`, Lil Buddy=`finn` unless Cody overrides it.
+
 ## Read next
 
 `BUDDY_PROFILE.md`, `LIL_BUDDY_PROFILE.md`, `standards/`, `examples/`.

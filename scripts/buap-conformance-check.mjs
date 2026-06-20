@@ -47,7 +47,11 @@ const requiredFiles = [
   'packages/buap-hatch-pet/src/index.ts',
   'packages/buap-hatch-pet/src/cli.ts',
   'packages/buap-hatch-pet/scripts/smoke.mjs',
-  'docs/hatch-pet-integration.md'
+  'docs/hatch-pet-integration.md',
+  'docs/buap-onboarding.md',
+  'docs/memory-and-obsidian.md',
+  'personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md',
+  'personalization/BUAP_HATCH_CONTEXT.md'
 ];
 
 const requiredText = [
@@ -103,7 +107,21 @@ const requiredText = [
   ['tools/buap-doctor.mjs', 'no credits spent'],
   ['tools/buap-doctor.mjs', 'secrets redacted'],
   ['tools/buap-doctor.mjs', 'Buddy profile: bmo'],
-  ['tools/buap-doctor.mjs', 'Lil Buddy profile: finn']
+  ['tools/buap-doctor.mjs', 'Lil Buddy profile: finn'],
+  // Local-first Obsidian memory + hatch context.
+  ['README.md', 'Obsidian memory'],
+  ['AGENTS.md', 'Obsidian memory rule'],
+  ['CODEX.md', 'BUAP_HATCH_CONTEXT.md'],
+  ['CLAUDE.md', 'BUAP memory and hatch context'],
+  ['plugins/buap/README.md', 'BUAP memory and Obsidian'],
+  ['docs/buap-onboarding.md', 'Do you have an Obsidian vault'],
+  ['docs/memory-and-obsidian.md', 'WHAT_YOU_KNOW_ABOUT_ME.md'],
+  ['docs/hatch-pet-integration.md', '$hatch-pet create a pet based on what you know about me'],
+  ['personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md', '/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md'],
+  ['personalization/BUAP_HATCH_CONTEXT.md', '/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md'],
+  ['tools/buap-doctor.mjs', 'BUAP memory'],
+  ['tools/buap-doctor.mjs', 'primary vault hatch context present'],
+  ['tools/buap-doctor.mjs', 'strongly recommend Obsidian']
 ];
 
 const failures = [];
