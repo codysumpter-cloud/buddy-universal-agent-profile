@@ -15,7 +15,12 @@ Why this split (verified constraints, do not regress):
     The `open` subcommand shells to that (best-effort, optional, GUI only).
 
 Subcommands: resize, clone, recolor, feature-swap, new-buddy, open.
+Codex buddy factory: compose-atlas, install-pet, sheet-64, mint.
 Run `buddy.py <subcommand> --help` for details.
+
+The factory composes a Codex pet atlas + 64x64 game sheets FROM real Buddy art
+(even-sampled + scaled-to-fit), never AI-generated -- AI generation drifts
+humanoid; composition preserves the buddy identity exactly.
 
 All input paths are arguments. Nothing here touches the network or the PixelLab
 API, and no path is hardcoded to a user's Downloads folder.
@@ -79,15 +84,30 @@ def _resize_image(im, size, method):
     )
 
 
-def _recolor_image(im, hue_shift):
+HEART_MODES = ("keep", "recolor", "remove")
+
+
+def _is_heart_pixel(hh, ss):
+    """Warm belly-heart accent test: warm hue band + saturated."""
+    return 0.02 < hh < 0.13 and ss > 0.4
+
+
+def _recolor_image(im, hue_shift, heart="keep"):
     """Hue-shift an RGBA image while protecting identity pixels.
 
     Per the proven logic:
       * fully transparent pixels stay transparent;
       * near-gray / white pixels (s < 0.18) are kept -- face, eyes, outline;
-      * the warm belly-heart accent (0.02 < h < 0.13 and s > 0.4) is kept;
+      * the warm belly-heart accent (0.02 < h < 0.13 and s > 0.4) is handled by
+        `heart`: keep (default, leave as-is), recolor (rotate it with the rest),
+        or remove (make it transparent);
       * everything else is rotated by hue_shift (a fraction of the wheel, 0..1).
+
+    The same hue_shift / heart mode is applied identically to every frame so a
+    whole animated buddy recolors consistently.
     """
+    if heart not in HEART_MODES:
+        raise ValueError(f"heart must be one of {HEART_MODES}, got {heart!r}")
     src = im.load()
     out = Image.new("RGBA", im.size)
     dst = out.load()
@@ -102,13 +122,34 @@ def _recolor_image(im, hue_shift):
             if ss < 0.18:
                 dst[x, y] = (r, g, b, a)  # face / eyes / outline (near gray)
                 continue
-            if 0.02 < hh < 0.13 and ss > 0.4:
-                dst[x, y] = (r, g, b, a)  # warm belly-heart accent
-                continue
+            if _is_heart_pixel(hh, ss):
+                if heart == "keep":
+                    dst[x, y] = (r, g, b, a)  # leave the heart as-is
+                    continue
+                if heart == "remove":
+                    dst[x, y] = (0, 0, 0, 0)  # drop the heart (zeroed RGB)
+                    continue
+                # heart == "recolor": fall through and rotate it with the body.
             nh = (hh + hue_shift) % 1.0
             nr, ng, nb = colorsys.hsv_to_rgb(nh, ss, vv)
             dst[x, y] = (round(nr * 255), round(ng * 255), round(nb * 255), a)
     return out
+
+
+def _zero_transparent_rgb(im):
+    """Return a copy where every fully-transparent pixel has RGB zeroed.
+
+    The Codex atlas contract requires transparent pixels to carry zeroed RGB.
+    """
+    src = im.convert("RGBA")
+    px = src.load()
+    w, h = src.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0 and (r or g or b):
+                px[x, y] = (0, 0, 0, 0)
+    return src
 
 
 def _alpha_paste(base, feature, offset):
@@ -203,7 +244,7 @@ def cmd_recolor(args):
 
     rc = 0
     for shift, name in shifts:
-        variant = _recolor_image(im, shift)
+        variant = _recolor_image(im, shift, heart=args.heart)
         native_out = os.path.join(args.outdir, name + ".png")
         variant.save(native_out)
         print(f"recolor native {native_out} (hue+{shift:.3f})")
@@ -327,6 +368,441 @@ def cmd_new_buddy(args):
     return 0
 
 
+# ===========================================================================
+# Codex buddy factory: compose a real-art Codex pet atlas + 64x64 game sheets.
+#
+# Compose-not-generate: every cell is composed from Cody's real Buddy animation
+# frames (even-sampled + scaled-to-fit), never AI-generated. AI generation
+# drifts humanoid; composition preserves the exact buddy identity.
+#
+# Codex pet atlas contract (reimplemented from the public hatch-pet skill spec,
+# NOT copied from any licensed source):
+#   * Atlas 1536x1872, 8 cols x 9 rows, cell 192x208, RGBA transparent.
+#   * Unused cells (col >= frame_count) fully transparent.
+#   * Transparent pixels must have zeroed RGB.
+#   * Each USED cell: >= 50 non-transparent px AND not > 95% opaque.
+#   * No fully-opaque atlas overall.
+#   * Saved as lossless PNG + lossless WebP.
+# ===========================================================================
+ATLAS_COLS = 8
+ATLAS_ROWS = 9
+CELL_W = 192
+CELL_H = 208
+ATLAS_W = ATLAS_COLS * CELL_W  # 1536
+ATLAS_H = ATLAS_ROWS * CELL_H  # 1872
+
+# Default state mapping: row -> (codex_state, frame_count, "Anim/dir").
+# Proven by Buddy to compose a valid atlas that renders in the Codex Pets tab.
+DEFAULT_MAPPING = [
+    {"row": 0, "state": "idle", "frames": 6, "source": "idle/south"},
+    {"row": 1, "state": "running-right", "frames": 8, "source": "Walk/east"},
+    {"row": 2, "state": "running-left", "frames": 8, "source": "Walk/west"},
+    {"row": 3, "state": "waving", "frames": 4, "source": "happy/south"},
+    {"row": 4, "state": "jumping", "frames": 5, "source": "victory/south"},
+    {"row": 5, "state": "failed", "frames": 8, "source": "defeat/south"},
+    {"row": 6, "state": "waiting", "frames": 6, "source": "thinking/south"},
+    {"row": 7, "state": "running", "frames": 6, "source": "cast/south"},
+    {"row": 8, "state": "review", "frames": 6, "source": "charge/south"},
+]
+
+# Per-frame durations (ms) from the contract, keyed by codex_state.
+STATE_DURATIONS = {
+    "idle": [280, 110, 110, 140, 140, 320],
+    "running-right": [120, 120, 120, 120, 120, 120, 120, 220],
+    "running-left": [120, 120, 120, 120, 120, 120, 120, 220],
+    "waving": [140, 140, 140, 280],
+    "jumping": [140, 140, 140, 140, 280],
+    "failed": [140, 140, 140, 140, 140, 140, 140, 240],
+    "waiting": [150, 150, 150, 150, 150, 260],
+    "running": [120, 120, 120, 120, 120, 220],
+    "review": [150, 150, 150, 150, 150, 280],
+}
+
+
+def _frame_duration(state, idx, frame_count):
+    durs = STATE_DURATIONS.get(state)
+    if durs and idx < len(durs):
+        return durs[idx]
+    return 200  # safe default if a custom mapping has no duration table
+
+
+def _even_sample(items, n):
+    """Pick n items evenly across a sorted list (first..last inclusive)."""
+    if n <= 0:
+        return []
+    if len(items) == 0:
+        return []
+    if len(items) == 1 or n == 1:
+        return [items[0]] * n
+    return [items[round(i * (len(items) - 1) / (n - 1))] for i in range(n)]
+
+
+def _list_frames(pack_dir, source):
+    """Return sorted PNG frame paths for an 'Anim/dir' source in a pack."""
+    sub = os.path.join(pack_dir, "animations", source)
+    if not os.path.isdir(sub):
+        raise FileNotFoundError(f"animation source not found: {sub}")
+    frames = [
+        os.path.join(sub, name)
+        for name in sorted(os.listdir(sub))
+        if name.lower().endswith(".png")
+    ]
+    if not frames:
+        raise FileNotFoundError(f"no PNG frames in {sub}")
+    return frames
+
+
+def _fit_into_cell(im, cell_w, cell_h, fill):
+    """Scale im to FIT (cell_w*fill, cell_h*fill) preserving aspect (LANCZOS)."""
+    target_w = max(1, int(cell_w * fill))
+    target_h = max(1, int(cell_h * fill))
+    w, h = im.size
+    scale = min(target_w / w, target_h / h)
+    new_w = max(1, round(w * scale))
+    new_h = max(1, round(h * scale))
+    return im.resize((new_w, new_h), Image.LANCZOS)
+
+
+def _load_mapping(path):
+    import json
+
+    with open(path, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+    if not isinstance(data, list):
+        raise ValueError("mapping JSON must be a list of row objects")
+    by_row = {row["row"]: dict(row) for row in DEFAULT_MAPPING}
+    for entry in data:
+        row = entry["row"]
+        base = by_row.get(row, {"row": row})
+        base.update(entry)
+        by_row[row] = base
+    return [by_row[r] for r in sorted(by_row)]
+
+
+def _compose_atlas_image(pack_dir, mapping, hue, heart, fill):
+    """Build the 1536x1872 RGBA atlas image from real pack frames."""
+    atlas = Image.new("RGBA", (ATLAS_W, ATLAS_H), (0, 0, 0, 0))
+    used_cells = []
+    for entry in mapping:
+        row = entry["row"]
+        n = int(entry["frames"])
+        source = entry["source"]
+        frames = _list_frames(pack_dir, source)
+        sampled = _even_sample(frames, n)
+        for col in range(n):
+            im = _load_rgba(sampled[col])
+            if hue is not None:
+                im = _recolor_image(im, hue, heart=heart)
+            scaled = _fit_into_cell(im, CELL_W, CELL_H, fill)
+            cell_x = col * CELL_W
+            cell_y = row * CELL_H
+            paste_x = cell_x + (CELL_W - scaled.width) // 2
+            paste_y = cell_y + (CELL_H - scaled.height) // 2
+            atlas.alpha_composite(scaled, dest=(paste_x, paste_y))
+            used_cells.append((row, col))
+    atlas = _zero_transparent_rgb(atlas)
+    return atlas, used_cells
+
+
+def _validate_atlas(atlas, mapping):
+    """Run the Codex atlas invariants. Returns a dict report with ok bool."""
+    errors = []
+    if atlas.size != (ATLAS_W, ATLAS_H):
+        # Dims are wrong: report and stop before per-pixel iteration (which would
+        # index out of range on an undersized image).
+        return {
+            "ok": False,
+            "dims": list(atlas.size),
+            "expected_dims": [ATLAS_W, ATLAS_H],
+            "used_cells_checked": 0,
+            "transparent_px_nonzero_rgb": 0,
+            "fully_opaque": None,
+            "errors": [f"dims {list(atlas.size)} != [{ATLAS_W}, {ATLAS_H}]"],
+        }
+    px = atlas.load()
+    frame_counts = {entry["row"]: int(entry["frames"]) for entry in mapping}
+    any_transparent = False
+    all_opaque = True
+    bad_rgb = 0
+    used_cell_checks = 0
+    for row in range(ATLAS_ROWS):
+        fc = frame_counts.get(row, 0)
+        for col in range(ATLAS_COLS):
+            cx0, cy0 = col * CELL_W, row * CELL_H
+            non_transparent = 0
+            opaque = 0
+            total = 0
+            for y in range(cy0, cy0 + CELL_H):
+                for x in range(cx0, cx0 + CELL_W):
+                    r, g, b, a = px[x, y]
+                    total += 1
+                    if a == 0:
+                        any_transparent = True
+                        if r or g or b:
+                            bad_rgb += 1
+                    else:
+                        all_opaque = False
+                        non_transparent += 1
+                        if a >= 255:
+                            opaque += 1
+            used = col < fc
+            if used:
+                used_cell_checks += 1
+                if non_transparent < 50:
+                    errors.append(
+                        f"used cell ({row},{col}) only {non_transparent} non-transparent px (<50)"
+                    )
+                if non_transparent > 0 and (opaque / non_transparent) > 0.95:
+                    errors.append(
+                        f"used cell ({row},{col}) is >95% opaque "
+                        f"({opaque}/{non_transparent}) -> likely non-transparent bg"
+                    )
+            else:
+                if non_transparent != 0:
+                    errors.append(
+                        f"unused cell ({row},{col}) has {non_transparent} non-transparent px"
+                    )
+    if all_opaque:
+        errors.append("atlas is fully opaque (no transparency)")
+    if bad_rgb:
+        errors.append(f"{bad_rgb} transparent px have non-zero RGB")
+    return {
+        "ok": len(errors) == 0,
+        "dims": list(atlas.size),
+        "expected_dims": [ATLAS_W, ATLAS_H],
+        "used_cells_checked": used_cell_checks,
+        "transparent_px_nonzero_rgb": bad_rgb,
+        "fully_opaque": all_opaque,
+        "errors": errors,
+    }
+
+
+def _save_webp_lossless(im, path):
+    im.save(path, format="WEBP", lossless=True, quality=100, method=6, exact=True)
+
+
+def _contact_sheet(atlas, scale=4):
+    """Scaled-down grid for visual QA (NEAREST so cells stay legible)."""
+    w = ATLAS_W // scale
+    h = ATLAS_H // scale
+    return atlas.resize((w, h), Image.NEAREST)
+
+
+def cmd_compose_atlas(args):
+    import json
+
+    pack_dir = args.pack
+    if not os.path.isdir(os.path.join(pack_dir, "animations")):
+        sys.stderr.write(f"ERROR: pack has no animations/ dir: {pack_dir}\n")
+        return 1
+    mapping = _load_mapping(args.mapping) if args.mapping else [dict(m) for m in DEFAULT_MAPPING]
+    if args.heart not in HEART_MODES:
+        sys.stderr.write(f"ERROR: --heart must be one of {HEART_MODES}\n")
+        return 1
+    os.makedirs(args.out, exist_ok=True)
+
+    atlas, _used = _compose_atlas_image(pack_dir, mapping, args.hue, args.heart, args.fill)
+
+    png_path = os.path.join(args.out, "spritesheet.png")
+    webp_path = os.path.join(args.out, "spritesheet.webp")
+    atlas.save(png_path)
+    _save_webp_lossless(atlas, webp_path)
+
+    report = _validate_atlas(atlas, mapping)
+    report["png"] = png_path
+    report["webp"] = webp_path
+    report["hue"] = args.hue
+    report["heart"] = args.heart
+    report["fill"] = args.fill
+    val_path = os.path.join(args.out, "validation.json")
+    with open(val_path, "w", encoding="utf-8") as fh:
+        json.dump(report, fh, indent=2)
+
+    contact = _contact_sheet(atlas)
+    contact_path = os.path.join(args.out, "contact-sheet.png")
+    contact.save(contact_path)
+
+    print(f"compose-atlas png   {png_path} ({ATLAS_W}x{ATLAS_H})")
+    print(f"compose-atlas webp  {webp_path} (lossless)")
+    print(f"compose-atlas valid {val_path} ok={report['ok']}")
+    print(f"compose-atlas sheet {contact_path}")
+    if not report["ok"]:
+        sys.stderr.write("ERROR: atlas failed validation:\n")
+        for e in report["errors"]:
+            sys.stderr.write(f"  - {e}\n")
+        return 1
+    return 0
+
+
+def cmd_install_pet(args):
+    import json
+
+    atlas = args.atlas
+    if not os.path.isfile(atlas):
+        sys.stderr.write(f"ERROR: atlas webp not found: {atlas}\n")
+        return 1
+    codex_home = args.codex_home or os.environ.get("CODEX_HOME") or os.path.join(
+        os.path.expanduser("~"), ".codex"
+    )
+    pet_dir = os.path.join(codex_home, "pets", args.id)
+    if os.path.isdir(pet_dir) and not args.force:
+        sys.stderr.write(
+            f"ERROR: pet id already exists: {pet_dir} (use --force to overwrite)\n"
+        )
+        return 1
+    os.makedirs(pet_dir, exist_ok=True)
+    dest_sheet = os.path.join(pet_dir, "spritesheet.webp")
+    shutil.copy2(atlas, dest_sheet)
+    pet_json = {
+        "id": args.id,
+        "displayName": args.name,
+        "description": args.desc,
+        "spritesheetPath": "spritesheet.webp",
+    }
+    pet_json_path = os.path.join(pet_dir, "pet.json")
+    with open(pet_json_path, "w", encoding="utf-8") as fh:
+        json.dump(pet_json, fh, indent=2)
+    print(f"install-pet pet.json {pet_json_path}")
+    print(f"install-pet sheet    {dest_sheet}")
+    print(f"install-pet dir      {pet_dir}")
+    return 0
+
+
+def cmd_sheet_64(args):
+    """64x64-per-frame game sheets + a packed sheet + a JSON frame map."""
+    import json
+
+    pack_dir = args.pack
+    if not os.path.isdir(os.path.join(pack_dir, "animations")):
+        sys.stderr.write(f"ERROR: pack has no animations/ dir: {pack_dir}\n")
+        return 1
+    mapping = [dict(m) for m in DEFAULT_MAPPING]
+    if args.state != "all":
+        mapping = [m for m in mapping if m["state"] == args.state]
+        if not mapping:
+            sys.stderr.write(f"ERROR: unknown state: {args.state}\n")
+            return 1
+    os.makedirs(args.out, exist_ok=True)
+    frames_dir = os.path.join(args.out, "frames")
+    os.makedirs(frames_dir, exist_ok=True)
+
+    method = args.method
+    max_cols = max(int(m["frames"]) for m in mapping)
+    rows = len(mapping)
+    sheet = Image.new("RGBA", (max_cols * 64, rows * 64), (0, 0, 0, 0))
+    frame_map = []
+    for ri, entry in enumerate(mapping):
+        state = entry["state"]
+        n = int(entry["frames"])
+        frames = _list_frames(pack_dir, entry["source"])
+        sampled = _even_sample(frames, n)
+        for col in range(n):
+            im = _load_rgba(sampled[col])
+            if args.hue is not None:
+                im = _recolor_image(im, args.hue, heart=args.heart)
+            small = _resize_image(im, (64, 64), method)
+            small = _zero_transparent_rgb(small)
+            fname = f"{state}_{col:02d}.png"
+            small.save(os.path.join(frames_dir, fname))
+            x, y = col * 64, ri * 64
+            sheet.alpha_composite(small, dest=(x, y))
+            frame_map.append({
+                "state": state,
+                "frame": col,
+                "x": x,
+                "y": y,
+                "w": 64,
+                "h": 64,
+                "duration": _frame_duration(state, col, n),
+            })
+    sheet = _zero_transparent_rgb(sheet)
+    sheet_path = os.path.join(args.out, "spritesheet-64.png")
+    sheet.save(sheet_path)
+    map_path = os.path.join(args.out, "frames-64.json")
+    with open(map_path, "w", encoding="utf-8") as fh:
+        json.dump({
+            "frameWidth": 64,
+            "frameHeight": 64,
+            "sheet": "spritesheet-64.png",
+            "sheetWidth": sheet.width,
+            "sheetHeight": sheet.height,
+            "frames": frame_map,
+        }, fh, indent=2)
+    print(f"sheet-64 frames dir {frames_dir} ({len(frame_map)} frames)")
+    print(f"sheet-64 sheet      {sheet_path} ({sheet.width}x{sheet.height})")
+    print(f"sheet-64 map        {map_path}")
+    return 0
+
+
+def cmd_mint(args):
+    """One-shot: recolored Codex atlas + pet.json + 64x64 game sheet."""
+    import json
+
+    pack_dir = args.pack
+    if not os.path.isdir(os.path.join(pack_dir, "animations")):
+        sys.stderr.write(f"ERROR: pack has no animations/ dir: {pack_dir}\n")
+        return 1
+    if args.heart not in HEART_MODES:
+        sys.stderr.write(f"ERROR: --heart must be one of {HEART_MODES}\n")
+        return 1
+    os.makedirs(args.out, exist_ok=True)
+    mapping = [dict(m) for m in DEFAULT_MAPPING]
+
+    # 1. Codex atlas (compose, validate, save png+webp).
+    atlas, _used = _compose_atlas_image(pack_dir, mapping, args.hue, args.heart, args.fill)
+    png_path = os.path.join(args.out, "spritesheet.png")
+    webp_path = os.path.join(args.out, "spritesheet.webp")
+    atlas.save(png_path)
+    _save_webp_lossless(atlas, webp_path)
+    report = _validate_atlas(atlas, mapping)
+    with open(os.path.join(args.out, "validation.json"), "w", encoding="utf-8") as fh:
+        json.dump(report, fh, indent=2)
+    contact = _contact_sheet(atlas)
+    contact.save(os.path.join(args.out, "contact-sheet.png"))
+    print(f"mint atlas png  {png_path} ({ATLAS_W}x{ATLAS_H}) ok={report['ok']}")
+    print(f"mint atlas webp {webp_path}")
+    if not report["ok"]:
+        sys.stderr.write("ERROR: minted atlas failed validation:\n")
+        for e in report["errors"]:
+            sys.stderr.write(f"  - {e}\n")
+        return 1
+
+    # 2. pet.json (staged in the out dir; install only with --install).
+    pet_json = {
+        "id": args.id,
+        "displayName": args.name,
+        "description": args.desc,
+        "spritesheetPath": "spritesheet.webp",
+    }
+    pet_json_path = os.path.join(args.out, "pet.json")
+    with open(pet_json_path, "w", encoding="utf-8") as fh:
+        json.dump(pet_json, fh, indent=2)
+    print(f"mint pet.json   {pet_json_path}")
+
+    # 3. 64x64 game sheet (reuse the sheet-64 logic via a shim args object).
+    sheet_out = os.path.join(args.out, "game-64")
+    sheet_args = argparse.Namespace(
+        pack=pack_dir, state="all", out=sheet_out,
+        method=args.method, hue=args.hue, heart=args.heart,
+    )
+    rc = cmd_sheet_64(sheet_args)
+    if rc != 0:
+        return rc
+
+    # 4. optional install.
+    if args.install:
+        install_args = argparse.Namespace(
+            atlas=webp_path, id=args.id, name=args.name,
+            desc=args.desc, codex_home=args.codex_home, force=args.force,
+        )
+        rc = cmd_install_pet(install_args)
+        if rc != 0:
+            return rc
+    else:
+        print("mint install    skipped (pass --install to copy into CODEX_HOME/pets)")
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # open (LibreSprite preview, optional/GUI, best-effort)
 # ---------------------------------------------------------------------------
@@ -383,6 +859,8 @@ def build_parser():
     rc.add_argument("--size", type=int, default=64,
                     help="also emit a resized copy at this size (0 to skip)")
     rc.add_argument("--method", choices=RESIZE_METHODS, default="lanczos-sharp")
+    rc.add_argument("--heart", choices=HEART_MODES, default="keep",
+                    help="belly-heart handling: keep (default), recolor, or remove")
     rc.set_defaults(func=cmd_recolor)
 
     # feature-swap
@@ -413,6 +891,65 @@ def build_parser():
                          "antennae, belly accent). Honest: basic, not hand-drawn pixel art.")
     nb.add_argument("--egg", action="store_true", help="procedural: egg body instead of round")
     nb.set_defaults(func=cmd_new_buddy)
+
+    # compose-atlas (Codex pet atlas from real Buddy art)
+    ca = sub.add_parser(
+        "compose-atlas",
+        help="compose a 1536x1872 Codex pet atlas from real Buddy frames (compose-not-generate)",
+    )
+    ca.add_argument("--pack", required=True, help="Buddy pack dir (contains animations/)")
+    ca.add_argument("--out", required=True, help="output dir for spritesheet.png/.webp + validation")
+    ca.add_argument("--mapping", default=None,
+                    help="optional JSON to override any row's source Anim/dir, state, or frames")
+    ca.add_argument("--hue", type=float, default=None, help="hue shift 0..1 to recolor a sibling")
+    ca.add_argument("--heart", choices=HEART_MODES, default="keep",
+                    help="belly-heart handling on recolor: keep (default), recolor, remove")
+    ca.add_argument("--fill", type=float, default=0.92,
+                    help="fraction of the cell the buddy fills (default 0.92)")
+    ca.set_defaults(func=cmd_compose_atlas)
+
+    # install-pet (write CODEX_HOME/pets/<id>/)
+    ip = sub.add_parser("install-pet", help="install a composed atlas as a Codex pet")
+    ip.add_argument("--atlas", required=True, help="path to spritesheet.webp")
+    ip.add_argument("--id", required=True, help="pet id (directory name)")
+    ip.add_argument("--name", required=True, help="display name")
+    ip.add_argument("--desc", required=True, help="description")
+    ip.add_argument("--codex-home", default=None,
+                    help="override CODEX_HOME (default $CODEX_HOME or ~/.codex)")
+    ip.add_argument("--force", action="store_true", help="overwrite an existing pet id")
+    ip.set_defaults(func=cmd_install_pet)
+
+    # sheet-64 (game-ready 64x64 sheets + frame map)
+    s64 = sub.add_parser("sheet-64", help="64x64 game sprite sheet + JSON frame map from real frames")
+    s64.add_argument("--pack", required=True, help="Buddy pack dir (contains animations/)")
+    s64.add_argument("--out", required=True, help="output dir")
+    s64.add_argument("--state", default="all",
+                     help="'all' or a single codex state (idle, running-right, ...)")
+    s64.add_argument("--method", choices=RESIZE_METHODS, default="lanczos-sharp",
+                     help="resize method for 64x64 frames (default lanczos-sharp)")
+    s64.add_argument("--hue", type=float, default=None, help="optional hue shift 0..1")
+    s64.add_argument("--heart", choices=HEART_MODES, default="keep",
+                     help="belly-heart handling on recolor: keep (default), recolor, remove")
+    s64.set_defaults(func=cmd_sheet_64)
+
+    # mint (one-shot atlas + pet.json + 64 sheet, optional install)
+    mt = sub.add_parser("mint", help="one-shot: recolored Codex atlas + pet.json + 64x64 game sheet")
+    mt.add_argument("--pack", required=True, help="Buddy pack dir (contains animations/)")
+    mt.add_argument("--id", required=True, help="pet id")
+    mt.add_argument("--name", required=True, help="display name")
+    mt.add_argument("--desc", default="", help="description")
+    mt.add_argument("--out", required=True, help="output dir")
+    mt.add_argument("--hue", type=float, default=None, help="hue shift 0..1 for a sibling buddy")
+    mt.add_argument("--heart", choices=HEART_MODES, default="keep",
+                    help="belly-heart handling: keep (default), recolor, remove")
+    mt.add_argument("--fill", type=float, default=0.92, help="cell fill factor (default 0.92)")
+    mt.add_argument("--method", choices=RESIZE_METHODS, default="lanczos-sharp",
+                    help="resize method for the 64x64 sheet (default lanczos-sharp)")
+    mt.add_argument("--install", action="store_true",
+                    help="also copy into CODEX_HOME/pets/<id>/ (off by default)")
+    mt.add_argument("--codex-home", default=None, help="override CODEX_HOME for --install")
+    mt.add_argument("--force", action="store_true", help="--install: overwrite existing pet id")
+    mt.set_defaults(func=cmd_mint)
 
     # open
     op = sub.add_parser("open", help="preview a file in LibreSprite (optional, GUI-only, best-effort)")
