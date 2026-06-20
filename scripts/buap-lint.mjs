@@ -206,6 +206,30 @@ for (const tier of allTiers) {
   }
 }
 
+// --- 5. .claude/ activation must stay in sync with the plugin source ---
+// The project activation under .claude/ uses real copies (not symlinks, which break on
+// no-symlink/Windows clones). To stop the copies from drifting from plugins/buap/, assert
+// they are byte-identical. If you intend to change one, change the plugins/buap/ source
+// and re-copy.
+const claudeMirror = [
+  [".claude/agents/lil-buddy.md", "plugins/buap/agents/lil-buddy.md"],
+  [".claude/commands/buap-audit.md", "plugins/buap/commands/buap-audit.md"],
+  [".claude/commands/buap-handoff.md", "plugins/buap/commands/buap-handoff.md"],
+  [".claude/skills/buap-repo-audit/SKILL.md", "plugins/buap/skills/buap-repo-audit/SKILL.md"],
+  [".claude/skills/buap-fix-pr-checks/SKILL.md", "plugins/buap/skills/buap-fix-pr-checks/SKILL.md"],
+  [".claude/skills/buap-migrate-repo/SKILL.md", "plugins/buap/skills/buap-migrate-repo/SKILL.md"]
+];
+for (const [copy, source] of claudeMirror) {
+  if (!exists(copy)) continue; // .claude/ activation is optional; only check when present
+  if (!exists(source)) {
+    failures.push(`${copy} has no plugin source ${source}`);
+    continue;
+  }
+  if (read(copy) !== read(source)) {
+    failures.push(`${copy} drifted from ${source} (re-copy from the plugin source)`);
+  }
+}
+
 // --- report ---
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (failures.length > 0) {
