@@ -26,7 +26,8 @@ const requiredAcpFiles = [
   ["src/runtime.ts", "packages/buap-acp-agent/src/runtime.ts"],
   ["smoke script", "packages/buap-acp-agent/scripts/smoke.mjs"],
   ["local smoke script", "packages/buap-acp-agent/scripts/local-smoke-check.mjs"],
-  ["local install guide", "packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md"]
+  ["local install guide", "packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md"],
+  ["hatch-pet package", "packages/buap-hatch-pet/package.json"]
 ];
 
 const buildOutputFiles = [
@@ -83,12 +84,87 @@ function exists(relativePath) {
   return fs.existsSync(path.join(repoRoot, relativePath));
 }
 
+function absoluteExists(absolutePath) {
+  return fs.existsSync(absolutePath);
+}
+
+function executableOnPath(command) {
+  for (const entry of (process.env.PATH || "").split(path.delimiter)) {
+    if (!entry) continue;
+    const candidate = path.join(entry, command);
+    try {
+      fs.accessSync(candidate, fs.constants.X_OK);
+      return candidate;
+    } catch {
+      // Try the next PATH entry.
+    }
+  }
+  return "";
+}
+
+function exactExecutable(absolutePath) {
+  try {
+    const parent = path.dirname(absolutePath);
+    const base = path.basename(absolutePath);
+    if (!fs.readdirSync(parent).includes(base)) return "";
+    fs.accessSync(absolutePath, fs.constants.X_OK);
+    return absolutePath;
+  } catch {
+    return "";
+  }
+}
+
+function toolHelpWorks(cliPath) {
+  if (!cliPath) return "unknown";
+  try {
+    execFileSync(cliPath, ["--help"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 10000 });
+    return "works";
+  } catch {
+    return "fails";
+  }
+}
+
+function spriteToolStatus({ label, command, appPath, executableNames }) {
+  const pathExecutable = executableOnPath(command);
+  let bundledExecutable = "";
+  for (const name of executableNames) {
+    bundledExecutable = exactExecutable(path.join(appPath, "Contents", "MacOS", name));
+    if (bundledExecutable) break;
+  }
+  const cliPath = pathExecutable || bundledExecutable;
+  console.log(`${label} app: ${absoluteExists(appPath) ? "present" : "missing"}`);
+  console.log(`${label} executable: ${cliPath || "missing"}`);
+  console.log(`${label} CLI help: ${toolHelpWorks(cliPath)}`);
+  console.log(`${label} on PATH: ${pathExecutable ? "yes" : "no"}`);
+  if (cliPath && !pathExecutable) {
+    console.log(`${label} direct command: ${cliPath} --help`);
+    console.log(`${label} optional alias: alias ${command}="${cliPath}"`);
+  }
+}
+
 function runVersion(label, command, args) {
   try {
     const output = execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
     pass(`${label} ${output}`);
   } catch (error) {
     fail(`${label} unavailable (${error.message})`);
+  }
+}
+
+function runOptionalVersion(label, command, args) {
+  try {
+    const output = execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+    pass(`${label} ${output || "available"}`);
+  } catch (error) {
+    warn(`${label} unavailable optional (${error.message})`);
+  }
+}
+
+function commandOutput(command, args) {
+  try {
+    return execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  } catch (error) {
+    return `${error.stdout?.toString?.() ?? ""}\n${error.stderr?.toString?.() ?? ""}`;
   }
 }
 
@@ -127,6 +203,7 @@ console.log("\nTools:");
 runVersion("node", "node", ["--version"]);
 runVersion("npm", "npm", ["--version"]);
 runVersion("git", "git", ["--version"]);
+runOptionalVersion("npx skills", "npx", ["skills", "--version"]);
 
 console.log("\nACP Agent:");
 for (const [label, relativePath] of requiredAcpFiles) {
@@ -153,6 +230,35 @@ if (configuredPersonalization) {
 } else {
   warn(`default personalization missing optional: ${defaultPersonalization}`);
 }
+
+console.log("\nOptional Skills:");
+const hatchPetSkill = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || "", ".codex"), "skills", "hatch-pet", "SKILL.md");
+fs.existsSync(hatchPetSkill)
+  ? pass(`hatch-pet skill installed: ${hatchPetSkill}`)
+  : warn(`hatch-pet skill missing optional: ${hatchPetSkill}`);
+/^\s+run(?:\s|,)/m.test(commandOutput("npx", ["skills", "--help"]))
+  ? warn("skills CLI advertises `run`, but BUAP hatch-pet still uses host handoff plus verification")
+  : pass("skills CLI has no `run`; BUAP hatch-pet correctly uses host handoff plus verification");
+
+console.log("\nHatch-pet modes:");
+pass("host-hatch-pet: preferred Codex host skill path");
+pass("manual-handoff: BUAP returns host prompt and /buap hatch-pet verify command");
+warn("pixel-art-fallback: Pixellab.ai is a Codex/MCP host capability; verify it in the active Codex tool list before using it");
+
+console.log("\nSprite tooling:");
+// Stable conformance marker: LibreSprite executable
+spriteToolStatus({
+  label: "LibreSprite",
+  command: "libresprite",
+  appPath: "/Applications/LibreSprite.app",
+  executableNames: ["LibreSprite", "libresprite"]
+});
+spriteToolStatus({
+  label: "Aseprite",
+  command: "aseprite",
+  appPath: "/Applications/Aseprite.app",
+  executableNames: ["aseprite", "Aseprite"]
+});
 
 console.log("\nEnvironment:");
 for (const name of optionalEnv) {

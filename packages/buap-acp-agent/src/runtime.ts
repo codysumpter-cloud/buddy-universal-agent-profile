@@ -16,6 +16,11 @@ import {
   createReminder,
   isSupported as appleIsSupported
 } from "@prismtek/buap-apple-notes-reminders";
+import {
+  planHatchPet,
+  verifyPetArtifact,
+  type HatchPetRequest
+} from "@prismtek/buap-hatch-pet";
 
 const execFileAsync = promisify(execFile);
 
@@ -27,6 +32,7 @@ export type PersonalizationState = {
   lil_buddy_profile_id: string;
   selected_profile_pack_id: string;
   updated_at?: string;
+  first_run_personalization_complete?: boolean;
 };
 
 export type Profile = {
@@ -111,6 +117,7 @@ const RUNTIME_COMMANDS = [
   { name: "buap add-note", description: "Create an Apple Note after permission (macOS only).", input: { hint: 'title="Idea" body="details"' } },
   { name: "buap reminders", description: "List pending Apple Reminders (macOS only)." },
   { name: "buap add-reminder", description: "Create an Apple Reminder after permission (macOS only).", input: { hint: 'title="Call Cody" dueDate="2026-07-01"' } },
+  { name: "buap hatch-pet", description: "Prepare a Codex-host hatch-pet handoff plan, then verify generated artifacts.", input: { hint: 'profile="buddy" name="Buddy" | verify name="Buddy"' } },
   { name: "buap mcp", description: "Show MCP server config passed by the ACP client." },
   { name: "buap mcp invoke", description: "Prepare an MCP invocation plan (currently blocked).", input: { hint: 'server="github" tool="search" payload="{}"' } }
 ];
@@ -139,7 +146,7 @@ function assertSafeRelativePath(workspace: string, requested: string): string {
 
 function parseKeyValues(input: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query|title|body|dueDate|limit)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
+  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query|title|body|dueDate|limit|concept|name|profile|outputDir)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(input))) result[match[1]] = match[3] ?? match[4] ?? match[5] ?? "";
   return result;
@@ -549,6 +556,171 @@ async function addReminderCommand(args: RuntimeArgs): Promise<string> {
   }
 }
 
+function personalizationConfirmed(state: PersonalizationState): boolean {
+  return state.first_run_personalization_complete === true ||
+    Boolean(state.updated_at) ||
+    Boolean(state.user_display_name && state.buddy_display_name && state.lil_buddy_display_name);
+}
+
+function profileLabel(profile: Profile | undefined, fallbackId: string): string {
+  return profile ? `${profile.id} (${profile.display_name ?? profile.id})` : fallbackId;
+}
+
+function profileConcept(profile: Profile | undefined, fallbackId: string, petName: string, slot: "Buddy" | "Lil Buddy"): string {
+  const id = profile?.id ?? fallbackId;
+  const display = profile?.display_name ?? id;
+  const role = profile?.role ? ` ${profile.role}.` : "";
+  const personality = profile?.personality ? ` Personality cues: ${profile.personality}` : "";
+  const bestFor = profile?.best_for?.length ? ` Best for: ${profile.best_for.join(", ")}.` : "";
+  return [
+    `A tiny tamagotchi-style pixel companion named ${petName}, inspired by the active BUAP ${slot} profile ${display} (${id}).${role}${personality}${bestFor}`,
+    "Design it as an original Prismtek-compatible desktop pet with a compact readable silhouette, expressive eyes, simple 64px-friendly pixel-art forms, and helpful companion behavior.",
+    "Avoid logos, readable text, brand marks, or copyrighted characters."
+  ].join(" ");
+}
+
+function personalizationPrompt(): string {
+  return [
+    "Before hatching a BUAP Codex pet, Buddy needs profile confirmation.",
+    "",
+    "Choose profiles with:",
+    "",
+    "```text",
+    '/buap personalize user=\"Cody\" buddy=\"Buddy\" lil_buddy=\"Lil Buddy\" buddy_profile=bmo lil_buddy_profile=finn',
+    "```",
+    "",
+    "Recommended defaults:",
+    "- Buddy profile: `bmo`",
+    "- Lil Buddy profile: `finn`",
+    "",
+    "Then retry:",
+    "",
+    "```text",
+    '/buap hatch-pet profile=\"buddy\" name=\"Buddy\"',
+    '/buap hatch-pet profile=\"lil-buddy\" name=\"Lil Buddy\"',
+    "```"
+  ].join("\n");
+}
+
+function hatchPetDirFromValues(values: Record<string, string>): string {
+  const root = path.resolve(values.outputDir || path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "pets"));
+  const name = values.name?.trim() || "Buddy";
+  const petId = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "buddy";
+  return path.join(root, petId);
+}
+
+async function hatchPetCommand(args: RuntimeArgs): Promise<string> {
+  const values = parseKeyValues(args.text);
+  const lower = args.text.toLowerCase();
+  if (lower.includes("/buap hatch-pet verify")) {
+    const petDir = values.path ? path.resolve(values.path) : hatchPetDirFromValues(values);
+    const result = await verifyPetArtifact(petDir);
+    const ok = result.exists && result.petJson && result.spritesheet;
+    return [
+      `Buddy Hatch Verify: ${ok ? "passed" : "blocked"}`,
+      "",
+      `Pet directory: \`${petDir}\``,
+      "",
+      "```json",
+      JSON.stringify(result, null, 2),
+      "```"
+    ].join("\n");
+  }
+
+  if (!personalizationConfirmed(args.state)) {
+    return personalizationPrompt();
+  }
+
+  const requestedProfile = (values.profile || (values.concept ? "custom" : "buddy")).trim();
+  const allowedProfiles = new Set(["buddy", "lil-buddy", "bmo", "custom"]);
+  if (!allowedProfiles.has(requestedProfile)) {
+    return '`profile` must be one of `buddy`, `lil-buddy`, `bmo`, or `custom`. Use `concept="..."` with `profile="custom"`.';
+  }
+
+  const buddyProfile = profileById(args.profilePack, args.state.buddy_profile_id);
+  const lilBuddyProfile = profileById(args.profilePack, args.state.lil_buddy_profile_id);
+  const name = values.name?.trim() || (requestedProfile === "lil-buddy" ? args.state.lil_buddy_display_name || "Lil Buddy" : args.state.buddy_display_name || "Buddy");
+  const request: HatchPetRequest = {
+    profile: requestedProfile as HatchPetRequest["profile"],
+    name,
+    outputDir: values.outputDir
+  };
+
+  if (values.concept) {
+    request.concept = values.concept;
+    request.profile = "custom";
+  } else if (requestedProfile === "buddy" && args.state.buddy_profile_id !== "bmo") {
+    request.concept = profileConcept(buddyProfile, args.state.buddy_profile_id, name, "Buddy");
+    request.profile = "custom";
+  } else if (requestedProfile === "buddy") {
+    request.profile = "buddy";
+  } else if (requestedProfile === "lil-buddy" && args.state.lil_buddy_profile_id !== "finn") {
+    request.concept = profileConcept(lilBuddyProfile, args.state.lil_buddy_profile_id, name, "Lil Buddy");
+    request.profile = "custom";
+  }
+
+  const plan = await planHatchPet(request);
+  const report = {
+    status: plan.status,
+    summary: "Prepared hatch-pet host handoff. BUAP did not generate files.",
+    actions_taken: ["checked active BUAP profiles", "built Codex host prompt", "prepared artifact verification command"],
+    evidence: {
+      expectedPetName: plan.expectedPetName,
+      expectedPetDir: plan.expectedPetDir,
+      expectedPetsRoot: plan.expectedPetsRoot
+    },
+    risks_or_permissions: [
+      "No files were generated by BUAP.",
+      "Run the host prompt only in a Codex chat where hatch-pet is installed/loaded.",
+      "Verify artifacts before claiming success."
+    ],
+    next_recommended_command: `/buap hatch-pet verify name="${plan.expectedPetName}"`
+  };
+
+  return [
+    "Buddy Hatch Plan",
+    "",
+    "Modes:",
+    "- `host-hatch-pet` — preferred: Codex host runs the official `$hatch-pet` skill.",
+    "- `manual-handoff` — current ACP path: BUAP returns the exact host prompt below.",
+    "- `pixel-art-fallback` — Pixellab.ai plus LibreSprite scripting can create/repair assets when official hatch execution is unavailable; packaging still requires verified `pet.json` and spritesheet/atlas files.",
+    "",
+    "Buddy active as:",
+    profileLabel(buddyProfile, args.state.buddy_profile_id),
+    "",
+    "Lil Buddy active as:",
+    profileLabel(lilBuddyProfile, args.state.lil_buddy_profile_id),
+    "",
+    "Status:",
+    plan.status,
+    plan.reason ? `Reason: ${plan.reason}` : "",
+    "",
+    "Install hatch-pet if needed:",
+    plan.installCommand,
+    "",
+    "Then run this in Codex chat:",
+    "",
+    "```text",
+    plan.hostPrompt,
+    "```",
+    "",
+    "Expected output:",
+    `\`${plan.expectedPetDir}\``,
+    "",
+    "Follow-up verification:",
+    "",
+    "```text",
+    `/buap hatch-pet verify name="${plan.expectedPetName}"`,
+    "```",
+    "",
+    "Lil Buddy report:",
+    "",
+    "```json",
+    JSON.stringify(report, null, 2),
+    "```"
+  ].filter(Boolean).join("\n");
+}
+
 async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
   if (!args.session || !args.client) return "Run is blocked because this ACP client bridge is unavailable.";
   if (!terminalSupported(args.client)) return "Run is blocked because the ACP client did not advertise terminal support.";
@@ -644,6 +816,9 @@ function renderHelp(): string {
     "- `/buap add-note title=\"Idea\" body=\"details\"` — request permission and create an Apple Note (macOS only)",
     "- `/buap reminders` — list pending Apple Reminders (macOS only)",
     "- `/buap add-reminder title=\"Call Cody\" dueDate=\"2026-07-01\"` — request permission and create an Apple Reminder (macOS only)",
+    "- `/buap hatch-pet profile=\"buddy\" name=\"Buddy\"` — prepare a Codex-host hatch-pet handoff",
+    "- `/buap hatch-pet profile=\"lil-buddy\" name=\"Lil Buddy\"` — prepare a Lil Buddy worker pet handoff",
+    "- `/buap hatch-pet verify name=\"Buddy\"` — verify generated pet files after the host skill runs",
     "- `/buap mcp` — show MCP server config passed by the ACP client",
     "- `/buap mcp invoke server=\"...\" tool=\"...\" payload=\"{}\"` — currently reports a blocked MCP invocation plan",
     "",
@@ -665,6 +840,7 @@ export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeRe
   if (lower.includes("/buap notes")) return { handled: true, response: await listNotesCommand(args) };
   if (lower.includes("/buap add-reminder")) return { handled: true, response: await addReminderCommand(args) };
   if (lower.includes("/buap reminders")) return { handled: true, response: await listRemindersCommand(args) };
+  if (lower.includes("/buap hatch-pet")) return { handled: true, response: await hatchPetCommand(args) };
   if (lower.includes("/buap mcp")) return { handled: true, response: renderMcpStatus(args) };
   return { handled: false, response: "" };
 }

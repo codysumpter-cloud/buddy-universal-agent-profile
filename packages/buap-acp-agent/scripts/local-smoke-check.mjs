@@ -64,7 +64,7 @@ agent.stdout.on("data", (chunk) => {
 
     if (message.id === 3) {
       const text = JSON.stringify(responses);
-      for (const expected of ["/buap read", "/buap patch", "/buap apply", "/buap run", "/buap search-vault", "available_commands_update"]) {
+      for (const expected of ["/buap read", "/buap patch", "/buap apply", "/buap run", "/buap search-vault", "/buap hatch-pet", "available_commands_update"]) {
         if (!text.includes(expected)) fail(`Missing expected ACP smoke marker: ${expected}`);
       }
       console.log("BUAP ACP local launch smoke passed");

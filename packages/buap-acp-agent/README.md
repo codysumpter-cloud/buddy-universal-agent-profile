@@ -44,6 +44,12 @@ KnowledgeVault search:
 ../../docs/knowledge-vault-search.md
 ```
 
+Codex pet hatching:
+
+```text
+../../docs/hatch-pet-integration.md
+```
+
 ## What it supports
 
 - newline-delimited JSON-RPC over stdio
@@ -77,6 +83,9 @@ KnowledgeVault search:
   - `/buap add-note title="Idea" body="details"` (macOS only, permission-gated) — create an Apple Note
   - `/buap reminders` (macOS only) — list pending Apple Reminders
   - `/buap add-reminder title="Call Cody" dueDate="2026-07-01"` (macOS only, permission-gated) — create an Apple Reminder
+  - `/buap hatch-pet profile="buddy" name="Buddy"` — prepare a Codex-host hatch-pet handoff from the active Buddy profile
+  - `/buap hatch-pet profile="lil-buddy" name="Lil Buddy"` — prepare a Codex-host hatch-pet handoff from the active Lil Buddy worker profile
+  - `/buap hatch-pet verify name="Buddy"` — verify generated pet files after the host skill runs
   - `/buap mcp`
   - `/buap mcp invoke server="..." tool="..." payload="..."` (blocked planning response)
 
@@ -183,5 +192,6 @@ Use `/buap profiles` to list available BMO council profiles.
 - `/buap search-vault` is read-only and searches local KnowledgeVault titles/excerpts.
 - `/buap notes` and `/buap reminders` are **macOS only** (driven by `osascript`) and read-only.
 - `/buap add-note` and `/buap add-reminder` are **macOS only** and call `session/request_permission` before creating anything; without an ACP permission channel they refuse. See `../../docs/apple-notes-reminders.md`.
+- `/buap hatch-pet` does not generate pets directly. It requires confirmed BUAP personalization, returns a Codex-host `$hatch-pet` prompt, and provides `/buap hatch-pet verify name="..."` for artifact checks. See `../../docs/hatch-pet-integration.md`.
 - Git helpers are read-only `status` and `diff` commands.
 - MCP server configs passed by the ACP client are reported; `/buap mcp invoke` returns a blocked planning response until ACP/MCP capability and permission handling is implemented.

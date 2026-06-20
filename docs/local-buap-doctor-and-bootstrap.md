@@ -132,3 +132,29 @@ hosts they return a clear "macOS-only" message. The first call triggers a macOS
 Automation permission prompt for the host app (Terminal/Xcode/ACP client); grant it
 under System Settings → Privacy & Security → Automation. The create commands ask for
 ACP permission before writing. Details: `docs/apple-notes-reminders.md`.
+
+## Hatch-Pet Skill (optional)
+
+`/buap hatch-pet profile="buddy" name="Buddy"` uses the official OpenAI
+`hatch-pet` skill through a Codex-host handoff. BUAP does not call
+`npx skills run` and does not generate files directly. It confirms Buddy/Lil Buddy
+personalization, returns a `$hatch-pet` host prompt, and verifies generated files
+afterward with `/buap hatch-pet verify name="Buddy"`. The skill is optional and may
+require separate installation, network access, and image generation support in the
+Codex host. Details: `docs/hatch-pet-integration.md`.
+
+Doctor reports three hatch modes:
+
+- `host-hatch-pet` — preferred, the Codex host runs the official skill.
+- `manual-handoff` — BUAP returns the prompt and verification command.
+- `pixel-art-fallback` — Pixellab.ai and LibreSprite scripting can generate or
+  repair pixel-art assets, but BUAP still requires a verified `pet.json` plus
+  spritesheet/atlas before claiming a Codex pet exists.
+
+LibreSprite may have a callable executable inside the app bundle even when no
+`libresprite` command is on `PATH`. Doctor checks the app, executable, CLI help,
+and prints an alias recommendation such as:
+
+```bash
+alias libresprite="/Applications/LibreSprite.app/Contents/MacOS/libresprite"
+```

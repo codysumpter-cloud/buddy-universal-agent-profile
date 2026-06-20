@@ -61,6 +61,8 @@ const runtimeMarkers = [
   "/buap git status",
   "/buap git diff",
   "/buap search-vault",
+  "/buap hatch-pet",
+  "hatch-pet verify",
   "/buap mcp",
   "/buap mcp invoke",
   "@prismtek/buap-knowledge-vault",
@@ -139,6 +141,7 @@ const advertised = [
   "buap git status",
   "buap git diff",
   "buap search-vault",
+  "buap hatch-pet",
   "buap mcp",
   "buap mcp invoke"
 ];
