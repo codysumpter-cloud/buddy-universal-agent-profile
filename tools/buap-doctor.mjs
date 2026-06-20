@@ -43,6 +43,7 @@ const requiredPluginFiles = [
   ["repo-audit skill", "plugins/buap/skills/buap-repo-audit/SKILL.md"],
   ["fix-pr-checks skill", "plugins/buap/skills/buap-fix-pr-checks/SKILL.md"],
   ["migrate-repo skill", "plugins/buap/skills/buap-migrate-repo/SKILL.md"],
+  ["libresprite-buddy skill", "plugins/buap/skills/libresprite-buddy/SKILL.md"],
   ["buap-audit command", "plugins/buap/commands/buap-audit.md"],
   ["buap-handoff command", "plugins/buap/commands/buap-handoff.md"],
   ["Claude hooks manifest", "plugins/buap/hooks/hooks.json"],

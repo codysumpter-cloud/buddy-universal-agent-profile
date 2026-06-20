@@ -217,7 +217,8 @@ const claudeMirror = [
   [".claude/commands/buap-handoff.md", "plugins/buap/commands/buap-handoff.md"],
   [".claude/skills/buap-repo-audit/SKILL.md", "plugins/buap/skills/buap-repo-audit/SKILL.md"],
   [".claude/skills/buap-fix-pr-checks/SKILL.md", "plugins/buap/skills/buap-fix-pr-checks/SKILL.md"],
-  [".claude/skills/buap-migrate-repo/SKILL.md", "plugins/buap/skills/buap-migrate-repo/SKILL.md"]
+  [".claude/skills/buap-migrate-repo/SKILL.md", "plugins/buap/skills/buap-migrate-repo/SKILL.md"],
+  [".claude/skills/libresprite-buddy/SKILL.md", "plugins/buap/skills/libresprite-buddy/SKILL.md"]
 ];
 for (const [copy, source] of claudeMirror) {
   if (!exists(copy)) continue; // .claude/ activation is optional; only check when present

@@ -1,0 +1,90 @@
+---
+name: libresprite-buddy
+description: >-
+  Hybrid LibreSprite + Python/Pillow toolkit for buddy sprites: crisp-resize to 64x64
+  (or any size), clone templates, generate recolored variants, feature-swap parts, and
+  build new-shape buddies by reusing the pose/rotation/animation library plus simple
+  procedural parts. Use when asked to resize, recolor, clone, feature-swap, or generate
+  buddy/pet sprite variants. Pillow is the pixel engine; LibreSprite is editor/preview.
+---
+
+# libresprite-buddy
+
+A hybrid sprite toolkit. **Pillow is the pixel engine. LibreSprite is the editor /
+preview only.** The entrypoint is a single dispatcher:
+
+`plugins/buap/skills/libresprite-buddy/scripts/buddy.py`
+
+## Hard constraints (verified — build on these, do not relitigate)
+
+- **LibreSprite headless (`-b`) scripting cannot do pixel ops.** In batch mode the `app`
+  object only exposes `launch, open, yield, createDialog, documentation` — no
+  `activeImage` / `activeSprite` / `pixelColor` / `command`. The pixel API exists **only
+  in the GUI**. So all automation here uses Python/Pillow, never LibreSprite CLI
+  scripting.
+- **LibreSprite CLI resize (`--scale`, `--shrink-to`) is smooth/bilinear only** (no
+  nearest) → soft results. Do not use it for quality resizes; use the `resize` subcommand.
+- **Opening a file for preview works**:
+  `/Applications/LibreSprite.app/Contents/MacOS/libresprite <file>`. The `open` subcommand
+  shells to that — optional, GUI-only, best-effort.
+- **Resize of the Buddy art is best-effort, not lossless.** The source art is true
+  ~116px anti-aliased color, not a clean low-res grid, so downscaling is a quality
+  reconstruction (`LANCZOS` + a light `UnsharpMask`), not a pixel-perfect conversion.
+
+## Dependency
+
+Requires **Pillow**. If it is missing the scripts exit with code 2 and print:
+`Install it with:  pip3 install --user Pillow`. Verified present on this machine as
+Pillow 11.3.0 under `python3` (3.9.6).
+
+## Subcommands
+
+Run `python3 .../buddy.py <subcommand> --help` for full flags.
+
+- **resize** `input output [--size 64] [--method lanczos-sharp|lanczos|nearest|box]`
+  Crisp-resize a PNG, or a whole directory of PNGs, preserving alpha. Default
+  `lanczos-sharp` (LANCZOS + UnsharpMask) is tuned for the anti-aliased Buddy art; use
+  `nearest` when the input is already clean low-res pixel art.
+- **clone** `source dest [--force]`
+  Copy a single template file, or a whole pose/rotation/animation directory, to a
+  destination.
+- **recolor** `input outdir [--count N | --hue 0..1] [--size 64] [--method ...]`
+  Generate hue-shifted variants. Identity is preserved: fully transparent pixels stay
+  transparent; near-gray/white pixels (face, eyes, outline) are kept; the warm
+  belly-heart accent is kept; everything else rotates by the hue shift. Emits a native
+  copy plus a resized copy per variant.
+- **feature-swap** `base feature output [--x N --y N] [--size 0] [--method ...]`
+  Alpha-paste a feature layer (alternate antennae / eyes / belly icon) onto a base buddy
+  at an offset. **Feature parts are user-supplied PNGs.**
+- **new-buddy** `--outdir DIR [--name N] [--base FRAME] [--hue 0..1] [--feature PNG --fx --fy] [--size 64] [--procedural [--egg]]`
+  "New shape" generator. Two paths:
+  - **Pose reuse (preferred):** pass `--base` = a pose/rotation/animation frame from a
+    Buddy pack (8 rotations, 24 animation sets), then apply recolor and/or feature-swap.
+    Emits native + resized.
+  - **Procedural v1 (`--procedural`):** simple parametric primitives (round or `--egg`
+    body, dot eyes, smile, antennae, belly accent) drawn with `PIL.ImageDraw`.
+- **open** `file [--libresprite PATH]`
+  Preview a file in the LibreSprite GUI. Optional, GUI-only, best-effort.
+
+## Honesty caveats
+
+- **Brand-new original silhouettes are best-effort.** The `new-buddy --procedural` path
+  is **v1 / simple** parametric art — basic primitives, not invented hand-drawn pixel
+  art. The higher-fidelity path reuses real pack poses (`--base`) and recolors/composites
+  them. Say so when reporting results.
+- AA-source downscales are reconstructions; do not claim pixel-perfect output.
+
+## How Claude should drive it
+
+1. Take all input paths as arguments from the user — never assume a Downloads location.
+2. For quality 64×64 output of Buddy art, use the `resize` default (`lanczos-sharp`);
+   switch to `--method nearest` only for clean pixel-art input.
+3. To produce variants, prefer `recolor` (preserves identity) and pose-reuse `new-buddy`
+   over the procedural path; reach for `--procedural` only for quick v1 shapes.
+4. Never call the PixelLab API, never touch the network, never spend credits, never print
+   tokens or config contents (consistent with the hatch-pet fallback rules in
+   `docs/hatch-pet-integration.md`).
+5. Report sample output paths and dimensions as receipts.
+
+For non-trivial batch jobs, delegate the run to the `lil-buddy` subagent and review its
+receipts before reporting back.
