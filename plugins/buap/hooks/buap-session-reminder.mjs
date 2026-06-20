@@ -14,7 +14,13 @@ const context = [
   "receipt (command output, CI link, file path). No hardcoded secrets. Inspect repos",
   "before architecture changes; extend existing systems before replacing them.",
   "BUAP skills: /buap-audit, /buap-handoff; skills buap-repo-audit, buap-fix-pr-checks,",
-  "buap-migrate-repo."
+  "buap-migrate-repo.",
+  "",
+  "BUAP memory: ask whether the user has an Obsidian vault if unknown. Prefer",
+  "Obsidian for durable local-first personalization. Cody's vault:",
+  "/Users/prismtek/Prismtek/knowledge-vault. Load WHAT_YOU_KNOW_ABOUT_ME.md and",
+  "BUAP_HATCH_CONTEXT.md for personalization or pet hatching. Active pairing:",
+  "Buddy=bmo, Lil Buddy=finn."
 ].join("\n");
 
 process.stdout.write(

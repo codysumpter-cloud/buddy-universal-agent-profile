@@ -32,6 +32,27 @@ The ACP agent exposes it as:
 /buap hatch-pet verify name="Buddy"
 ```
 
+Before running:
+
+```text
+$hatch-pet create a pet based on what you know about me
+```
+
+load Cody's hatch context first:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+```
+
+When useful, also load the high-level memory file:
+
+```text
+/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+```
+
+Repo fallback pointers are stored in `personalization/BUAP_HATCH_CONTEXT.md` and
+`personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md`.
+
 ## Modes
 
 1. `host-hatch-pet` — preferred. A Codex host with the official `$hatch-pet` skill
