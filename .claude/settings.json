@@ -25,13 +25,15 @@
   },
   "permissions": {
     "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./**/.env)",
-      "Read(./secrets/**)",
-      "Read(./**/*.pem)",
-      "Read(./**/id_rsa)",
-      "Read(./**/credentials*.json)"
+      "Read(/.env)",
+      "Read(/.env.*)",
+      "Read(/**/.env)",
+      "Read(/**/.env.*)",
+      "Read(/secrets/**)",
+      "Read(/**/secrets/**)",
+      "Read(/**/*.pem)",
+      "Read(/**/id_rsa)",
+      "Read(/**/credentials*.json)"
     ]
   }
 }
