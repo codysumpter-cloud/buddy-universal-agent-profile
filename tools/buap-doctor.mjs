@@ -26,7 +26,8 @@ const requiredAcpFiles = [
   ["src/runtime.ts", "packages/buap-acp-agent/src/runtime.ts"],
   ["smoke script", "packages/buap-acp-agent/scripts/smoke.mjs"],
   ["local smoke script", "packages/buap-acp-agent/scripts/local-smoke-check.mjs"],
-  ["local install guide", "packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md"]
+  ["local install guide", "packages/buap-acp-agent/docs/local-install-and-xcode-smoke.md"],
+  ["hatch-pet package", "packages/buap-hatch-pet/package.json"]
 ];
 
 const buildOutputFiles = [
@@ -92,6 +93,23 @@ function runVersion(label, command, args) {
   }
 }
 
+function runOptionalVersion(label, command, args) {
+  try {
+    const output = execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+    pass(`${label} ${output || "available"}`);
+  } catch (error) {
+    warn(`${label} unavailable optional (${error.message})`);
+  }
+}
+
+function commandOutput(command, args) {
+  try {
+    return execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  } catch (error) {
+    return `${error.stdout?.toString?.() ?? ""}\n${error.stderr?.toString?.() ?? ""}`;
+  }
+}
+
 function runPackageCheck(command, args) {
   const packageRoot = path.join(repoRoot, "packages", "buap-acp-agent");
   const rendered = [command, ...args].join(" ");
@@ -127,6 +145,7 @@ console.log("\nTools:");
 runVersion("node", "node", ["--version"]);
 runVersion("npm", "npm", ["--version"]);
 runVersion("git", "git", ["--version"]);
+runOptionalVersion("npx skills", "npx", ["skills", "--version"]);
 
 console.log("\nACP Agent:");
 for (const [label, relativePath] of requiredAcpFiles) {
@@ -153,6 +172,15 @@ if (configuredPersonalization) {
 } else {
   warn(`default personalization missing optional: ${defaultPersonalization}`);
 }
+
+console.log("\nOptional Skills:");
+const hatchPetSkill = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || "", ".codex"), "skills", "hatch-pet", "SKILL.md");
+fs.existsSync(hatchPetSkill)
+  ? pass(`hatch-pet skill installed: ${hatchPetSkill}`)
+  : warn(`hatch-pet skill missing optional: ${hatchPetSkill}`);
+/^\s+run(?:\s|,)/m.test(commandOutput("npx", ["skills", "--help"]))
+  ? pass("skills CLI supports non-interactive run")
+  : warn("skills CLI does not advertise `run`; /buap hatch-pet live generation will be blocked until a runner is available");
 
 console.log("\nEnvironment:");
 for (const name of optionalEnv) {

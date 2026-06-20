@@ -42,7 +42,11 @@ const requiredFiles = [
   'packages/buap-apple-notes-reminders/package.json',
   'packages/buap-apple-notes-reminders/src/index.ts',
   'packages/buap-apple-notes-reminders/scripts/smoke.mjs',
-  'docs/apple-notes-reminders.md'
+  'docs/apple-notes-reminders.md',
+  'packages/buap-hatch-pet/package.json',
+  'packages/buap-hatch-pet/src/index.ts',
+  'packages/buap-hatch-pet/scripts/smoke.mjs',
+  'docs/hatch-pet-integration.md'
 ];
 
 const requiredText = [
@@ -59,7 +63,10 @@ const requiredText = [
   ['tests/conformance/README.md', 'conformance'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-note'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-reminder'],
-  ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders']
+  ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders'],
+  ['packages/buap-acp-agent/src/runtime.ts', 'buap hatch-pet'],
+  ['packages/buap-hatch-pet/src/index.ts', 'hatchPet'],
+  ['docs/hatch-pet-integration.md', '/buap hatch-pet']
 ];
 
 const failures = [];

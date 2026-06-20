@@ -16,6 +16,7 @@ import {
   createReminder,
   isSupported as appleIsSupported
 } from "@prismtek/buap-apple-notes-reminders";
+import { hatchPet } from "@prismtek/buap-hatch-pet";
 
 const execFileAsync = promisify(execFile);
 
@@ -111,6 +112,7 @@ const RUNTIME_COMMANDS = [
   { name: "buap add-note", description: "Create an Apple Note after permission (macOS only).", input: { hint: 'title="Idea" body="details"' } },
   { name: "buap reminders", description: "List pending Apple Reminders (macOS only)." },
   { name: "buap add-reminder", description: "Create an Apple Reminder after permission (macOS only).", input: { hint: 'title="Call Cody" dueDate="2026-07-01"' } },
+  { name: "buap hatch-pet", description: "Request permission, then hatch a Codex pet with the official hatch-pet skill.", input: { hint: 'concept="tiny teal robot helper" [name="Buddy"]' } },
   { name: "buap mcp", description: "Show MCP server config passed by the ACP client." },
   { name: "buap mcp invoke", description: "Prepare an MCP invocation plan (currently blocked).", input: { hint: 'server="github" tool="search" payload="{}"' } }
 ];
@@ -139,7 +141,7 @@ function assertSafeRelativePath(workspace: string, requested: string): string {
 
 function parseKeyValues(input: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query|title|body|dueDate|limit)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
+  const regex = /(path|find|replace|prompt|cmd|args|max_bytes|server|tool|payload|query|title|body|dueDate|limit|concept|name)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(input))) result[match[1]] = match[3] ?? match[4] ?? match[5] ?? "";
   return result;
@@ -549,6 +551,98 @@ async function addReminderCommand(args: RuntimeArgs): Promise<string> {
   }
 }
 
+async function hatchPetCommand(args: RuntimeArgs): Promise<string> {
+  const values = parseKeyValues(args.text);
+  const hasKeyedInput = Object.keys(values).length > 0;
+  const concept = values.concept || (hasKeyedInput ? "" : stripCommandPrefix(args.text, "/buap hatch-pet"));
+  const name = values.name?.trim() || undefined;
+  if (!concept.trim()) {
+    return [
+      "Hatch-pet needs `concept=`.",
+      "",
+      "```text",
+      '/buap hatch-pet concept="tiny teal robot helper" name="Buddy"',
+      "```"
+    ].join("\n");
+  }
+  if (!args.session || !args.client) {
+    return "Hatching a Codex pet is blocked because this ACP client bridge is unavailable, so Buddy cannot request permission. Run inside an ACP client.";
+  }
+
+  const toolCallId = randomId("hatch_pet");
+  const outputDir = path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "pets");
+  const allowed = await requestToolPermission(args, toolCallId, "Hatch Codex pet", "execute", {
+    command: "npx skills add/run hatch-pet",
+    concept,
+    name: name ?? null,
+    outputDir,
+    note: "This installs/runs the official hatch-pet skill and generates files under .codex/pets."
+  });
+  if (!allowed) return "Hatch-pet blocked: permission was not granted.";
+
+  try {
+    sendToolCallUpdate(args, toolCallId, {
+      status: "in_progress",
+      content: [{ type: "content", content: { type: "text", text: "Running official hatch-pet skill. This can take several minutes." } }]
+    });
+    const result = await hatchPet({ concept, name, outputDir });
+    sendToolCallUpdate(args, toolCallId, { status: "completed", rawOutput: result });
+    const report = {
+      status: "done",
+      summary: `Hatched Codex pet ${result.petName}.`,
+      actions_taken: [
+        "requested ACP permission",
+        "installed or refreshed the official hatch-pet skill",
+        "ran hatch-pet with the requested concept",
+        "located generated pet metadata"
+      ],
+      evidence: [{ petName: result.petName, petPath: result.petPath }],
+      risks_or_permissions: [
+        "External npx skills commands ran only after permission.",
+        "Generated files are expected under the local Codex pets directory.",
+        "Review generated pet assets before sharing them."
+      ],
+      next_recommended_command: "Open Codex Settings -> Appearance -> Pets and select the new pet."
+    };
+    return [
+      `Lil Buddy hatched Codex pet **${result.petName}**.`,
+      "",
+      `Generated pet: \`${result.petPath}\``,
+      "",
+      "Select it under Settings -> Appearance -> Pets.",
+      "",
+      "Lil Buddy report:",
+      "",
+      "```json",
+      JSON.stringify(report, null, 2),
+      "```"
+    ].join("\n");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    sendToolCallUpdate(args, toolCallId, {
+      status: "failed",
+      content: [{ type: "content", content: { type: "text", text: "hatch-pet failed." } }],
+      rawOutput: { error: message }
+    });
+    return [
+      "Buddy could not hatch the Codex pet.",
+      "",
+      "Lil Buddy report:",
+      "",
+      "```json",
+      JSON.stringify({
+        status: "blocked",
+        summary: "The official hatch-pet skill did not complete successfully.",
+        actions_taken: ["requested permission", "attempted to install/run hatch-pet"],
+        risks_or_permissions: ["No success claimed; inspect the error before retrying."],
+        reason_blocked: message,
+        next_recommended_command: "Confirm `npx skills` is available, then retry `/buap hatch-pet concept=\"...\"`."
+      }, null, 2),
+      "```"
+    ].join("\n");
+  }
+}
+
 async function runTerminalCommand(args: RuntimeArgs): Promise<string> {
   if (!args.session || !args.client) return "Run is blocked because this ACP client bridge is unavailable.";
   if (!terminalSupported(args.client)) return "Run is blocked because the ACP client did not advertise terminal support.";
@@ -644,6 +738,7 @@ function renderHelp(): string {
     "- `/buap add-note title=\"Idea\" body=\"details\"` — request permission and create an Apple Note (macOS only)",
     "- `/buap reminders` — list pending Apple Reminders (macOS only)",
     "- `/buap add-reminder title=\"Call Cody\" dueDate=\"2026-07-01\"` — request permission and create an Apple Reminder (macOS only)",
+    "- `/buap hatch-pet concept=\"tiny teal robot helper\" [name=\"Buddy\"]` — request permission and hatch a Codex pet",
     "- `/buap mcp` — show MCP server config passed by the ACP client",
     "- `/buap mcp invoke server=\"...\" tool=\"...\" payload=\"{}\"` — currently reports a blocked MCP invocation plan",
     "",
@@ -665,6 +760,7 @@ export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeRe
   if (lower.includes("/buap notes")) return { handled: true, response: await listNotesCommand(args) };
   if (lower.includes("/buap add-reminder")) return { handled: true, response: await addReminderCommand(args) };
   if (lower.includes("/buap reminders")) return { handled: true, response: await listRemindersCommand(args) };
+  if (lower.includes("/buap hatch-pet")) return { handled: true, response: await hatchPetCommand(args) };
   if (lower.includes("/buap mcp")) return { handled: true, response: renderMcpStatus(args) };
   return { handled: false, response: "" };
 }

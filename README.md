@@ -89,6 +89,7 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
 | `packages/buap-knowledge-vault/` | Local KnowledgeVault Markdown index/search helper |
 | `packages/buap-apple-notes-reminders/` | macOS-only Apple Notes/Reminders helper (osascript) used by the ACP agent |
+| `packages/buap-hatch-pet/` | Wrapper for permission-gated Codex pet generation through the official `hatch-pet` skill |
 | `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
 | `integrations/` | Runtime integration docs and canonical ecosystem routing |
@@ -145,6 +146,8 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
   For local verification and first-run setup, see
   `docs/local-buap-doctor-and-bootstrap.md`.
   For local KnowledgeVault search, see `docs/knowledge-vault-search.md`.
+  For Codex pet generation through `/buap hatch-pet`, see
+  `docs/hatch-pet-integration.md`.
 - **Any AI chat / search box:** use `BUAP_KERNEL.md` or `BUAP_LITE.md` for tiny tools,
   and `BUAP_STANDARD.md` or `universal-ai-chat/UNIVERSAL_AI_CHAT_PASTE.md` for normal chats.
 - **OpenAI-style multi-agent / Symphony setup:** use

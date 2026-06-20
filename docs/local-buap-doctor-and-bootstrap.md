@@ -132,3 +132,14 @@ hosts they return a clear "macOS-only" message. The first call triggers a macOS
 Automation permission prompt for the host app (Terminal/Xcode/ACP client); grant it
 under System Settings → Privacy & Security → Automation. The create commands ask for
 ACP permission before writing. Details: `docs/apple-notes-reminders.md`.
+
+## Hatch-Pet Skill (optional)
+
+`/buap hatch-pet concept="..."` uses the official OpenAI `hatch-pet` skill through
+`npx skills`. It is optional and may require separate skill installation, network
+access, image generation support, and a skills CLI/runtime that can execute skills
+non-interactively. Some `skills` CLI versions expose `add`/`use` but not `run`; in
+that case BUAP reports a blocker rather than claiming generation succeeded. The ACP
+command asks for permission before installing/running the skill and writes generated
+pets under `${CODEX_HOME:-$HOME/.codex}/pets/` when live execution is supported.
+Details: `docs/hatch-pet-integration.md`.

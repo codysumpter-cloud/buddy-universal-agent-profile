@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@prismtek/buap-apple-notes-reminders": "file:../buap-apple-notes-reminders",
+    "@prismtek/buap-hatch-pet": "file:../buap-hatch-pet",
     "@prismtek/buap-knowledge-vault": "file:../buap-knowledge-vault"
   },
   "engines": {
