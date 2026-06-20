@@ -63,3 +63,21 @@ folder. The plugin ships:
 Codex does not guarantee the same real subagent behavior as Claude Code in every runtime.
 When no real subagent is available, Buddy should emulate Lil Buddy as an explicit work
 phase and still return receipts.
+
+## BUAP profile pairing
+
+This repo locks the pairing Buddy = `bmo`, Lil Buddy = `finn`, with Lil Buddy as the
+implementation worker. In Claude Code with this plugin active, `lil-buddy` is a true
+subagent; in plain node tooling (`tools/buap-doctor.mjs`) there is no subagent runtime,
+so the doctor reports Lil Buddy as an emulated worker pattern (true subagent in Claude
+Code plugin). New sessions should ask for a profile selection only when none is
+configured; this repo defaults to Buddy=`bmo` / Lil Buddy=`finn`.
+
+## Hatch-pet PixelLab + LibreSprite fallback
+
+The bundled hatch-pet skill documents a `pixellab-libresprite-fallback` mode wired to a
+local PixelLab MCP config (`/Users/prismtek/.codex/config.toml`), a LibreSprite JS adapter
+(`PixelLab.js`, balance check + Pixflux generation), a reference-only Lua-based Aseprite
+extension (`PixelLab-Aseprite-extension`), and the LibreSprite CLI
+(`/Applications/LibreSprite.app/Contents/MacOS/libresprite`). The doctor never calls the
+PixelLab API and never spends credits. See `docs/hatch-pet-integration.md`.

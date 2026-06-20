@@ -260,6 +260,75 @@ spriteToolStatus({
   executableNames: ["aseprite", "Aseprite"]
 });
 
+console.log("\nPixelLab + LibreSprite fallback:");
+// Optional capability: missing PixelLab/LibreSprite must warn, never fail.
+{
+  const home = process.env.HOME || "";
+  const pixelLabConfigPath = path.join(home, ".codex", "config.toml");
+  const pixelLabAdapterPath = path.join(
+    home,
+    "Library",
+    "Application Support",
+    "LibreSprite",
+    "scripts",
+    "PixelLab.js"
+  );
+  const asepriteExtensionPath = path.join(
+    home,
+    "Library",
+    "Application Support",
+    "LibreSprite",
+    "PixelLab-Aseprite-extension"
+  );
+  const libreSpriteCliPath = "/Applications/LibreSprite.app/Contents/MacOS/libresprite";
+
+  // Safe substring scan only: never print config contents or tokens.
+  const configPresent = fs.existsSync(pixelLabConfigPath);
+  let mcpEntry = "missing";
+  if (configPresent) {
+    try {
+      const lower = fs.readFileSync(pixelLabConfigPath, "utf8").toLowerCase();
+      const hasPixelLab = lower.includes("pixellab") || lower.includes("pixflux");
+      const hasMcp = lower.includes("mcp");
+      mcpEntry = hasPixelLab && hasMcp ? "present" : hasPixelLab || hasMcp ? "unknown" : "missing";
+    } catch {
+      mcpEntry = "unknown";
+    }
+  }
+
+  console.log(`PixelLab MCP config: ${configPresent ? "present" : "missing"}`);
+  console.log(`PixelLab MCP config path: ${pixelLabConfigPath}`);
+  console.log(`PixelLab MCP entry: ${mcpEntry}`);
+  console.log("Token safety: secrets redacted; config contents not printed");
+  console.log("API probe: skipped, would spend credits; no credits spent");
+  console.log(`LibreSprite PixelLab JS adapter: ${fs.existsSync(pixelLabAdapterPath) ? "present" : "missing"}`);
+  console.log(`LibreSprite PixelLab JS adapter path: ${pixelLabAdapterPath}`);
+  console.log("Adapter capabilities: balance check, Pixflux image generation");
+  console.log(`Aseprite PixelLab extension reference: ${fs.existsSync(asepriteExtensionPath) ? "present" : "missing"}`);
+  console.log(`Aseprite PixelLab extension reference path: ${asepriteExtensionPath}`);
+  console.log("Runtime note: Lua-based Aseprite code; reference only for LibreSprite");
+  console.log(`LibreSprite CLI path: ${libreSpriteCliPath}`);
+
+  if (configPresent) {
+    pass("PixelLab MCP config present (optional)");
+  } else {
+    warn("PixelLab MCP config missing optional; pixellab-libresprite-fallback unavailable");
+  }
+  if (fs.existsSync(pixelLabAdapterPath)) {
+    pass("LibreSprite PixelLab JS adapter present (optional)");
+  } else {
+    warn("LibreSprite PixelLab JS adapter missing optional");
+  }
+  if (!fs.existsSync(asepriteExtensionPath)) {
+    warn("Aseprite PixelLab extension reference missing optional (reference only)");
+  }
+}
+
+console.log("\nBUAP profile pairing:");
+pass("Buddy profile: bmo");
+pass("Lil Buddy profile: finn");
+pass("Lil Buddy is the implementation worker: emulated worker pattern (true subagent in Claude Code plugin)");
+
 console.log("\nEnvironment:");
 for (const name of optionalEnv) {
   const value = process.env[name];

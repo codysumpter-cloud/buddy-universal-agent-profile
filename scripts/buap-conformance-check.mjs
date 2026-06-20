@@ -76,7 +76,34 @@ const requiredText = [
   ['docs/hatch-pet-integration.md', 'manual-handoff'],
   ['docs/hatch-pet-integration.md', 'pixel-art-fallback'],
   ['tools/buap-doctor.mjs', 'pixel-art-fallback'],
-  ['tools/buap-doctor.mjs', 'LibreSprite executable']
+  ['tools/buap-doctor.mjs', 'LibreSprite executable'],
+  // PixelLab + LibreSprite fallback wiring (docs + code, no secrets).
+  ['docs/hatch-pet-integration.md', 'PixelLab.js'],
+  ['docs/hatch-pet-integration.md', 'Pixflux'],
+  ['docs/hatch-pet-integration.md', '/Users/prismtek/.codex/config.toml'],
+  ['docs/hatch-pet-integration.md', '/Applications/LibreSprite.app/Contents/MacOS/libresprite'],
+  ['docs/hatch-pet-integration.md', 'PixelLab-Aseprite-extension'],
+  ['docs/hatch-pet-integration.md', 'Lua-based Aseprite code'],
+  ['docs/hatch-pet-integration.md', 'LibreSprite JS adapter'],
+  ['docs/hatch-pet-integration.md', 'secrets redacted'],
+  ['docs/hatch-pet-integration.md', 'API probe'],
+  ['docs/hatch-pet-integration.md', 'no credits spent'],
+  ['docs/hatch-pet-integration.md', 'would spend credits'],
+  ['docs/hatch-pet-integration.md', 'Buddy profile: bmo'],
+  ['docs/hatch-pet-integration.md', 'Lil Buddy profile: finn'],
+  ['docs/hatch-pet-integration.md', 'Lil Buddy is the implementation worker'],
+  // BUAP pairing persisted in durable instruction files.
+  ['CLAUDE.md', 'Buddy = `bmo`'],
+  ['CLAUDE.md', 'Lil Buddy = `finn`'],
+  ['personalization/BUDDY_LIL_BUDDY_PROFILE_SELECTION.md', 'Active pairing for this repo'],
+  // Doctor + cli wiring assertions.
+  ['packages/buap-hatch-pet/src/cli.ts', 'Adapter capabilities: balance check, Pixflux image generation'],
+  ['packages/buap-hatch-pet/src/cli.ts', 'Buddy profile: bmo'],
+  ['packages/buap-hatch-pet/src/cli.ts', 'Lil Buddy profile: finn'],
+  ['tools/buap-doctor.mjs', 'no credits spent'],
+  ['tools/buap-doctor.mjs', 'secrets redacted'],
+  ['tools/buap-doctor.mjs', 'Buddy profile: bmo'],
+  ['tools/buap-doctor.mjs', 'Lil Buddy profile: finn']
 ];
 
 const failures = [];

@@ -41,7 +41,9 @@ The ACP agent exposes it as:
    `skills` CLI does not provide `npx skills run`.
 3. `pixel-art-fallback` — when official hatch-pet execution is unavailable,
    Pixellab.ai and LibreSprite scripting can be used to generate, assemble, repair,
-   validate, slice, or export Buddy/Lil Buddy pixel-art assets.
+   validate, slice, or export Buddy/Lil Buddy pixel-art assets. The concrete local
+   wiring for this mode is the `pixellab-libresprite-fallback` toolchain documented
+   below.
 
 The fallback path is an art pipeline, not a success claim. BUAP must still package
 and verify the final artifact before reporting completion. Do not invent a Codex
@@ -169,3 +171,74 @@ uses an energetic, task-focused worker companion concept.
   capabilities.
 - BUAP reports generated paths; it does not automatically select the pet in Codex
   Settings.
+
+## PixelLab + LibreSprite Fallback Tooling
+
+The `pixellab-libresprite-fallback` mode wires three local capabilities. The doctor
+detects each by existence only; it never calls the PixelLab API and never spends
+credits.
+
+PixelLab MCP config:
+
+```text
+/Users/prismtek/.codex/config.toml
+```
+
+The doctor reads this file only to test for safe lowercase substrings (`pixellab`,
+`pixflux`, `mcp`) so it can report `PixelLab MCP entry: present|missing|unknown`.
+It never prints config contents or token values — secrets redacted. PixelLab
+generation allowance is verified manually by the user, not by the doctor. The
+doctor's `API probe` is `skipped, would spend credits` (no credits spent).
+
+LibreSprite JS adapter (the active LibreSprite runtime path):
+
+```text
+/Users/prismtek/Library/Application Support/LibreSprite/scripts/PixelLab.js
+```
+
+This LibreSprite JS adapter supports a PixelLab balance check and Pixflux image
+generation.
+
+Aseprite PixelLab extension reference (reference only):
+
+```text
+/Users/prismtek/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension
+```
+
+This is Lua-based Aseprite code kept as a reference for the LibreSprite JS adapter;
+it is not an active LibreSprite runtime.
+
+LibreSprite CLI:
+
+```text
+/Applications/LibreSprite.app/Contents/MacOS/libresprite
+```
+
+It is not on `PATH`; use the direct path or the optional alias:
+
+```bash
+alias libresprite="/Applications/LibreSprite.app/Contents/MacOS/libresprite"
+```
+
+### Hatch workflow modes, in order
+
+1. `host-hatch-pet`
+2. `manual-handoff`
+3. `pixellab-libresprite-fallback`
+
+## BUAP Active Profile Pairing
+
+For this repo the BUAP pairing is locked:
+
+- `Buddy profile: bmo` (BMO-style: playful, warm, curious, practical, friendly)
+- `Lil Buddy profile: finn` (Finn-style: brave, action-oriented, direct, loyal,
+  persistent)
+- `Lil Buddy is the implementation worker`.
+
+In Claude Code with the BUAP plugin active, Lil Buddy is a true subagent. In plain
+node tooling (`tools/buap-doctor.mjs`) there is no subagent runtime, so the doctor
+reports Lil Buddy as an emulated worker pattern (true subagent in Claude Code
+plugin) rather than claiming a live runtime.
+
+Future sessions should ask the user to select Buddy/Lil Buddy profiles only when no
+pairing is configured. This repo defaults to Buddy=`bmo` / Lil Buddy=`finn`.
