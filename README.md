@@ -46,12 +46,14 @@ BUAP links to, but does not vendor or replace, the owning runtime repos:
 | Durable graph memory / Vegapunk Brain | `codysumpter-cloud/knowledge-vault` |
 | Governance / policy / council / operator runbooks | `codysumpter-cloud/buddy-brain` |
 | Guarded execution / action risk / receipts | `codysumpter-cloud/buddy-agent` |
+| Buddy MCP bridge for Codex/Odysseus/local MCP clients | `codysumpter-cloud/buddy-agent` |
 | Local device voice / vision / transport runtime | `codysumpter-cloud/omni-buddy` |
 | Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
 
 Read `integrations/ecosystem-routing-spec.md` first for canonical routing. Use
 `linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,
-and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable links and detail.
+`integrations/buddy-mcp-server.md`, and `integrations/prismtek-ecosystem-map.md` for
+supporting machine-readable links and detail.
 
 ## Resilience and negotiation standards
 
@@ -91,16 +93,17 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 | `packages/buap-apple-notes-reminders/` | macOS-only Apple Notes/Reminders helper (osascript) used by the ACP agent |
 | `packages/buap-hatch-pet/` | Wrapper for permission-gated Codex pet generation through the official `hatch-pet` skill |
 | `personalization/` | Personalization handshake and Buddy/Lil Buddy profile selection assets |
+| `exports/` | Pasteable ChatGPT and other client exports generated from BUAP source material |
 | `linked-repos/` | Machine-readable linked repo map for Buddy ecosystem routing |
-| `integrations/` | Runtime integration docs and canonical ecosystem routing |
+| `integrations/` | Runtime integration docs and canonical ecosystem routing, including Buddy MCP bridge docs |
 | `audits/` | Source-backed BUAP and runtime integration audit reports |
 | `standards/` | Orchestration, runtime contracts, capability negotiation, memory, failure modes, validation, response format |
 | `schemas/` | Machine-readable schemas, including receipts and capability declarations |
 | `tests/conformance/` | Prompt/rubric suite for checking BUAP compatibility |
 | `scripts/` | Local validation and conformance helper scripts |
 | `.github/workflows/` | CI checks for BUAP docs/spec conformance |
-| `runbooks/` | Repeatable procedures for common repo, game, docs, runtime, and agent tasks |
-| `adapters/` | Tool-specific install templates |
+| `runbooks/` | Repeatable procedures for common repo, game, docs, runtime, MCP bridge, and agent tasks |
+| `adapters/` | Tool-specific install templates, including Codex/Odysseus Buddy MCP client templates |
 | `chatgpt-projects/buddy/` | ChatGPT Project source pack: pasteable project instructions, uploadable knowledge files, source metadata, and test prompts |
 | `universal-ai-chat/` | Low-context prompt pack for any AI chat/search box, including tools that cannot read files or repos |
 | `openai-symphony-agent-pack/` | Symphony-style multi-agent role pack for conductor/section/critic orchestration |
@@ -119,6 +122,10 @@ and `integrations/prismtek-ecosystem-map.md` for supporting machine-readable lin
 - **Codex plugin:** use `plugins/buap/.codex-plugin/plugin.json` for native Codex
   plugin metadata, BUAP skills, slash-command prompts, Lil Buddy profile assets, and
   safety/receipts hooks. Details: `plugins/buap/README.md`.
+- **Buddy MCP for Codex/Odysseus:** read `integrations/buddy-mcp-server.md`, then adapt
+  `adapters/codex-buddy-mcp.template.toml` or `adapters/odysseus-buddy-mcp.template.md`.
+  The bridge is source-backed by `codysumpter-cloud/buddy-agent#24`, but do not claim it
+  is locally working until a `buddy-mcp` executable exists and `buddy.self_test` passes.
 - **Claude Code:** add to the repo's `CLAUDE.md` (or create one):
   `Read buddy-universal-agent-profile/CLAUDE.md and follow it.`
 - **Claude Code (plugin, recommended):** install BUAP as a native plugin so the loop is
