@@ -1,0 +1,11 @@
+# BUAP / Buddy MCP server template for Codex.
+# Copy into the Codex MCP config location supported by your host.
+# Replace absolute paths before use.
+#
+# Source-backed by codysumpter-cloud/buddy-agent#24.
+# Do not claim this is working until `buddy.self_test` succeeds locally.
+
+[mcp_servers.buddy]
+command = "/absolute/path/to/buddy-mcp-plugin/.venv/bin/buddy-mcp"
+args = []
+env = { BUDDY_VAULT_PATH = "/absolute/path/to/knowledge-vault" }
