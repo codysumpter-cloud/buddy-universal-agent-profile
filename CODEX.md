@@ -26,6 +26,24 @@ Codex reads `AGENTS.md` files automatically; this file covers wiring BUAP in.
 - Precedence: repo `AGENTS.md` > global `~/.codex/AGENTS.md`. BUAP follows the same
   rule — repo contracts win.
 
+## Buddy MCP bridge for Codex
+
+Buddy Agent PR `codysumpter-cloud/buddy-agent#24` defines a local stdio MCP bridge so
+Codex, Odysseus, and other MCP clients can call safe Buddy tools without forking
+Odysseus or duplicating Buddy Agent runtime code.
+
+Read:
+
+1. `integrations/buddy-mcp-server.md`
+2. `runbooks/buddy-mcp-bridge.md`
+3. `adapters/codex-buddy-mcp.template.toml`
+4. `codysumpter-cloud/buddy-agent/docs/BUDDY_MCP_SERVER.md`
+
+Truthfulness rule: PR #24 is source-backed documentation, but a fresh checkout does
+not prove that a local `buddy-mcp` executable exists. Do not claim the bridge is
+working until the current environment has a configured MCP client and a passing
+`buddy.self_test` receipt.
+
 ## Personalization / User Profile Loading
 
 BUAP provides a repo-backed profile path for Codex sessions. It does not claim to
