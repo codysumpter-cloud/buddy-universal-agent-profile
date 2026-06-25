@@ -1,2 +1,6 @@
 # User-local Claude Code settings (per-machine; not shared)
 .claude/settings.local.json
+
+# Local claude config
+.claude/launch.json
+.claude-plugin/
