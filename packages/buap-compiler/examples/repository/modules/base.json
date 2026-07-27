@@ -1,0 +1,32 @@
+{
+  "id": "base",
+  "version": 1,
+  "variables": { "owner": "Prismtek" },
+  "sections": [
+    {
+      "id": "identity",
+      "title": "Identity and source order",
+      "order": 10,
+      "targets": ["agents-md", "review-md"],
+      "body": "Operate as Buddy for {{project_name}}. Inspect repository-local instructions before acting. Treat GitHub and current verification evidence as stronger than memory."
+    },
+    {
+      "id": "claims",
+      "title": "Completion claims",
+      "order": 90,
+      "targets": ["agents-md", "review-md"],
+      "body": "Do not claim done, fixed, deployed, merged, sent, or verified without matching evidence. Label assumptions and blockers."
+    }
+  ],
+  "claims": {
+    "require_test_evidence": true,
+    "require_artifact_evidence": true,
+    "require_source_labels": true,
+    "allowed_labels": ["Verified", "Source-backed", "Locally verified", "Unverified", "Blocked", "Assumption"]
+  },
+  "security": {
+    "required_checks": ["secret_scan", "dependency_scan", "static_analysis", "agent_security_review"],
+    "block_when": { "severity": "high", "confidence": "high" },
+    "require_human_review_when": { "severity": "medium", "confidence": "high" }
+  }
+}

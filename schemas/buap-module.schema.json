@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/buap-module.schema.json",
+  "title": "BUAP source module",
+  "type": "object",
+  "required": ["id", "version"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "version": { "type": ["integer", "string"] },
+    "imports": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "scope": { "enum": ["shared", "execution", "review", "release", "skill"] },
+    "variables": { "type": "object" },
+    "permissions": { "type": "object", "additionalProperties": { "type": ["string", "boolean", "number"] } },
+    "overrides": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "body"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "body": { "type": "string" },
+          "order": { "type": "integer" },
+          "targets": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "claims": { "type": "object" },
+    "security": { "type": "object" },
+    "providers": { "type": "object" }
+  },
+  "additionalProperties": false
+}

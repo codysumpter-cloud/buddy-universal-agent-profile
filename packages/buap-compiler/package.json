@@ -1,0 +1,21 @@
+{
+  "name": "@prismtek/buap-compiler",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic compiler for BUAP source modules, scoped agent policies, and provider-specific repository instructions.",
+  "type": "module",
+  "bin": {
+    "buap-compile": "src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "scripts": {
+    "test": "node --test",
+    "build:example": "node src/cli.mjs build --config examples/repository/buap.config.json",
+    "check:example": "node src/cli.mjs check --config examples/repository/buap.config.json"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
