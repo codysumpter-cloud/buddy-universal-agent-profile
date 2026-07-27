@@ -1,0 +1,21 @@
+{
+  "moduleDir": "modules",
+  "outDir": "generated",
+  "defaultProfile": "coding",
+  "titles": {
+    "agents": "Buddy Repository Instructions",
+    "review": "Buddy Review Instructions"
+  },
+  "variables": {
+    "project_name": "Example Prismtek Repository"
+  },
+  "profiles": {
+    "coding": { "entrypoints": ["coding"] },
+    "review": { "entrypoints": ["review"] },
+    "release": { "entrypoints": ["release"] }
+  },
+  "tokenBudgets": {
+    "AGENTS.md": 1600,
+    "REVIEW.md": 1200
+  }
+}

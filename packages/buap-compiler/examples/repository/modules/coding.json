@@ -1,0 +1,35 @@
+{
+  "id": "coding",
+  "version": 1,
+  "imports": ["base"],
+  "scope": "execution",
+  "permissions": {
+    "network": "allowlist",
+    "filesystem": "workspace-write",
+    "secrets": "none",
+    "merge": "deny",
+    "release": "deny"
+  },
+  "sections": [
+    {
+      "id": "execution",
+      "title": "Execution policy",
+      "order": 20,
+      "targets": ["agents-md"],
+      "body": "Use the smallest durable change. Workspace writes are allowed; merge and release remain human-approved actions. Start with network disabled and expand to an allowlist only when the task proves it is required."
+    }
+  ],
+  "providers": {
+    "codex": {
+      "sandbox_mode": "workspace-write",
+      "network_access": "allowlist",
+      "approval_policy": "on-request"
+    },
+    "buddy": {
+      "profile": "coding",
+      "capabilities": ["read", "write", "test", "receipt"],
+      "requires_human_approval": false,
+      "experimental": []
+    }
+  }
+}

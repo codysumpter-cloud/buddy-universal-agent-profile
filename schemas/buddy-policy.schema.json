@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/buddy-policy.schema.json",
+  "title": "Generated Buddy repository policy",
+  "type": "object",
+  "required": ["version", "default_profile", "profiles"],
+  "properties": {
+    "version": { "const": 1 },
+    "default_profile": { "type": "string" },
+    "profiles": {
+      "type": "object",
+      "required": ["coding", "review", "release"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["permissions", "requires_human_approval"],
+        "properties": {
+          "permissions": { "type": "object" },
+          "requires_human_approval": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

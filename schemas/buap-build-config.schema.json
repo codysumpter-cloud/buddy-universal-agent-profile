@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/buap-build-config.schema.json",
+  "title": "BUAP compiler configuration",
+  "type": "object",
+  "required": ["profiles"],
+  "properties": {
+    "moduleDir": { "type": "string" },
+    "outDir": { "type": "string" },
+    "defaultProfile": { "type": "string" },
+    "variables": { "type": "object" },
+    "titles": { "type": "object" },
+    "tokenBudgets": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 1 } },
+    "profiles": {
+      "type": "object",
+      "required": ["coding", "review", "release"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["entrypoints"],
+        "properties": { "entrypoints": { "type": "array", "items": { "type": "string" }, "minItems": 1 } },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

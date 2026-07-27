@@ -1,0 +1,37 @@
+{
+  "id": "review",
+  "version": 1,
+  "imports": ["base"],
+  "scope": "review",
+  "permissions": {
+    "network": "none",
+    "filesystem": "readonly",
+    "secrets": "none",
+    "merge": "deny",
+    "release": "deny"
+  },
+  "sections": [
+    {
+      "id": "review",
+      "title": "Review policy",
+      "order": 20,
+      "targets": ["review-md"],
+      "body": "Review the pull request head branch instructions, inspect changed behavior, and report severity plus confidence. Never mutate the workspace or merge from the review profile."
+    }
+  ],
+  "providers": {
+    "copilot-review": {
+      "runner": "separate",
+      "firewall": true,
+      "network": "none",
+      "permissions": "read-only",
+      "setup_workflow": ".github/workflows/copilot-code-review.yml"
+    },
+    "buddy": {
+      "profile": "review",
+      "capabilities": ["read", "review", "security-evidence"],
+      "requires_human_approval": false,
+      "experimental": []
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "release",
+  "version": 1,
+  "imports": ["base"],
+  "scope": "release",
+  "permissions": {
+    "network": "allowlist",
+    "filesystem": "workspace-write",
+    "secrets": "scoped",
+    "merge": "confirm",
+    "release": "confirm"
+  },
+  "providers": {
+    "buddy": {
+      "profile": "release",
+      "capabilities": ["read", "write", "test", "release-receipt"],
+      "requires_human_approval": true,
+      "experimental": []
+    }
+  }
+}
