@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/prismtek-component.schema.json",
+  "title": "Prismtek Buddy Stack component declaration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "component",
+    "repository",
+    "role",
+    "owns",
+    "provides",
+    "consumes",
+    "events",
+    "health_checks",
+    "stack_map"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "component": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]+$"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "role": {
+      "type": "string",
+      "minLength": 10
+    },
+    "owns": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2
+      }
+    },
+    "provides": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contract"
+      }
+    },
+    "consumes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "emits",
+        "receives"
+      ],
+      "properties": {
+        "emits": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "receives": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "health_checks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "stack_map": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "$defs": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "path"
+      ],
+      "properties": {
+        "contract": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+\\.v[0-9]+$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "from"
+      ],
+      "properties": {
+        "contract": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+\\.v[0-9]+$"
+        },
+        "from": {
+          "type": "string",
+          "minLength": 2
+        }
+      }
+    }
+  }
+}
