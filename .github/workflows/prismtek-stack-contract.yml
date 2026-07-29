@@ -1,0 +1,62 @@
+name: Prismtek stack contract
+
+on:
+  push:
+    paths:
+      - "prismtek.component.json"
+      - "linked-repos/prismtek-stack.manifest.json"
+      - "schemas/prismtek-component.schema.json"
+      - "scripts/validate-prismtek-stack.mjs"
+      - ".github/workflows/prismtek-stack-contract.yml"
+  pull_request:
+    paths:
+      - "prismtek.component.json"
+      - "linked-repos/prismtek-stack.manifest.json"
+      - "schemas/prismtek-component.schema.json"
+      - "scripts/validate-prismtek-stack.mjs"
+      - ".github/workflows/prismtek-stack-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate router declaration and topology
+        run: node scripts/validate-prismtek-stack.mjs --workspace . --local-only
+
+  public-stack-contract:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: stack/buddy-universal-agent-profile
+      - uses: actions/checkout@v4
+        with:
+          repository: codysumpter-cloud/knowledge-vault
+          path: stack/knowledge-vault
+      - uses: actions/checkout@v4
+        with:
+          repository: codysumpter-cloud/buddy-brain
+          ref: master
+          path: stack/buddy-brain
+      - uses: actions/checkout@v4
+        with:
+          repository: codysumpter-cloud/buddy-agent
+          path: stack/buddy-agent
+      - uses: actions/checkout@v4
+        with:
+          repository: codysumpter-cloud/omni-buddy
+          path: stack/omni-buddy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate public repository contracts
+        run: node stack/buddy-universal-agent-profile/scripts/validate-prismtek-stack.mjs --workspace stack
