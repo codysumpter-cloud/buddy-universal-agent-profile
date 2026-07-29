@@ -9,6 +9,7 @@
     "buddy-brain",
     "buddy-agent",
     "omni-buddy",
+    "prismtek-site",
     "prismtek-apps",
     "buddy-universal-agent-profile"
   ],
@@ -62,12 +63,14 @@
         "agent-policy-compilation",
         "capability-negotiation",
         "ecosystem-routing",
-        "conformance"
+        "conformance",
+        "game-protocol-conformance"
       ],
       "provides": [
         "buap.policy-profile.v1",
         "prismtek.stack-manifest.v1",
-        "prismtek.component.v1"
+        "prismtek.component.v1",
+        "prismtek.buddy-game-schema.v1"
       ],
       "consumes": [
         "knowledge.graph.v1",
@@ -84,7 +87,9 @@
         "admissibility-policy",
         "verification",
         "receipts",
-        "sandbox-contracts"
+        "sandbox-contracts",
+        "game-runtime",
+        "game-runtime-transport"
       ],
       "provides": [
         "buddy.evidence-bundle.v1",
@@ -92,12 +97,14 @@
         "buddy.policy-decision.v1",
         "buddy.execution-receipt.v1",
         "buddy.execution-verified.v1",
-        "buddy.task-economics.v1"
+        "buddy.task-economics.v1",
+        "prismtek.buddy-game.v1"
       ],
       "consumes": [
         "buap.policy-profile.v1",
         "retrieval.evidence.v1",
-        "knowledge.graph.v1"
+        "knowledge.graph.v1",
+        "prismtek.buddy-game-schema.v1"
       ]
     },
     {
@@ -117,7 +124,29 @@
       "consumes": [
         "buap.policy-profile.v1",
         "buddy.execution-receipt.v1",
-        "knowledge.graph.v1"
+        "knowledge.graph.v1",
+        "prismtek.buddy-game.v1"
+      ]
+    },
+    {
+      "name": "prismtek-site",
+      "repository": "codysumpter-cloud/prismtek-site",
+      "visibility": "private",
+      "owns": [
+        "hosted-product-surface",
+        "account-session-boundary",
+        "hosted-model-routing",
+        "hosted-game-task-state",
+        "website-distribution"
+      ],
+      "provides": [
+        "prismtek.buddy-game.hosted.v1"
+      ],
+      "consumes": [
+        "buap.policy-profile.v1",
+        "knowledge.graph.v1",
+        "prismtek.buddy-game-schema.v1",
+        "prismtek.buddy-game.v1"
       ]
     },
     {
@@ -129,7 +158,8 @@
         "user-experience",
         "games",
         "creative-tools",
-        "admin-surfaces"
+        "admin-surfaces",
+        "game-command-authority"
       ],
       "provides": [
         "prismtek.product-event.v1"
@@ -138,7 +168,10 @@
         "buap.policy-profile.v1",
         "buddy.execution-receipt.v1",
         "knowledge.graph.v1",
-        "omni.device-event.v1"
+        "omni.device-event.v1",
+        "prismtek.buddy-game-schema.v1",
+        "prismtek.buddy-game.v1",
+        "prismtek.buddy-game.hosted.v1"
       ]
     }
   ],
@@ -174,6 +207,32 @@
         {
           "component": "buddy-brain",
           "produces": "buddy.policy-report.v1"
+        }
+      ]
+    },
+    {
+      "id": "prismtek-buddies-game-runtime",
+      "purpose": "Give native and hosted Prismtek Buddies one policy-aware Buddy protocol while preserving game and account boundaries.",
+      "steps": [
+        {
+          "component": "buddy-universal-agent-profile",
+          "produces": "prismtek.buddy-game-schema.v1"
+        },
+        {
+          "component": "buddy-agent",
+          "produces": "prismtek.buddy-game.v1"
+        },
+        {
+          "component": "prismtek-site",
+          "produces": "prismtek.buddy-game.hosted.v1"
+        },
+        {
+          "component": "prismtek-apps",
+          "produces": "prismtek.product-event.v1"
+        },
+        {
+          "component": "knowledge-vault",
+          "produces": "knowledge.graph.v1"
         }
       ]
     }

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/prismtek-buddy-game.schema.json",
+  "title": "Prismtek Buddy Game Protocol v1",
+  "description": "Provider-neutral request and response envelopes shared by local Buddy Agent and hosted Prismtek.dev game runtimes.",
+  "oneOf": [
+    { "$ref": "#/$defs/call_request" },
+    { "$ref": "#/$defs/success_response" },
+    { "$ref": "#/$defs/error_response" }
+  ],
+  "$defs": {
+    "json_value": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 12000 },
+        {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/json_value" }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "additionalProperties": { "$ref": "#/$defs/json_value" }
+        }
+      ]
+    },
+    "call_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "arguments"],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "pattern": "^buddy\\.(game|task|status|project_context|vault_search|repo_overview)(\\.|$)"
+        },
+        "arguments": {
+          "type": "object",
+          "maxProperties": 100,
+          "additionalProperties": { "$ref": "#/$defs/json_value" }
+        }
+      }
+    },
+    "success_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "result"],
+      "properties": {
+        "ok": { "const": true },
+        "result": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/json_value" }
+        }
+      }
+    },
+    "error_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "error"],
+      "properties": {
+        "ok": { "const": false },
+        "error": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    }
+  }
+}
