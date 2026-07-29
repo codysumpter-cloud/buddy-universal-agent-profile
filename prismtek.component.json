@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/prismtek-component.schema.json",
+  "schema_version": "1.0",
+  "component": "buddy-universal-agent-profile",
+  "repository": "codysumpter-cloud/buddy-universal-agent-profile",
+  "role": "portable policy compiler, capability negotiation, ecosystem routing, and conformance",
+  "owns": [
+    "agent-policy-compilation",
+    "capability-negotiation",
+    "ecosystem-routing",
+    "conformance"
+  ],
+  "provides": [
+    {
+      "contract": "buap.policy-profile.v1",
+      "path": "compiler/"
+    },
+    {
+      "contract": "prismtek.stack-manifest.v1",
+      "path": "linked-repos/prismtek-stack.manifest.json"
+    },
+    {
+      "contract": "prismtek.component.v1",
+      "path": "schemas/prismtek-component.schema.json"
+    }
+  ],
+  "consumes": [
+    {
+      "contract": "knowledge.graph.v1",
+      "from": "knowledge-vault"
+    },
+    {
+      "contract": "buddy.receipt.v1",
+      "from": "buddy-agent"
+    }
+  ],
+  "events": {
+    "emits": [
+      "policy_compiled"
+    ],
+    "receives": [
+      "stack_contract_changed"
+    ]
+  },
+  "health_checks": [
+    "node scripts/validate-prismtek-stack.mjs --workspace . --local-only"
+  ],
+  "stack_map": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/blob/main/linked-repos/prismtek-stack.manifest.json"
+}
