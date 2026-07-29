@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0",
+  "name": "Prismtek Buddy Agent Platform",
+  "owner": "Prismtek",
+  "canonical_router": "codysumpter-cloud/buddy-universal-agent-profile",
+  "component_declaration": "prismtek.component.json",
+  "source_order": [
+    "knowledge-vault",
+    "buddy-brain",
+    "buddy-agent",
+    "omni-buddy",
+    "prismtek-apps",
+    "buddy-universal-agent-profile"
+  ],
+  "components": [
+    {
+      "name": "knowledge-vault",
+      "repository": "codysumpter-cloud/knowledge-vault",
+      "visibility": "public",
+      "owns": [
+        "durable-memory",
+        "provenance-ledger",
+        "event-ingestion",
+        "graph-compilation"
+      ],
+      "provides": [
+        "vegapunk.graph-event.v1",
+        "knowledge.graph.v1"
+      ],
+      "consumes": [
+        "buddy.evidence-evaluated.v1",
+        "buddy.execution-verified.v1",
+        "buddy.policy-report.v1"
+      ]
+    },
+    {
+      "name": "buddy-brain",
+      "repository": "codysumpter-cloud/buddy-brain",
+      "visibility": "public",
+      "owns": [
+        "governance",
+        "policy",
+        "readiness-scoring",
+        "routing-feedback",
+        "outcome-economics"
+      ],
+      "provides": [
+        "buddy.policy-report.v1",
+        "buddy.task-economics-report.v1"
+      ],
+      "consumes": [
+        "buddy.policy-decision.v1",
+        "buddy.task-economics.v1",
+        "knowledge.graph.v1"
+      ]
+    },
+    {
+      "name": "buddy-universal-agent-profile",
+      "repository": "codysumpter-cloud/buddy-universal-agent-profile",
+      "visibility": "public",
+      "owns": [
+        "agent-policy-compilation",
+        "capability-negotiation",
+        "ecosystem-routing",
+        "conformance"
+      ],
+      "provides": [
+        "buap.policy-profile.v1",
+        "prismtek.stack-manifest.v1",
+        "prismtek.component.v1"
+      ],
+      "consumes": [
+        "knowledge.graph.v1",
+        "buddy.receipt.v1"
+      ]
+    },
+    {
+      "name": "buddy-agent",
+      "repository": "codysumpter-cloud/buddy-agent",
+      "visibility": "public",
+      "owns": [
+        "guarded-execution",
+        "evidence-normalization",
+        "admissibility-policy",
+        "verification",
+        "receipts",
+        "sandbox-contracts"
+      ],
+      "provides": [
+        "buddy.evidence-bundle.v1",
+        "buddy.policy-decision.v1",
+        "buddy.execution-receipt.v1",
+        "buddy.task-economics.v1"
+      ],
+      "consumes": [
+        "buap.policy-profile.v1",
+        "retrieval.evidence.v1",
+        "knowledge.graph.v1"
+      ]
+    },
+    {
+      "name": "omni-buddy",
+      "repository": "codysumpter-cloud/omni-buddy",
+      "visibility": "public",
+      "owns": [
+        "voice-runtime",
+        "vision-runtime",
+        "device-runtime",
+        "local-model-routing",
+        "transport"
+      ],
+      "provides": [
+        "omni.device-event.v1"
+      ],
+      "consumes": [
+        "buap.policy-profile.v1",
+        "buddy.execution-receipt.v1",
+        "knowledge.graph.v1"
+      ]
+    },
+    {
+      "name": "prismtek-apps",
+      "repository": "codysumpter-cloud/prismtek-apps",
+      "visibility": "private",
+      "owns": [
+        "product-surfaces",
+        "user-experience",
+        "games",
+        "creative-tools",
+        "admin-surfaces"
+      ],
+      "provides": [
+        "prismtek.product-event.v1"
+      ],
+      "consumes": [
+        "buap.policy-profile.v1",
+        "buddy.execution-receipt.v1",
+        "knowledge.graph.v1",
+        "omni.device-event.v1"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "trust-fabric",
+      "purpose": "Turn retrieved memory into admissible, guarded, verifiable action.",
+      "steps": [
+        {
+          "component": "external-retrieval-provider",
+          "produces": "retrieval.evidence.v1"
+        },
+        {
+          "component": "buddy-agent",
+          "produces": "buddy.evidence-bundle.v1"
+        },
+        {
+          "component": "buddy-agent",
+          "produces": "buddy.policy-decision.v1"
+        },
+        {
+          "component": "buddy-universal-agent-profile",
+          "produces": "buap.policy-profile.v1"
+        },
+        {
+          "component": "buddy-agent",
+          "produces": "buddy.execution-receipt.v1"
+        },
+        {
+          "component": "knowledge-vault",
+          "produces": "knowledge.graph.v1"
+        },
+        {
+          "component": "buddy-brain",
+          "produces": "buddy.policy-report.v1"
+        }
+      ]
+    }
+  ],
+  "external_adapters": [
+    {
+      "id": "mitosis-cortex",
+      "status": "optional-public-contract-adapter",
+      "provides": "retrieval.evidence.v1",
+      "boundary": "Mitosis can supply cited retrieval evidence; Prismtek retains policy, execution, verification, and durable-record authority."
+    }
+  ]
+}
