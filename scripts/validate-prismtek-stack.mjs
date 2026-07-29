@@ -62,6 +62,10 @@ for (const component of manifest.components || []) {
   const repoDir = localOnly ? routerDir : path.join(workspace, component.name);
   const declarationPath = path.join(repoDir, manifest.component_declaration || 'prismtek.component.json');
   if (!fs.existsSync(declarationPath)) {
+    if (component.visibility === 'private') {
+      console.warn(`SKIP: ${component.name} is private and was not checked out.`);
+      continue;
+    }
     fail(`${component.name} is missing ${path.basename(declarationPath)}`);
     continue;
   }
