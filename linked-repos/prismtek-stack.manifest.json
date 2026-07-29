@@ -71,7 +71,7 @@
       ],
       "consumes": [
         "knowledge.graph.v1",
-        "buddy.receipt.v1"
+        "buddy.execution-receipt.v1"
       ]
     },
     {
@@ -88,8 +88,10 @@
       ],
       "provides": [
         "buddy.evidence-bundle.v1",
+        "buddy.evidence-evaluated.v1",
         "buddy.policy-decision.v1",
         "buddy.execution-receipt.v1",
+        "buddy.execution-verified.v1",
         "buddy.task-economics.v1"
       ],
       "consumes": [
