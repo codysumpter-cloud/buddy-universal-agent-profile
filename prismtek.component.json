@@ -8,7 +8,8 @@
     "agent-policy-compilation",
     "capability-negotiation",
     "ecosystem-routing",
-    "conformance"
+    "conformance",
+    "game-protocol-conformance"
   ],
   "provides": [
     {
@@ -22,6 +23,10 @@
     {
       "contract": "prismtek.component.v1",
       "path": "schemas/prismtek-component.schema.json"
+    },
+    {
+      "contract": "prismtek.buddy-game-schema.v1",
+      "path": "schemas/prismtek-buddy-game.schema.json"
     }
   ],
   "consumes": [
