@@ -30,7 +30,7 @@
       "from": "knowledge-vault"
     },
     {
-      "contract": "buddy.receipt.v1",
+      "contract": "buddy.execution-receipt.v1",
       "from": "buddy-agent"
     }
   ],
