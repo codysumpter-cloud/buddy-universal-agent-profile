@@ -1,14 +1,26 @@
 {
   "name": "@prismtek/buap-compiler",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Deterministic compiler for BUAP source modules, scoped agent policies, and provider-specific repository instructions.",
+  "version": "0.2.0",
+  "description": "Initialize, compile, validate, and diagnose portable BUAP repository policy.",
   "type": "module",
   "bin": {
+    "buap": "src/cli.mjs",
     "buap-compile": "src/cli.mjs"
   },
   "exports": {
     ".": "./src/index.mjs"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile.git",
+    "directory": "packages/buap-compiler"
   },
   "scripts": {
     "test": "node --test",
