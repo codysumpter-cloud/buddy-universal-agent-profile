@@ -1,0 +1,35 @@
+{
+  "version": "retrieval.evidence.v1",
+  "evidence_id": "sample-evidence-001",
+  "provider": {
+    "name": "example-provider",
+    "source_id": "provider-source-123"
+  },
+  "source": {
+    "stable_id": "source-123",
+    "revision": "7",
+    "digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "type": "document"
+  },
+  "temporal": {
+    "observed_at": "2026-07-29T12:00:00Z",
+    "retrieved_at": "2026-07-29T12:05:00Z",
+    "valid_until": null
+  },
+  "lineage": {
+    "supports": [],
+    "contradicts": [],
+    "superseded_by": []
+  },
+  "retrieval": {
+    "rank": 1,
+    "signals": {
+      "aggregate": 0.91
+    }
+  },
+  "prismtek_result": {
+    "decision": "review",
+    "reason_codes": ["PUBLIC_SAMPLE_ONLY"]
+  },
+  "notice": "This reduced sample is non-executable and omits proprietary policy and verification logic."
+}
