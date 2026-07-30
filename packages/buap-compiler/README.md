@@ -1,6 +1,6 @@
 # BUAP Compiler
 
-`@prismtek/buap-compiler` initializes repositories and turns canonical BUAP modules into deterministic, diffable agent instructions and policy files.
+`@prismtek/buap-compiler` initializes repositories and turns canonical BUAP modules into deterministic, diffable agent instructions, policy files, and bounded agent life profiles.
 
 ## Five-minute install
 
@@ -21,8 +21,13 @@ REVIEW.md
 .buddy/providers/codex.yaml
 .buddy/providers/copilot-review.yaml
 .buddy/providers/buddy.yaml
+.buddy/life-profile.json
 .buddy/manifest.json
 ```
+
+`.buddy/life-profile.json` is the agent's compiled developmental genome. It keeps constitution and safety boundaries immutable while declaring bounded drives, traits, reinforcement authorities, memory provenance, relationship scope, developmental stages, and inheritance policy. Hosts may persist learned state separately through `@prismtek/buap-agent-life`; learned state never rewrites the compiled profile.
+
+Modules may add a `life` object. Conflicting scalar values require an explicit `life.*` override, just like other high-impact policy changes.
 
 It refuses to overwrite managed files unless `--force` is explicitly provided. Review existing instructions before using that flag.
 
@@ -55,6 +60,7 @@ The legacy `buap-compile` binary remains an alias for compatibility.
 - undefined variables;
 - duplicate sections without explicit overrides;
 - conflicting permissions without explicit overrides;
+- conflicting life-profile values without explicit overrides;
 - unsupported provider fields;
 - secret-like strings;
 - generated-file drift;
