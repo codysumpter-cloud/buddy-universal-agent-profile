@@ -18,7 +18,7 @@ test("initializes a repository into deterministic root policy", async () => {
   const root = await temporaryProject("hello-buddy");
   const result = await initProject(root);
   assert.equal(result.projectName, "hello-buddy");
-  assert.equal(result.outputCount, 8);
+  assert.equal(result.outputCount, 9);
   assert.equal(result.overwritten.length, 0);
 
   for (const relative of [
@@ -32,6 +32,7 @@ test("initializes a repository into deterministic root policy", async () => {
     "REVIEW.md",
     ".buddy/policy.yaml",
     ".buddy/manifest.json",
+    ".buddy/life-profile.json",
   ]) {
     const stat = await fs.stat(path.join(root, relative));
     assert.ok(stat.isFile(), `${relative} should exist`);
