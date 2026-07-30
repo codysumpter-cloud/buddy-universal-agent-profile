@@ -3,6 +3,7 @@ import path from "node:path";
 import os from "node:os";
 import { readStructuredFile } from "./parser.mjs";
 import { resolveModuleGraph } from "./graph.mjs";
+import { compileLifeProfile } from "./life-profile.mjs";
 import {
   estimateTokens,
   findSecretLikeStrings,
@@ -21,6 +22,7 @@ const TARGET_PATHS = {
   codex: ".buddy/providers/codex.yaml",
   "copilot-review": ".buddy/providers/copilot-review.yaml",
   buddy: ".buddy/providers/buddy.yaml",
+  life: ".buddy/life-profile.json",
   manifest: ".buddy/manifest.json",
 };
 
@@ -110,7 +112,7 @@ export async function compileProject(configPath) {
   }
 
   const sourceSnapshot = {
-    compilerVersion: "0.1.0",
+    compilerVersion: "0.3.0",
     config: { ...config, outDir: undefined },
     profiles: Object.fromEntries(Object.entries(resolvedProfiles).map(([name, profile]) => [name, profile.modules.map(({ __file, ...module }) => module)])),
   };
@@ -156,8 +158,12 @@ export async function compileProject(configPath) {
     }, sourceHash));
   }
 
+  outputs.set(TARGET_PATHS.life, `${stableStringify(
+    compileLifeProfile(coding.modules, config, sourceHash, "coding"),
+  )}\n`);
+
   const manifest = {
-    compiler: "@prismtek/buap-compiler@0.1.0",
+    compiler: "@prismtek/buap-compiler@0.3.0",
     source_sha256: sourceHash,
     files: Object.fromEntries([...outputs.entries()].sort().map(([filePath, content]) => [filePath, {
       sha256: digest(content),

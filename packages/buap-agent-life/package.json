@@ -1,0 +1,19 @@
+{
+  "name": "@prismtek/buap-agent-life",
+  "version": "0.1.0",
+  "description": "Bounded, provenance-backed affect, preference, relationship, and development runtime for BUAP agents.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

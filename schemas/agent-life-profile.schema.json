@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/agent-life-profile.schema.json",
+  "title": "Prismtek Agent Life Profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source_sha256",
+    "profile",
+    "agent",
+    "constitution",
+    "affect",
+    "reinforcement",
+    "memory",
+    "relationships",
+    "development",
+    "inheritance",
+    "source_modules"
+  ],
+  "properties": {
+    "schema": { "const": "prismtek-agent-life-profile-v1" },
+    "source_sha256": { "type": "string", "minLength": 1 },
+    "profile": { "type": "string", "minLength": 1 },
+    "source_modules": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "agent": {
+      "type": "object",
+      "required": ["id", "lineage"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "lineage": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      },
+      "additionalProperties": true
+    },
+    "constitution": {
+      "type": "object",
+      "required": ["immutable", "learned_state_may_not_expand_permissions", "learned_state_may_not_override_safety"],
+      "properties": {
+        "immutable": { "const": true },
+        "learned_state_may_not_expand_permissions": { "const": true },
+        "learned_state_may_not_override_safety": { "const": true },
+        "claim_subjective_consciousness": { "const": false },
+        "invariants": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+      },
+      "additionalProperties": true
+    },
+    "affect": {
+      "type": "object",
+      "required": ["drives", "traits"],
+      "properties": {
+        "drives": { "$ref": "#/$defs/dimensions" },
+        "traits": { "$ref": "#/$defs/dimensions" }
+      },
+      "additionalProperties": false
+    },
+    "reinforcement": {
+      "type": "object",
+      "required": ["allowed_authorities", "max_drive_delta_per_event", "max_trait_delta_per_event", "max_preference_delta_per_event"],
+      "properties": {
+        "allowed_authorities": {
+          "type": "array",
+          "items": { "enum": ["human", "host", "verifier"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "max_drive_delta_per_event": { "type": "number", "minimum": 0, "maximum": 1 },
+        "max_trait_delta_per_event": { "type": "number", "minimum": 0, "maximum": 1 },
+        "max_preference_delta_per_event": { "type": "number", "minimum": 0, "maximum": 1 },
+        "preference_half_life_hours": { "type": "number", "minimum": 0 },
+        "event_effects": { "type": "object", "additionalProperties": { "type": "object" } }
+      },
+      "additionalProperties": true
+    },
+    "memory": { "type": "object", "additionalProperties": true },
+    "relationships": { "type": "object", "additionalProperties": true },
+    "development": { "type": "object", "additionalProperties": true },
+    "inheritance": { "type": "object", "additionalProperties": true }
+  },
+  "$defs": {
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["initial", "min", "max"],
+        "properties": {
+          "initial": { "type": "number" },
+          "baseline": { "type": "number" },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "half_life_hours": { "type": "number", "minimum": 0 },
+          "plasticity": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
