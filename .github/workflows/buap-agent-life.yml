@@ -1,0 +1,31 @@
+name: BUAP agent life
+
+on:
+  pull_request:
+    paths:
+      - "packages/buap-agent-life/**"
+      - "schemas/agent-life-*.schema.json"
+      - "contracts/prismtek-agent-life-v1.md"
+      - ".github/workflows/buap-agent-life.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/buap-agent-life/**"
+      - "schemas/agent-life-*.schema.json"
+      - "contracts/prismtek-agent-life-v1.md"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test bounded agent life runtime
+        working-directory: packages/buap-agent-life
+        run: npm test
