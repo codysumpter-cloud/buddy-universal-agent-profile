@@ -47,6 +47,31 @@ Overlays never override BUAP safety, validation, capability detection, source-of
   `@buddy-universal-agent-profile/CLAUDE.md` or a plain "read this file first"
   instruction.
 
+
+## Field-proven operating rules (prismtek-apps, 2026-07)
+
+These outrank generic instincts; each one is a defect or a lost hour on record.
+
+- **Verify as rendered.** For Godot visual work, run the project's capture harness at
+  real in-game scale before shipping. Passing verifiers with wrong pixels happened
+  twice in one day (TV blackout, near-wall opacity).
+- **Editor-green and CI-green are different claims.** CI rebuilds `.godot`, so
+  `class_name` load-order breaks only cold editor sessions; GDScript warnings are
+  editor-analyzer-only (no CLI emits them in 4.7.1). Say which one you verified.
+- **Never regex-rename identifiers.** String literals are data contracts
+  (`get_meta` keys, dictionary schemas). Rename within the declaring scope only,
+  then grep the new names inside quotes to prove no literal changed.
+- **Self-hosted CI: check the runner before trusting the queue.** A runner can be
+  offline-but-busy holding a job that will never finish. Never foreground-poll a PR;
+  use a bounded background watcher that merges on green. Restarting a runner kills
+  its in-flight job — reconcile afterwards.
+- **Per-asset quirks are measured, not hardcoded.** Offline detector writes JSON,
+  runtime reads JSON, `--check` mode keeps the data honest against the pack.
+- **New subsystems must reach the debug surface** (the game's sim snapshot), or
+  "why did it do that" is unanswerable and the system is decoration.
+- **Two agents share these repos.** `gh pr list` first, rebase before starting,
+  expect main to move mid-task, and never leave a merge-watcher unbounded.
+
 ## BUAP active profile pairing
 
 For this repo the BUAP pairing is locked:
