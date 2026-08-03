@@ -1,7 +1,7 @@
 {
   "name": "@prismtek/buap-compiler",
-  "version": "0.3.0",
-  "description": "Initialize, compile, validate, and diagnose portable BUAP repository policy and agent life profiles.",
+  "version": "0.4.0",
+  "description": "Initialize, compile, validate, and diagnose portable BUAP repository policy, GitHub skills, and agent life profiles.",
   "type": "module",
   "bin": {
     "buap": "src/cli.mjs",
