@@ -12,8 +12,16 @@ import {
   validateModuleShape,
   validateProviderFields,
 } from "./validate.mjs";
-import { digest, renderMarkdown, renderYaml, stableStringify } from "./targets.mjs";
+import {
+  digest,
+  renderGitHubSkill,
+  renderMarkdown,
+  renderYaml,
+  stableStringify,
+} from "./targets.mjs";
 
+const COMPILER_VERSION = "0.4.0";
+const GITHUB_SKILL_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TARGET_PATHS = {
   "agents-md": "AGENTS.md",
   "review-md": "REVIEW.md",
@@ -59,6 +67,60 @@ function targetModules(config, modulesById, profileName) {
   const profile = config.profiles?.[profileName];
   if (!profile) throw new Error(`missing profile ${profileName}`);
   return resolveModuleGraph(profile.entrypoints ?? [], modulesById);
+}
+
+function titleFromName(name) {
+  return name.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+}
+
+function githubSkillPath(name) {
+  return `.github/skills/${name}/SKILL.md`;
+}
+
+function githubSkills(config, resolvedProfiles) {
+  const definitions = config.githubSkills ?? [];
+  if (!Array.isArray(definitions)) throw new Error("githubSkills must be an array");
+  const seen = new Set();
+  return definitions.map((definition, index) => {
+    if (!definition || typeof definition !== "object" || Array.isArray(definition)) {
+      throw new Error(`githubSkills[${index}] must be an object`);
+    }
+    const name = String(definition.name ?? "");
+    if (!GITHUB_SKILL_NAME.test(name)) {
+      throw new Error(`githubSkills[${index}].name must be lowercase kebab-case`);
+    }
+    if (seen.has(name)) throw new Error(`duplicate GitHub skill name ${name}`);
+    seen.add(name);
+    const description = String(definition.description ?? "").trim();
+    if (!description || description.length > 1024 || /[\r\n]/.test(description)) {
+      throw new Error(`githubSkills.${name}.description must be one line between 1 and 1024 characters`);
+    }
+    const profileName = String(definition.profile ?? "review");
+    const profile = resolvedProfiles[profileName];
+    if (!profile) throw new Error(`githubSkills.${name} references missing profile ${profileName}`);
+    const license = definition.license === undefined ? undefined : String(definition.license).trim();
+    if (license !== undefined && (!license || /[\r\n]/.test(license))) {
+      throw new Error(`githubSkills.${name}.license must be a non-empty single line`);
+    }
+    const title = String(definition.title ?? titleFromName(name)).trim();
+    if (!title || /[\r\n]/.test(title)) {
+      throw new Error(`githubSkills.${name}.title must be a non-empty single line`);
+    }
+    const target = `github-skill:${name}`;
+    const sections = uniqueSections(profile.modules, target);
+    if (!sections.length) {
+      throw new Error(`githubSkills.${name} has no canonical sections targeting ${target}`);
+    }
+    return {
+      name,
+      description,
+      license,
+      title,
+      profile: profileName,
+      path: githubSkillPath(name),
+      sections,
+    };
+  });
 }
 
 export async function loadProject(configPath) {
@@ -112,7 +174,7 @@ export async function compileProject(configPath) {
   }
 
   const sourceSnapshot = {
-    compilerVersion: "0.3.0",
+    compilerVersion: COMPILER_VERSION,
     config: { ...config, outDir: undefined },
     profiles: Object.fromEntries(Object.entries(resolvedProfiles).map(([name, profile]) => [name, profile.modules.map(({ __file, ...module }) => module)])),
   };
@@ -133,6 +195,17 @@ export async function compileProject(configPath) {
     sections: uniqueSections(review.modules, "review-md"),
     hash: sourceHash,
   }));
+
+  for (const skill of githubSkills(config, resolvedProfiles)) {
+    outputs.set(skill.path, renderGitHubSkill({
+      name: skill.name,
+      description: skill.description,
+      license: skill.license,
+      title: skill.title,
+      sections: skill.sections,
+      hash: sourceHash,
+    }));
+  }
 
   const policy = {
     version: 1,
@@ -163,7 +236,7 @@ export async function compileProject(configPath) {
   )}\n`);
 
   const manifest = {
-    compiler: "@prismtek/buap-compiler@0.3.0",
+    compiler: `@prismtek/buap-compiler@${COMPILER_VERSION}`,
     source_sha256: sourceHash,
     files: Object.fromEntries([...outputs.entries()].sort().map(([filePath, content]) => [filePath, {
       sha256: digest(content),

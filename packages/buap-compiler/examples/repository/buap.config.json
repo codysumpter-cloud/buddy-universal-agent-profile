@@ -14,8 +14,38 @@
     "review": { "entrypoints": ["review"] },
     "release": { "entrypoints": ["release"] }
   },
+  "githubSkills": [
+    {
+      "name": "godot-review",
+      "description": "Review Godot scene, script, resource, import, and rendered-behavior changes. Use for pull requests that modify Godot projects or game assets.",
+      "profile": "review",
+      "title": "Godot pull request review"
+    },
+    {
+      "name": "react-browser-verification",
+      "description": "Review React UI changes with browser, accessibility, responsive-layout, and console verification. Use for pull requests that modify web interfaces.",
+      "profile": "review",
+      "title": "React browser verification"
+    },
+    {
+      "name": "purchased-assets-policy",
+      "description": "Review changes involving purchased, private, generated, or third-party assets. Use when a pull request touches asset files, licenses, or public fallbacks.",
+      "profile": "review",
+      "title": "Purchased and private asset policy"
+    },
+    {
+      "name": "buddy-claim-verification",
+      "description": "Verify completion, test, deployment, merge, and release claims against exact evidence. Use when reviewing claims that work is done or working.",
+      "profile": "review",
+      "title": "Buddy claim verification"
+    }
+  ],
   "tokenBudgets": {
     "AGENTS.md": 1600,
-    "REVIEW.md": 1200
+    "REVIEW.md": 1200,
+    ".github/skills/godot-review/SKILL.md": 700,
+    ".github/skills/react-browser-verification/SKILL.md": 700,
+    ".github/skills/purchased-assets-policy/SKILL.md": 700,
+    ".github/skills/buddy-claim-verification/SKILL.md": 700
   }
 }
