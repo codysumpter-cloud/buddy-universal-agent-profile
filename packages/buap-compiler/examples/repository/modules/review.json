@@ -17,6 +17,34 @@
       "order": 20,
       "targets": ["review-md"],
       "body": "Review the pull request head branch instructions, inspect changed behavior, and report severity plus confidence. Never mutate the workspace or merge from the review profile."
+    },
+    {
+      "id": "godot-review-workflow",
+      "title": "Review the Godot change as rendered behavior",
+      "order": 10,
+      "targets": ["github-skill:godot-review"],
+      "body": "Inspect changed scenes, scripts, resources, node paths, signals, exported properties, and import settings together. Check nearest-neighbor and pixel-art constraints where applicable. Run the repository's Godot verifier and relevant tests. Treat headless CI as necessary but not sufficient for visual behavior: require a runtime screenshot, video, or equivalent rendered evidence before accepting claims about layout, animation, depth, input, or camera behavior. Report the exact failing path and distinguish editor-only, runtime-only, and CI-only findings."
+    },
+    {
+      "id": "react-browser-workflow",
+      "title": "Verify React changes in a real browser",
+      "order": 10,
+      "targets": ["github-skill:react-browser-verification"],
+      "body": "Inspect component boundaries, state transitions, semantic HTML, keyboard behavior, focus handling, loading and error states, and responsive layout. Run repository-native tests and build checks, then exercise the changed route in a browser at representative viewport sizes. Check the browser console and failed network requests. Do not accept a snapshot or successful build as proof that the interaction works. Record the route, viewport, interaction, and observable result used as evidence."
+    },
+    {
+      "id": "purchased-assets-workflow",
+      "title": "Preserve purchased and private asset boundaries",
+      "order": 10,
+      "targets": ["github-skill:purchased-assets-policy"],
+      "body": "Identify whether changed assets are purchased, private, generated, redistributable, or public fallbacks before judging the diff. Preserve license notices and source attribution. Flag newly committed private source files, unauthorized redistribution, accidental replacement of purchased originals, and public builds that depend on unavailable private paths. Verify that fallback assets are actually reachable and that generated outputs do not erase provenance. Do not recommend deleting or replacing licensed assets merely to simplify CI."
+    },
+    {
+      "id": "claim-verification-workflow",
+      "title": "Tie every completion claim to exact evidence",
+      "order": 10,
+      "targets": ["github-skill:buddy-claim-verification"],
+      "body": "For each claim such as done, fixed, working, verified, merged, deployed, released, or secure, locate matching evidence from the pull request head: tests, exact-head checks, artifacts, screenshots, runtime receipts, commit state, or deployment state. A green unrelated check is not proof. Report missing or stale evidence as Unverified rather than inferring success. Include severity and confidence for defects, and distinguish Source-backed, Locally verified, Verified, Assumption, and Blocked claims."
     }
   ],
   "providers": {
