@@ -42,19 +42,34 @@ jobs:
         with:
           repository: codysumpter-cloud/knowledge-vault
           path: stack/knowledge-vault
+      # buddy-brain, buddy-agent, and omni-buddy were consolidated into the
+      # prismtek-apps monorepo and their repositories archived. Check out the
+      # monorepo once and map each component to its path, instead of cloning
+      # three archived repositories. prismtek-apps is private, so this job needs
+      # a token with read access to it; without one the components are reported
+      # as private and skipped rather than failing.
       - uses: actions/checkout@v4
         with:
-          repository: codysumpter-cloud/buddy-brain
-          ref: master
-          path: stack/buddy-brain
-      - uses: actions/checkout@v4
-        with:
-          repository: codysumpter-cloud/buddy-agent
-          path: stack/buddy-agent
-      - uses: actions/checkout@v4
-        with:
-          repository: codysumpter-cloud/omni-buddy
-          path: stack/omni-buddy
+          repository: codysumpter-cloud/prismtek-apps
+          token: ${{ secrets.PRISMTEK_APPS_READ_TOKEN || github.token }}
+          path: stack/prismtek-apps
+        continue-on-error: true
+      - name: Map consolidated components into the stack workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d stack/prismtek-apps ]; then
+            echo "prismtek-apps was not checked out; consolidated components will be skipped as private."
+            exit 0
+          fi
+          for pair in "buddy-brain:tools/buddy-brain" \
+                      "buddy-agent:services/buddy-agent" \
+                      "omni-buddy:services/omni-buddy"; do
+            name="${pair%%:*}"; sub="${pair##*:}"
+            mkdir -p "stack/$name"
+            cp "stack/prismtek-apps/$sub/prismtek.component.json" "stack/$name/"
+            echo "mapped $name <- prismtek-apps/$sub"
+          done
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
