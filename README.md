@@ -44,11 +44,13 @@ BUAP links to, but does not vendor or replace, the owning runtime repos:
 | Runtime need | Owner |
 |---|---|
 | Durable graph memory / Vegapunk Brain | `codysumpter-cloud/knowledge-vault` |
-| Governance / policy / council / operator runbooks | `codysumpter-cloud/buddy-brain` |
-| Guarded execution / action risk / receipts | `codysumpter-cloud/buddy-agent` |
-| Buddy MCP bridge for Codex/Odysseus/local MCP clients | `codysumpter-cloud/buddy-agent` |
-| Local device voice / vision / transport runtime | `codysumpter-cloud/omni-buddy` |
+| Governance / policy / council / operator runbooks | `codysumpter-cloud/prismtek-apps` -> `tools/buddy-brain` + `packages/buddy-governance` |
+| Guarded execution / action risk / receipts | `codysumpter-cloud/prismtek-apps` -> `services/buddy-agent` |
+| Buddy MCP bridge for Codex/Odysseus/local MCP clients | `codysumpter-cloud/prismtek-apps` -> `services/buddy-agent` |
+| Local device voice / vision / transport runtime | `codysumpter-cloud/prismtek-apps` -> `services/omni-buddy` + `packages/omni-adapters` |
 | Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
+| Buddy object/visual contracts | `codysumpter-cloud/prismtek-apps` -> `packages/buddy-core` |
+| Trust fabric / Alderaan / VADER certification | `codysumpter-cloud/prismtek-apps` -> `tools/trust-fabric` |
 
 Read `integrations/ecosystem-routing-spec.md` first for canonical routing. Use
 `linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,

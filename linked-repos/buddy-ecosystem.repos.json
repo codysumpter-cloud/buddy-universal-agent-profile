@@ -5,10 +5,10 @@
   "purpose": "Machine-readable linked-repo map for BUAP routing across the Buddy ecosystem.",
   "default_source_order": [
     "knowledge-vault",
+    "prismtek-apps",
     "buddy-brain",
     "buddy-agent",
     "omni-buddy",
-    "prismtek-apps",
     "buddy-universal-agent-profile"
   ],
   "repos": [
@@ -36,64 +36,79 @@
     },
     {
       "name": "buddy-brain",
-      "repository": "codysumpter-cloud/buddy-brain",
+      "repository": "codysumpter-cloud/prismtek-apps",
       "role": "operator brain, policy, council, memory, runbooks, cross-repo coordination, skills registry",
       "read_first": [
-        "README.md",
-        "AGENTS.md",
-        "soul.md",
-        "memory.md",
-        "routines.md",
-        "RESPONSE_GUIDE.md",
-        "context/RUNBOOK.md"
+        "tools/buddy-brain/README.md",
+        "tools/buddy-brain/AGENTS.md",
+        "tools/buddy-brain/soul.md",
+        "tools/buddy-brain/memory.md",
+        "tools/buddy-brain/routines.md",
+        "tools/buddy-brain/RESPONSE_GUIDE.md",
+        "tools/buddy-brain/context/RUNBOOK.md"
       ],
       "validation": [
-        "make doctor",
-        "make runtime-doctor",
-        "make workspace-sync",
-        "make project-snapshot"
-      ]
+        "make -C tools/buddy-brain doctor"
+      ],
+      "path": "tools/buddy-brain",
+      "consolidated_from": "codysumpter-cloud/buddy-brain",
+      "consolidated_at": "22bdfd4067635c0aa242565a652329bf509802e9"
     },
     {
       "name": "buddy-agent",
-      "repository": "codysumpter-cloud/buddy-agent",
+      "repository": "codysumpter-cloud/prismtek-apps",
       "role": "guarded execution boundary, Orchestrator/Worker runtime, action validation, risk policy, receipts",
       "read_first": [
-        "README.md",
-        "docs/BUDDY_ACTION_ADAPTER.md",
-        "docs/BUDDY_FEATURE_PARITY.md"
+        "services/buddy-agent/README.md",
+        "services/buddy-agent/AGENTS.md",
+        "services/buddy-agent/docs/BUDDY_ACTION_ADAPTER.md"
       ],
       "validation": [
-        "buddy parity",
-        "buddy doctor"
-      ]
+        "python -m pip install -e services/buddy-agent[dev]",
+        "buddy skills validate",
+        "pytest services/buddy-agent"
+      ],
+      "path": "services/buddy-agent",
+      "consolidated_from": "codysumpter-cloud/buddy-agent",
+      "consolidated_at": "83244d3ce70830d6f142db8ab09ce543875db31b"
     },
     {
       "name": "omni-buddy",
-      "repository": "codysumpter-cloud/omni-buddy",
+      "repository": "codysumpter-cloud/prismtek-apps",
       "role": "Raspberry Pi / local multimodal voice, vision, local model, transport, and device runtime",
       "read_first": [
-        "README.md",
-        "docs/VALIDATION_MATRIX.md",
-        "docs/K4_OPERATOR_RUNBOOK.md",
-        "OMNI_INTEGRATION_MAP.md"
+        "services/omni-buddy/README.md",
+        "services/omni-buddy/docs/VALIDATION_MATRIX.md",
+        "services/omni-buddy/OMNI_INTEGRATION_MAP.md",
+        "packages/omni-adapters/README.md"
       ],
       "validation": [
-        "./scripts/bmo_omni_doctor.sh",
-        "./scripts/run_validation_matrix.sh",
-        "python3 ./scripts/apply_runtime_profile.py dev",
-        "python3 ./scripts/apply_latency_profile.py snappy"
-      ]
+        "bash services/omni-buddy/scripts/run_validation_matrix.sh"
+      ],
+      "path": "services/omni-buddy",
+      "consolidated_from": "codysumpter-cloud/omni-buddy",
+      "consolidated_at": "9299607731bd7adfc05687a6f0597b2d5759304f"
     },
     {
       "name": "prismtek-apps",
       "repository": "codysumpter-cloud/prismtek-apps",
-      "role": "product surfaces, apps, games, downloads, user-facing Buddy UX",
+      "role": "canonical product and runtime monorepo: product surfaces, apps, games, Buddy runtime, governance, adapters, visual/core contracts, and verification tooling",
       "read_first": [
         "README.md",
-        "AGENTS.md"
+        "AGENTS.md",
+        "docs/repository-registry.yaml",
+        "docs/repository-consolidation.md"
       ],
-      "validation": []
+      "validation": [],
+      "owns_paths": {
+        "buddy-core": "packages/buddy-core",
+        "buddy-agent": "services/buddy-agent",
+        "buddy-brain": "tools/buddy-brain",
+        "buddy-governance": "packages/buddy-governance",
+        "omni-adapters": "packages/omni-adapters",
+        "omni-buddy": "services/omni-buddy",
+        "trust-fabric": "tools/trust-fabric"
+      }
     },
     {
       "name": "buddy-universal-agent-profile",
@@ -142,5 +157,10 @@
         "node --test tests/installer/*.test.mjs"
       ]
     }
-  ]
+  ],
+  "consolidation": {
+    "date": "2026-08-04",
+    "tracker": "codysumpter-cloud/prismtek-apps#359",
+    "note": "buddy-brain, buddy-agent, and omni-buddy are capability entries hosted inside the prismtek-apps monorepo, not separate repositories. Their former repositories are archived read-only. Route work to the paths, not the archived URLs."
+  }
 }

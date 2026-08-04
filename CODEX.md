@@ -19,7 +19,8 @@ Codex reads `AGENTS.md` files automatically; this file covers wiring BUAP in.
 - Codex has no persistent sub-agent runtime exposed to instructions. Lil' Buddy is
   **emulated**: run the loop as explicit phases (plan → work → review) in one session,
   using the response format in `standards/response-format.md`.
-- A real worker path exists in the ecosystem: buddy-brain's `mcp/codex-bridge/`
+- A real worker path exists in the ecosystem: Buddy Brain's `mcp/codex-bridge/`
+  (now `prismtek-apps/tools/buddy-brain/mcp/codex-bridge/`)
   dispatches Codex runs into isolated git worktrees with structured artifacts. When
   operating from an orchestrator that can call it, treat each bridge run as a
   Lil' Buddy (see `standards/orchestration.md`).
@@ -28,7 +29,8 @@ Codex reads `AGENTS.md` files automatically; this file covers wiring BUAP in.
 
 ## Buddy MCP bridge for Codex
 
-Buddy Agent PR `codysumpter-cloud/buddy-agent#24` defines a local stdio MCP bridge so
+Buddy Agent PR `codysumpter-cloud/buddy-agent#24` (archived repository; historical
+reference) defines a local stdio MCP bridge so
 Codex, Odysseus, and other MCP clients can call safe Buddy tools without forking
 Odysseus or duplicating Buddy Agent runtime code.
 
@@ -37,7 +39,7 @@ Read:
 1. `integrations/buddy-mcp-server.md`
 2. `runbooks/buddy-mcp-bridge.md`
 3. `adapters/codex-buddy-mcp.template.toml`
-4. `codysumpter-cloud/buddy-agent/docs/BUDDY_MCP_SERVER.md`
+4. `codysumpter-cloud/prismtek-apps` -> `services/buddy-agent/docs/BUDDY_MCP_SERVER.md`
 
 Truthfulness rule: PR #24 is source-backed documentation, but a fresh checkout does
 not prove that a local `buddy-mcp` executable exists. Do not claim the bridge is

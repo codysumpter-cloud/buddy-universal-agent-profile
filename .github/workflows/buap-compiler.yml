@@ -27,9 +27,23 @@ jobs:
       - name: Test compiler
         working-directory: packages/buap-compiler
         run: npm test
-      - name: Build deterministic example
-        working-directory: packages/buap-compiler
-        run: npm run build:example
-      - name: Check generated drift
+      # Drift must be checked against what is COMMITTED. Running build:example
+      # first regenerated every artifact, so check:example could only ever
+      # compare freshly written files against themselves and passed no matter
+      # how stale the committed goldens were. It hid goldens that had been left
+      # behind at compiler 0.1.0 while the compiler moved to 0.4.0.
+      - name: Check committed generated artifacts for drift
         working-directory: packages/buap-compiler
         run: npm run check:example
+      - name: Rebuild the example and prove the compiler is deterministic
+        working-directory: packages/buap-compiler
+        run: |
+          set -euo pipefail
+          npm run build:example
+          npm run check:example
+          if ! git diff --quiet -- examples; then
+            echo "::error::rebuilding the example changed committed artifacts; regenerate and commit them"
+            git --no-pager diff --stat -- examples
+            exit 1
+          fi
+          echo "example artifacts are byte-identical after a rebuild"

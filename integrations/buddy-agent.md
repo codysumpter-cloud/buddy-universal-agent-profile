@@ -1,13 +1,18 @@
 # Buddy Agent Integration
 
+> **Consolidated.** `codysumpter-cloud/buddy-agent` was migrated into the `prismtek-apps`
+> monorepo at `services/buddy-agent` (source head `83244d3ce70830d6f142db8ab09ce543875db31b`) and archived read-only.
+> Route work to the path, not the archived repository URL.
+> Record: `prismtek-apps/docs/migrations/buddy-agent.yaml`. Tracker: `prismtek-apps#359`.
+
 ## Purpose
 
-Teach BUAP how to treat `codysumpter-cloud/buddy-agent` as the guarded execution layer
+Teach BUAP how to treat `codysumpter-cloud/prismtek-apps` at `services/buddy-agent` as the guarded execution layer
 for Buddy tasks.
 
 ## Ownership
 
-- **Owner repo:** `codysumpter-cloud/buddy-agent`
+- **Owner path:** `codysumpter-cloud/prismtek-apps` at `services/buddy-agent`
 - **BUAP role:** route implementation/execution work to Buddy Agent contracts when a
   real runtime is available; otherwise create safe handoffs.
 

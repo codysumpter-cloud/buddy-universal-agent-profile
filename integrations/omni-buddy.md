@@ -1,13 +1,18 @@
 # Omni Buddy Integration
 
+> **Consolidated.** `codysumpter-cloud/omni-buddy` was migrated into the `prismtek-apps`
+> monorepo at `services/omni-buddy` (source head `9299607731bd7adfc05687a6f0597b2d5759304f`) and archived read-only.
+> Route work to the path, not the archived repository URL.
+> Record: `prismtek-apps/docs/migrations/omni-buddy.yaml`. Tracker: `prismtek-apps#359`.
+
 ## Purpose
 
-Teach BUAP how to treat `codysumpter-cloud/omni-buddy` as the local device, voice,
+Teach BUAP how to treat `codysumpter-cloud/prismtek-apps` at `services/omni-buddy` as the local device, voice,
 vision, model, transport, and Raspberry Pi runtime path.
 
 ## Ownership
 
-- **Owner repo:** `codysumpter-cloud/omni-buddy`
+- **Owner path:** `codysumpter-cloud/prismtek-apps` at `services/omni-buddy`
 - **BUAP role:** know what Omni owns, route device/runtime claims to Omni validation,
   and avoid claiming hardware behavior without device receipts.
 

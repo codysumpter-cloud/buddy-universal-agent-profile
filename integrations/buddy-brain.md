@@ -1,13 +1,18 @@
 # Buddy Brain Integration
 
+> **Consolidated.** `codysumpter-cloud/buddy-brain` was migrated into the `prismtek-apps`
+> monorepo at `tools/buddy-brain` (source head `22bdfd4067635c0aa242565a652329bf509802e9`) and archived read-only.
+> Route work to the path, not the archived repository URL.
+> Record: `prismtek-apps/docs/migrations/buddy-brain.yaml`. Tracker: `prismtek-apps#359`.
+
 ## Purpose
 
-Teach BUAP how to treat `codysumpter-cloud/buddy-brain` as the operator brain,
+Teach BUAP how to treat `codysumpter-cloud/prismtek-apps` at `tools/buddy-brain` as the operator brain,
 governance, council, memory, policy, runbook, and cross-repo coordination source.
 
 ## Ownership
 
-- **Owner repo:** `codysumpter-cloud/buddy-brain`
+- **Owner path:** `codysumpter-cloud/prismtek-apps` at `tools/buddy-brain`
 - **BUAP role:** defer governance, policy, council posture, durable operator context,
   skills registry, and coordination rules to Buddy Brain.
 
