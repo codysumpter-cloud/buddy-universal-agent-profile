@@ -1,0 +1,16 @@
+categories:
+  - name: autonomous-ai-agents
+    skills:
+      - name: buddy-universal-agent-profile
+        description: "Buddy + Lil' Buddy portable agent standard across platforms."
+        path: skills/autonomous-ai-agents/buddy-universal-agent-profile/SKILL.md
+        version: "1.0.0"
+        license: Apache-2.0
+        author: Cody Sumpter (codysumpter-cloud), Hermes Agent
+        tags:
+          - agent
+          - orchestration
+          - buddy
+          - standard
+          - multi-agent
+          - workflow
