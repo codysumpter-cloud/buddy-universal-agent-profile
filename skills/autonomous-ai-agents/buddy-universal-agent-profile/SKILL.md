@@ -41,56 +41,36 @@ Don't use for: running a sub-agent runtime (BUAP doesn't spawn processes by defa
 
 ### Inspect whether a repo uses BUAP
 
-```bash
-# Check for BUAP folder or references in a repo
-gh repo view <owner>/<repo> --json name,isPrivate 2>/dev/null
-# Then clone/navigate and check for buddy-universal-agent-profile/ or AGENTS.md/CLAUDE.md references
-```
+Check whether `buddy-universal-agent-profile/` exists in the repo, or whether
+the repo's agent entry point (`AGENTS.md`, `CLAUDE.md`) references BUAP.
 
 ### Load BUAP for the current session
 
-Point the session at the BUAP root or a tier file:
+Point the session at the BUAP root or a tier file. The BUAP file itself describes
+what the agent should do — no additional writes are needed to operate.
 
-```
-Read the file at <path-to-buap>/CLAUDE.md and follow it.
-```
+Tier files (pick one, not all):
+- `BUAP_KERNEL.md` — micro-profile for constrained tools
+- `BUAP_LITE.md` — low-context, search boxes
+- `BUAP_STANDARD.md` — normal AI chats
+- `BUAP_FULL.md` — repo-aware agents
 
-Or for constrained/low-context tools, load a tier:
+### Install BUAP into a repo (user action)
 
-```
-Read <path-to-buap>/BUAP_KERNEL.md  (micro-profile)
-Read <path-to-buap>/BUAP_LITE.md    (low-context)
-Read <path-to-buap>/BUAP_STANDARD.md (normal)
-Read <path-to-buap>/BUAP_FULL.md    (repo-aware)
-```
+The repo consumer copies `buddy-universal-agent-profile/` into the repo root,
+then points the repo's agent entry point at it. This is a one-time setup step;
+the session does not perform it.
 
-### Install BUAP into a repo
-
-```bash
-# Clone and copy into repo root
-git clone https://github.com/codysumpter-cloud/buddy-universal-agent-profile.git /tmp/buap
-cp -r /tmp/buap <target-repo>/
-# Then point the repo's agent entry point at it
-# Claude Code: add to CLAUDE.md — "Read buddy-universal-agent-profile/CLAUDE.md and follow it."
-# Codex: symlink AGENTS.md or add reference to root AGENTS.md
-```
+For Claude Code, the recommended path is the plugin:
+`/plugin marketplace add codysumpter-cloud/buddy-universal-agent-profile` then
+`/plugin install buap@buap`. This provides `/buap-audit`, `/buap-handoff`,
+a `lil-buddy` subagent, and safety/receipts hooks.
 
 ### Run conformance checks
 
-```bash
-cd <buap-dir>
-node scripts/buap-conformance-check.mjs   # required files + key text
-node scripts/buap-lint.mjs                  # plugin manifests, frontmatter, links, invariants
-```
-
-### Claude Code plugin install (recommended path)
-
-```
-/plugin marketplace add codysumpter-cloud/buddy-universal-agent-profile
-/plugin install buap@buap
-```
-
-This gives you `/buap-audit`, `/buap-handoff`, a real `lil-buddy` subagent, and safety/receipts hooks.
+When working in a BUAP repo, the consumer runs:
+`node scripts/buap-conformance-check.mjs` (required files + key text) and
+`node scripts/buap-lint.mjs` (plugin manifests, frontmatter, links, invariants).
 
 ## Quick Reference
 
@@ -101,24 +81,24 @@ This gives you `/buap-audit`, `/buap-handoff`, a real `lil-buddy` subagent, and 
 | Standard | `BUAP_STANDARD.md` | Normal AI chats |
 | Full | `BUAP_FULL.md` | Repo-aware agents |
 
-| Platform | Install |
-|----------|---------|
-| Claude Code | `/plugin install buap@buap` or `Read .../CLAUDE.md` |
-| Codex | symlink `AGENTS.md` or use `CODEX.md` notes |
-| ChatGPT | paste `chatgpt-projects/buddy/00_PROJECT_INSTRUCTIONS_PASTE.md` + upload knowledge files |
-| Grok/xAI | paste `GROK_BUAP.md` into custom instructions |
-| Siri/App Intents | `SIRI_BUAP.md` + `README_SIRI.md` |
-| Xcode/ACP | build `packages/buap-acp-agent/` |
-| Cursor | `.cursor/rules/buap.mdc` from template |
-| Windsurf | `.windsurf/rules/` from template |
-| Gemini CLI | point `GEMINI.md` at the folder |
-| Cowork | connect folder, say "Read .../CLAUDE.md and operate under BUAP" |
+| Platform | Install path |
+|----------|-------------|
+| Claude Code | `/plugin install buap@buap` or reference BUAP CLAUDE.md |
+| Codex | symlink AGENTS.md or follow CODEX.md notes |
+| ChatGPT | paste project instructions + upload knowledge files |
+| Grok/xAI | paste GROK_BUAP.md into custom instructions |
+| Siri/App Intents | SIRI_BUAP.md + README_SIRI.md |
+| Xcode/ACP | build packages/buap-acp-agent/ |
+| Cursor | .cursor/rules/buap.mdc from template |
+| Windsurf | .windsurf/rules/ from template |
+| Gemini CLI | point GEMINI.md at the folder |
+| Cowork | connect folder, load BUAP CLAUDE.md |
 
 ## Procedure — Adopt BUAP in a repo
 
 1. **Pick the tier** that fits the repo's agent surface (usually Standard or Full).
-2. **Copy** `buddy-universal-agent-profile/` into the repo root.
-3. **Wire the entry point** — point the repo's `AGENTS.md` / `CLAUDE.md` at BUAP.
+2. **Copy** `buddy-universal-agent-profile/` into the repo root (user action).
+3. **Wire the entry point** — the repo's AGENTS.md / CLAUDE.md references BUAP (user action).
 4. **Run conformance**: `node scripts/buap-conformance-check.mjs`.
 5. **Run lint**: `node scripts/buap-lint.mjs`.
 6. **Verify the loop** with a test task: intent → plan → delegate → review → handoff.
@@ -134,18 +114,19 @@ This gives you `/buap-audit`, `/buap-handoff`, a real `lil-buddy` subagent, and 
 
 ## Pitfalls
 
-- **Repo contract clash**: if the repo has its own `AGENTS.md`/`CLAUDE.md` that conflicts with BUAP, the repo contract takes precedence. BUAP supplies the orchestration beneath it — don't force it on top of an existing contract without checking.
+- **Repo contract clash**: if the repo has its own AGENTS.md/CLAUDE.md that conflicts with BUAP, the repo contract takes precedence. BUAP supplies the orchestration beneath it — don't force it on top of an existing contract without checking.
 - **Over-installing tiers**: don't load all four tiers at once. Pick one. Loading Kernel + Full together is contradictory.
-- **Plugin vs prose**: the Claude plugin path (`/plugin install buap@buap`) gives structural loop (real subagent, slash commands, hooks). The prose path (`Read CLAUDE.md`) is lighter but the loop is advisory, not enforced. Don't claim the plugin path is active when you used prose.
-- **MCP bridge claims**: don't claim `buddy-mcp` is locally working until a `buddy-mcp` executable exists and `buddy.self_test` passes. Source-backed ≠ locally verified.
+- **Plugin vs prose**: the Claude plugin path provides a structural loop (real subagent, slash commands, hooks). The prose path is lighter but the loop is advisory, not enforced. Don't claim the plugin path is active when you used prose.
+- **MCP bridge claims**: don't claim buddy-mcp is locally working until a buddy-mcp executable exists and buddy.self_test passes. Source-backed ≠ locally verified.
 - **Platform sprawl**: BUAP covers 13+ platforms but not all are equally maintained. Prioritize the ones in the Buddy ecosystem; treat the rest as reference.
+- **Git clone as setup step**: the repo consumer clones BUAP as a one-time copy into their repo; the session does not clone repos as part of operating under BUAP.
 
 ## Verification
 
 - Conformance passes: `node scripts/buap-conformance-check.mjs` exits 0.
 - Lint passes: `node scripts/buap-lint.mjs` exits 0.
 - Session behavior: after loading BUAP, the agent clarifies intent before implementing, delegates to a worker, reviews outputs, and produces handoffs — not just jumping to code.
-- Plugin (if used): `/buap-audit` and `/buap-handoff` commands are available; `lil-buddy` subagent exists.
+- Plugin (if used): /buap-audit and /buap-handoff commands are available; lil-buddy subagent exists.
 
 ## Source
 
