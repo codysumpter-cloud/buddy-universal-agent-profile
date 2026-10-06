@@ -116,7 +116,7 @@ export class AgentProfileRuntime {
   constructor(profile, snapshot = null) {
     validateAgentProfile(profile);
     this.profile = deepFreeze(clone(profile));
-    this.profileHash = String(profile.source_sha256 ?? digest(profile));
+    this.profileHash = digest(profile);
     this.state = {
       schema: STATE_SCHEMA,
       agent_id: String(profile.id),
