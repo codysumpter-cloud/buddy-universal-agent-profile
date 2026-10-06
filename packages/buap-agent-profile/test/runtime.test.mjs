@@ -179,6 +179,14 @@ test("autonomy flags constrain self-created work", () => {
   assert.equal(runtime.snapshot().tasks.length, 1);
 });
 
+test("profile hashes are stable across object key order", () => {
+  const runtime = new AgentProfileRuntime(profile);
+  const snapshot = runtime.snapshot();
+  const reordered = Object.fromEntries(Object.entries(profile).reverse());
+  const restored = new AgentProfileRuntime(reordered, snapshot);
+  assert.equal(restored.snapshot().profile_sha256, snapshot.profile_sha256);
+});
+
 test("concurrency limits and profile-bound snapshots are enforced", () => {
   const runtime = new AgentProfileRuntime(profile);
   runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
