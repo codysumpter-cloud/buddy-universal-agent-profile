@@ -333,6 +333,21 @@
           }
         }
       }
+    },
+    "source_sha256": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Compiler source provenance hash when generated from BUAP modules."
+    },
+    "policy_profile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "BUAP policy profile whose permissions constrain this agent."
+    },
+    "policy_permissions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Compiled permission snapshot inherited from the selected BUAP policy profile."
     }
   }
 }
