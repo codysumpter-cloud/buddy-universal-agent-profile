@@ -1,6 +1,12 @@
 import { digest, stableStringify } from "./targets.mjs";
 
 const AGENT_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const RELATIONSHIP_ROLES = new Set(["buddy", "lil_buddy", "specialist"]);
+const KINDS = new Set(["primary", "specialist", "worker"]);
+const NAME_SOURCES = new Set(["user", "self", "organization"]);
+const EXECUTION_TARGETS = new Set(["chat", "work", "codex_cloud", "local_computer", "cloud_computer", "ide", "daemon"]);
+const CHANNELS = new Set(["chat", "slack", "teams", "email", "sms", "voice", "app", "cli", "ide"]);
+const ACTION_BEHAVIORS = new Set(["allow", "preapproved", "ask", "handoff", "deny"]);
 
 function clone(value) {
   return structuredClone(value);
@@ -82,6 +88,52 @@ function compileDefinition(definition, resolvedProfiles, sourceHash) {
   if (profile.goals.length === 0) throw new Error(`agentProfiles.${id} requires at least one goal`);
   if (profile.responsibilities.length === 0) {
     throw new Error(`agentProfiles.${id} requires at least one responsibility`);
+  }
+  if (!RELATIONSHIP_ROLES.has(profile.relationship_role)) {
+    throw new Error(`agentProfiles.${id} has invalid relationshipRole ${profile.relationship_role}`);
+  }
+  if (!KINDS.has(profile.kind)) {
+    throw new Error(`agentProfiles.${id} has invalid kind ${profile.kind}`);
+  }
+  if (!NAME_SOURCES.has(profile.identity.name_source)) {
+    throw new Error(`agentProfiles.${id} has invalid nameSource ${profile.identity.name_source}`);
+  }
+  if (
+    !Number.isInteger(profile.execution.max_concurrent_tasks) ||
+    profile.execution.max_concurrent_tasks < 1 ||
+    profile.execution.max_concurrent_tasks > 64
+  ) {
+    throw new Error(`agentProfiles.${id} max_concurrent_tasks must be an integer in 1..64`);
+  }
+  for (const target of profile.execution.preferred_targets) {
+    if (!EXECUTION_TARGETS.has(target)) {
+      throw new Error(`agentProfiles.${id} has invalid execution target ${target}`);
+    }
+  }
+  for (const channel of profile.channels) {
+    if (!CHANNELS.has(channel)) throw new Error(`agentProfiles.${id} has invalid channel ${channel}`);
+  }
+  const denied = new Set(profile.capabilities.denied);
+  for (const capability of [...profile.capabilities.required, ...profile.capabilities.optional]) {
+    if (denied.has(capability)) {
+      throw new Error(`agentProfiles.${id} capability ${capability} cannot be both allowed and denied`);
+    }
+  }
+  for (const [index, rule] of profile.action_rules.entries()) {
+    if (!String(rule?.match ?? "").trim() || !ACTION_BEHAVIORS.has(rule?.behavior)) {
+      throw new Error(`agentProfiles.${id} actionRules[${index}] is invalid`);
+    }
+  }
+  for (const [index, schedule] of profile.schedules.entries()) {
+    if (!AGENT_ID.test(String(schedule?.id ?? ""))) {
+      throw new Error(`agentProfiles.${id} schedules[${index}].id must be lowercase kebab-case`);
+    }
+    if (!String(schedule?.prompt ?? "").trim() || !String(schedule?.rrule ?? "").trim()) {
+      throw new Error(`agentProfiles.${id} schedules[${index}] requires prompt and rrule`);
+    }
+    if (typeof schedule?.enabled !== "boolean") {
+      throw new Error(`agentProfiles.${id} schedules[${index}].enabled must be boolean`);
+    }
   }
 
   return profile;
