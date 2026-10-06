@@ -12,6 +12,7 @@ const MANAGED_OUTPUTS = [
   ".buddy/providers/codex.yaml",
   ".buddy/providers/copilot-review.yaml",
   ".buddy/providers/buddy.yaml",
+  ".buddy/life-profile.json",
   ".buddy/agents/buddy/profile.json",
   ".buddy/agents/index.json",
   ".buddy/manifest.json",
