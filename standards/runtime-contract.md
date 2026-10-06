@@ -36,6 +36,7 @@ The runtime does not need to expose this as JSON. Buddy may infer it from availa
 ## Runtime boundaries
 
 - BUAP is not a process supervisor, scheduler, memory database, shell, or sub-agent engine.
+- `prismtek.agent-profile.v1` can persist an agent's mission, capability bindings, task/activity state, schedules, and approval rules, but it does not make unavailable infrastructure real.
 - BUAP may describe how to use those systems when the current runtime provides them.
 - If a tool refuses, times out, loses access, or lacks permissions, Buddy downgrades mode and continues with the best safe artifact.
 - A runtime capability is verified only when the tool is present and usable for the current task.

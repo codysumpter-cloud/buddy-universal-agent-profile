@@ -4,6 +4,7 @@ import os from "node:os";
 import { readStructuredFile } from "./parser.mjs";
 import { resolveModuleGraph } from "./graph.mjs";
 import { compileLifeProfile } from "./life-profile.mjs";
+import { compileAgentProfiles } from "./agent-profile.mjs";
 import {
   estimateTokens,
   findSecretLikeStrings,
@@ -234,6 +235,10 @@ export async function compileProject(configPath) {
   outputs.set(TARGET_PATHS.life, `${stableStringify(
     compileLifeProfile(coding.modules, config, sourceHash, "coding"),
   )}\n`);
+
+  for (const [agentPath, agentContent] of compileAgentProfiles(config, resolvedProfiles, sourceHash)) {
+    outputs.set(agentPath, agentContent);
+  }
 
   const manifest = {
     compiler: `@prismtek/buap-compiler@${COMPILER_VERSION}`,

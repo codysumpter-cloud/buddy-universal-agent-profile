@@ -1,6 +1,6 @@
 # BUAP Compiler
 
-`@prismtek/buap-compiler` initializes repositories and turns canonical BUAP modules into deterministic, diffable agent instructions, GitHub agent skills, policy files, and bounded agent life profiles.
+`@prismtek/buap-compiler` initializes repositories and turns canonical BUAP modules into deterministic, diffable agent instructions, GitHub agent skills, policy files, bounded agent life profiles, and first-class persistent agent profiles.
 
 ## Five-minute install
 
@@ -22,6 +22,8 @@ REVIEW.md
 .buddy/providers/copilot-review.yaml
 .buddy/providers/buddy.yaml
 .buddy/life-profile.json
+.buddy/agents/buddy/profile.json
+.buddy/agents/index.json
 .buddy/manifest.json
 ```
 
@@ -30,6 +32,12 @@ Projects may also configure narrow GitHub agent skills under `.github/skills/<na
 `.buddy/life-profile.json` is the agent's compiled developmental genome. It keeps constitution and safety boundaries immutable while declaring bounded drives, traits, reinforcement authorities, memory provenance, relationship scope, developmental stages, and inheritance policy. Hosts may persist learned state separately through `@prismtek/buap-agent-life`; learned state never rewrites the compiled profile.
 
 Modules may add a `life` object. Conflicting scalar values require an explicit `life.*` override, just like other high-impact policy changes.
+
+`agentProfiles` in `buap.config.json` compile portable persistent agent objects under
+`.buddy/agents/`. Each agent declares identity, mission, goals, memory namespace,
+execution targets, capabilities, autonomy, action/approval rules, channels, schedules,
+and the BUAP policy profile whose permissions constrain it. See `docs/agent-profiles.md`
+and `@prismtek/buap-agent-profile`.
 
 It refuses to overwrite managed files unless `--force` is explicitly provided. Review existing instructions before using that flag.
 
