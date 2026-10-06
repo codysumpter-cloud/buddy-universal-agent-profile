@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/agent-profile-state.schema.json",
+  "title": "Prismtek Agent Profile State v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "agent_id",
+    "profile_sha256",
+    "lifecycle_status",
+    "capability_bindings",
+    "tasks",
+    "activity",
+    "updated_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "prismtek-agent-profile-state-v1"
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_sha256": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lifecycle_status": {
+      "enum": [
+        "active",
+        "paused"
+      ]
+    },
+    "capability_bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "connected",
+              "disconnected"
+            ]
+          },
+          "evidence_ref": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "status",
+          "action",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "scheduled",
+              "in_progress",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "preapproved": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scheduled_for": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "result_ref": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "error": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "activity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "at",
+          "kind",
+          "summary"
+        ],
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "ref": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
