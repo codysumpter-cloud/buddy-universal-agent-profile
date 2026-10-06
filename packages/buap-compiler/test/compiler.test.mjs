@@ -119,6 +119,41 @@ test("compiles first-class agent profiles with policy provenance", async () => {
   assert.ok(index.agents[0].profile_sha256);
 });
 
+test("rejects invalid first-class agent profiles", async () => {
+  const { configPath } = await copiedExample();
+  const config = JSON.parse(await fs.readFile(configPath, "utf8"));
+  config.agentProfiles = [{
+    id: "bad-agent",
+    displayName: "Bad Agent",
+    relationshipRole: "buddy",
+    kind: "primary",
+    policyProfile: "coding",
+    mission: "Invalid on purpose",
+    goals: ["Test validation"],
+    responsibilities: ["Break safely"],
+    execution: {
+      preferred_targets: ["telepathy"],
+      background_allowed: true,
+      max_concurrent_tasks: 1
+    },
+    capabilities: {
+      required: [],
+      optional: [],
+      denied: []
+    },
+    autonomy: {
+      proactive_research: false,
+      create_tasks: false,
+      schedule_tasks: false
+    },
+    channels: ["chat"],
+    actionRules: [{ match: "*", behavior: "ask" }],
+    schedules: []
+  }];
+  await fs.writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  await assert.rejects(() => compileProject(configPath), /invalid execution target/);
+});
+
 test("build then check reports no drift", async () => {
   const { temp, configPath } = await copiedExample();
   await writeProject(configPath);
