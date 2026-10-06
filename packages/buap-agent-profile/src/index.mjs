@@ -15,8 +15,19 @@ function deepFreeze(value) {
   return value;
 }
 
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function digest(value) {
-  return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
+  return crypto.createHash("sha256").update(stableStringify(value)).digest("hex");
 }
 
 function timestamp(value = new Date()) {
@@ -280,7 +291,7 @@ export class AgentProfileRuntime {
 
   startTask(id, options = {}) {
     if (this.state.lifecycle_status !== "active") {
-      return { started: false, decision: "paused", task: this.#task(id) };
+      return { started: false, decision: "paused", task: clone(this.#task(id)) };
     }
 
     const capabilityReport = this.capabilityReport();
@@ -289,7 +300,7 @@ export class AgentProfileRuntime {
         started: false,
         decision: "missing_capabilities",
         missing_capabilities: capabilityReport.missing_required,
-        task: this.#task(id),
+        task: clone(this.#task(id)),
       };
     }
 
