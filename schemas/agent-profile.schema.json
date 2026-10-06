@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/agent-profile.schema.json",
+  "title": "Prismtek Agent Profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "display_name",
+    "relationship_role",
+    "kind",
+    "mission",
+    "goals",
+    "responsibilities",
+    "identity",
+    "memory",
+    "execution",
+    "capabilities",
+    "autonomy",
+    "action_rules",
+    "channels",
+    "schedules"
+  ],
+  "properties": {
+    "schema": {
+      "const": "prismtek-agent-profile-v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "relationship_role": {
+      "enum": [
+        "buddy",
+        "lil_buddy",
+        "specialist"
+      ]
+    },
+    "kind": {
+      "enum": [
+        "primary",
+        "specialist",
+        "worker"
+      ]
+    },
+    "mission": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "minItems": 1
+    },
+    "responsibilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "minItems": 1
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name_source"
+      ],
+      "properties": {
+        "name_source": {
+          "enum": [
+            "user",
+            "self",
+            "organization"
+          ]
+        },
+        "handle": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "avatar_ref": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "pet_ref": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "enum": [
+            "host_default",
+            "preferred",
+            "fixed"
+          ],
+          "default": "host_default"
+        },
+        "preferred": {
+          "type": "string",
+          "maxLength": 160
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "shared_context",
+        "write_scopes",
+        "proactive_learning"
+      ],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "shared_context": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "uniqueItems": true
+        },
+        "write_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "uniqueItems": true
+        },
+        "proactive_learning": {
+          "type": "boolean"
+        },
+        "life_profile_ref": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferred_targets",
+        "background_allowed",
+        "max_concurrent_tasks"
+      ],
+      "properties": {
+        "preferred_targets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "chat",
+              "work",
+              "codex_cloud",
+              "local_computer",
+              "cloud_computer",
+              "ide",
+              "daemon"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "background_allowed": {
+          "type": "boolean"
+        },
+        "max_concurrent_tasks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "optional",
+        "denied"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "uniqueItems": true
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "uniqueItems": true
+        },
+        "denied": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "autonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proactive_research",
+        "create_tasks",
+        "schedule_tasks"
+      ],
+      "properties": {
+        "proactive_research": {
+          "type": "boolean"
+        },
+        "create_tasks": {
+          "type": "boolean"
+        },
+        "schedule_tasks": {
+          "type": "boolean"
+        }
+      }
+    },
+    "action_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "match",
+          "behavior"
+        ],
+        "properties": {
+          "match": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "behavior": {
+            "enum": [
+              "allow",
+              "preapproved",
+              "ask",
+              "handoff",
+              "deny"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      }
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "chat",
+          "slack",
+          "teams",
+          "email",
+          "sms",
+          "voice",
+          "app",
+          "cli",
+          "ide"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "schedules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "prompt",
+          "rrule",
+          "enabled"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "rrule": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
