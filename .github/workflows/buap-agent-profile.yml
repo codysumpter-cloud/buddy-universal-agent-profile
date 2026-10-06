@@ -1,0 +1,31 @@
+name: BUAP agent profile
+
+on:
+  pull_request:
+    paths:
+      - "packages/buap-agent-profile/**"
+      - "schemas/agent-profile*.schema.json"
+      - "contracts/prismtek-agent-profile-v1.md"
+      - ".github/workflows/buap-agent-profile.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/buap-agent-profile/**"
+      - "schemas/agent-profile*.schema.json"
+      - "contracts/prismtek-agent-profile-v1.md"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test persistent agent profile runtime
+        working-directory: packages/buap-agent-profile
+        run: npm test
