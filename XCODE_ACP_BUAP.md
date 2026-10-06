@@ -20,8 +20,12 @@ ACP standardizes communication between editors/IDEs and coding agents. BUAP shou
 If personalization is missing, the agent must ask:
 
 ```text
-Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?
+Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?
 ```
+
+"Buddy" and "Lil Buddy" remain the BUAP relationship/role labels. Their individual
+display names may be user-selected or self-selected and should remain stable once
+chosen.
 
 Then offer profile defaults or selection:
 
