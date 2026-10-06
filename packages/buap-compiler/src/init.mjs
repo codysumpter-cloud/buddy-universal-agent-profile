@@ -211,7 +211,7 @@ function configDocument(name) {
       {
         id: "buddy",
         displayName: "Buddy",
-        nameSource: "self",
+        nameSource: "organization",
         relationshipRole: "buddy",
         kind: "primary",
         policyProfile: "coding",
