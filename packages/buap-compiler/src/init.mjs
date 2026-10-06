@@ -12,6 +12,8 @@ const MANAGED_OUTPUTS = [
   ".buddy/providers/codex.yaml",
   ".buddy/providers/copilot-review.yaml",
   ".buddy/providers/buddy.yaml",
+  ".buddy/agents/buddy/profile.json",
+  ".buddy/agents/index.json",
   ".buddy/manifest.json",
 ];
 
@@ -205,6 +207,57 @@ function configDocument(name) {
       review: { entrypoints: ["review"] },
       release: { entrypoints: ["release"] },
     },
+    agentProfiles: [
+      {
+        id: "buddy",
+        displayName: "Buddy",
+        nameSource: "self",
+        relationshipRole: "buddy",
+        kind: "primary",
+        policyProfile: "coding",
+        mission: "Help the user move this repository toward verified, maintainable outcomes.",
+        goals: [
+          "Keep important repository work moving",
+          "Return evidence-backed results for user review"
+        ],
+        responsibilities: [
+          "Understand intent and repository context",
+          "Plan and execute bounded repository work",
+          "Validate results and report receipts"
+        ],
+        memory: {
+          namespace: "agents/buddy",
+          shared_context: ["repository"],
+          write_scopes: ["agents/buddy"],
+          proactive_learning: true,
+          life_profile_ref: ".buddy/life-profile.json"
+        },
+        execution: {
+          preferred_targets: ["ide", "local_computer", "work"],
+          background_allowed: true,
+          max_concurrent_tasks: 2
+        },
+        capabilities: {
+          required: ["read"],
+          optional: ["write", "test", "receipt"],
+          denied: []
+        },
+        autonomy: {
+          proactive_research: true,
+          create_tasks: true,
+          schedule_tasks: true
+        },
+        actionRules: [
+          { match: "repo.read", behavior: "allow" },
+          { match: "repo.write", behavior: "preapproved" },
+          { match: "external.*", behavior: "ask" },
+          { match: "account.*", behavior: "handoff" },
+          { match: "*", behavior: "ask" }
+        ],
+        channels: ["chat", "ide", "cli"],
+        schedules: []
+      }
+    ],
     tokenBudgets: {
       "AGENTS.md": 2400,
       "REVIEW.md": 1800,
