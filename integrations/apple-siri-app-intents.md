@@ -35,8 +35,10 @@ Siri phrase
 
 - `request`: user's natural language task.
 - `userDisplayName`: optional stored user name.
-- `buddyDisplayName`: optional stored Buddy name.
-- `lilBuddyDisplayName`: optional stored Lil Buddy name.
+- `buddyDisplayName`: optional stored Buddy individual name.
+- `buddyNameSource`: optional `user` or `self`.
+- `lilBuddyDisplayName`: optional stored Lil Buddy individual name.
+- `lilBuddyNameSource`: optional `user` or `self`.
 - `buddyProfileId`: optional Buddy profile template ID.
 - `lilBuddyProfileId`: optional Lil Buddy profile template ID.
 - `selectedProfilePackId`: optional profile pack ID.
@@ -45,11 +47,14 @@ Siri phrase
 
 ## First-run behavior
 
-If any required display name is missing, return the personalization prompt before running non-urgent tasks:
+If required personalization is missing, return the personalization prompt before running non-urgent tasks:
 
 ```text
-Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?
+Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?
 ```
+
+If a naming source is `self` and its display name is still empty, let that agent choose
+a stable individual name before marking personalization complete.
 
 If the task is urgent, help first and ask the missing personalization question afterward.
 
