@@ -15,6 +15,11 @@ BUAP also includes copy-paste packs for low-context chat/search tools that canno
 read a repo, run a shell, or persist files. Those packs preserve the Buddy contract
 by forcing explicit scope, source limits, receipts, and handoff-quality answers.
 
+BUAP also defines **first-class Agent Profiles**: persistent, host-portable agent
+objects with identity, mission, memory namespace, execution targets, capability
+bindings, autonomy, approval rules, schedules, pause state, and activity history.
+See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
+
 ## Prompt tiers
 
 | Tier | File | Use |
@@ -91,6 +96,8 @@ supporting machine-readable links and detail.
 | `plugins/buap/` | Native Claude Code and Codex plugin assets: Lil Buddy profile, BUAP runbook skills, slash commands, and safety/receipts hooks |
 | `.claude-plugin/marketplace.json` | Plugin marketplace manifest so BUAP installs via `/plugin install buap@buap` |
 | `packages/buap-acp-agent/` | Local stdio ACP server package for Xcode/ACP clients |
+| `packages/buap-agent-profile/` | Persistent agent identity, mission, capability, approval, scheduling, and activity runtime |
+| `packages/buap-agent-life/` | Bounded developmental state for preferences, relationships, traits, drives, and stages |
 | `packages/buap-knowledge-vault/` | Local KnowledgeVault Markdown index/search helper |
 | `packages/buap-apple-notes-reminders/` | macOS-only Apple Notes/Reminders helper (osascript) used by the ACP agent |
 | `packages/buap-hatch-pet/` | Wrapper for permission-gated Codex pet generation through the official `hatch-pet` skill |
@@ -100,7 +107,7 @@ supporting machine-readable links and detail.
 | `integrations/` | Runtime integration docs and canonical ecosystem routing, including Buddy MCP bridge docs |
 | `audits/` | Source-backed BUAP and runtime integration audit reports |
 | `standards/` | Orchestration, runtime contracts, capability negotiation, memory, failure modes, validation, response format |
-| `schemas/` | Machine-readable schemas, including receipts and capability declarations |
+| `schemas/` | Machine-readable schemas, including receipts, capability declarations, Agent Profiles, and Agent Life |
 | `tests/conformance/` | Prompt/rubric suite for checking BUAP compatibility |
 | `scripts/` | Local validation and conformance helper scripts |
 | `.github/workflows/` | CI checks for BUAP docs/spec conformance |
