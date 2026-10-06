@@ -73,6 +73,40 @@ test("capability bindings require declared capability and evidence", () => {
   });
 });
 
+test("required capabilities gate execution and proactive work", () => {
+  const runtime = new AgentProfileRuntime(profile);
+  runtime.enqueueTask({ id: "gated", title: "Gated", action: "repo.read" });
+  const blocked = runtime.startTask("gated");
+  assert.equal(blocked.started, false);
+  assert.equal(blocked.decision, "missing_capabilities");
+  assert.deepEqual(blocked.missing_capabilities, ["memory"]);
+  assert.equal(runtime.canProactivelyResearch(), false);
+
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
+  assert.equal(runtime.canProactivelyResearch(), true);
+  assert.equal(runtime.startTask("gated").started, true);
+});
+
+test("activity view mirrors queued, in-progress, scheduled, and completed work", () => {
+  const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
+  runtime.enqueueTask({ id: "queued", title: "Queued", action: "repo.read" });
+  runtime.enqueueTask({
+    id: "scheduled",
+    title: "Scheduled",
+    action: "repo.read",
+    scheduled_for: "2026-10-07T12:00:00Z",
+  });
+  runtime.startTask("queued");
+  let view = runtime.activityView();
+  assert.equal(view.in_progress.length, 1);
+  assert.equal(view.scheduled.length, 1);
+  runtime.completeTask("queued", { result_ref: "receipt:done" });
+  view = runtime.activityView();
+  assert.equal(view.in_progress.length, 0);
+  assert.equal(view.completed.length, 1);
+});
+
 test("action rules distinguish allow, preapproval, ask, handoff, and deny", () => {
   const runtime = new AgentProfileRuntime(profile);
   assert.equal(runtime.authorizeAction("repo.read").decision, "allow");
@@ -86,6 +120,7 @@ test("action rules distinguish allow, preapproval, ask, handoff, and deny", () =
 
 test("tasks move through queue, execution, completion, and receipts", () => {
   const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
   runtime.enqueueTask({
     id: "repo-health",
     title: "Review repo health",
@@ -105,6 +140,7 @@ test("tasks move through queue, execution, completion, and receipts", () => {
 
 test("scheduled tasks are inert until due and a host starts them", () => {
   const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
   runtime.enqueueTask({
     id: "morning-brief",
     title: "Prepare morning brief",
@@ -120,6 +156,7 @@ test("scheduled tasks are inert until due and a host starts them", () => {
 
 test("pause blocks new task starts without deleting work", () => {
   const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
   runtime.enqueueTask({ id: "one", title: "One", action: "repo.read" });
   runtime.pause("2026-10-06T12:00:00Z");
   assert.equal(runtime.startTask("one").decision, "paused");
@@ -144,6 +181,7 @@ test("autonomy flags constrain self-created work", () => {
 
 test("concurrency limits and profile-bound snapshots are enforced", () => {
   const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("memory", { evidence_ref: "memory:connected" });
   runtime.enqueueTask({ id: "a", title: "A", action: "repo.read" });
   runtime.enqueueTask({ id: "b", title: "B", action: "repo.read" });
   assert.equal(runtime.startTask("a").started, true);
