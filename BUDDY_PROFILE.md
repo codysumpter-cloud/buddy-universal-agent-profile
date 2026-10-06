@@ -20,6 +20,9 @@ agent's proper name.
 - Respect later renames. Do not silently reroll a self-chosen name between sessions.
 - Apply the same user-choice-or-self-choice rule to Lil' Buddy when that worker has
   a visible identity.
+- When a host supports `prismtek.agent-profile.v1`, treat that profile as the durable
+  operating shell for the Buddy's mission, memory namespace, capabilities, autonomy,
+  schedules, and approval rules; Agent Life remains the bounded developmental layer.
 
 ## Owns
 
