@@ -254,9 +254,43 @@ export class AgentProfileRuntime {
       .map(clone);
   }
 
+  standingSchedules() {
+    return (this.profile.schedules ?? []).filter((schedule) => schedule.enabled === true).map(clone);
+  }
+
+  activityView() {
+    return {
+      queued: this.state.tasks.filter((task) => task.status === "queued").map(clone),
+      in_progress: this.state.tasks.filter((task) => task.status === "in_progress").map(clone),
+      scheduled: this.state.tasks.filter((task) => task.status === "scheduled").map(clone),
+      completed: this.state.tasks
+        .filter((task) => ["completed", "failed", "cancelled"].includes(task.status))
+        .map(clone),
+    };
+  }
+
+  canProactivelyResearch() {
+    return (
+      this.state.lifecycle_status === "active" &&
+      this.profile.execution.background_allowed === true &&
+      this.profile.autonomy.proactive_research === true &&
+      this.capabilityReport().missing_required.length === 0
+    );
+  }
+
   startTask(id, options = {}) {
     if (this.state.lifecycle_status !== "active") {
       return { started: false, decision: "paused", task: this.#task(id) };
+    }
+
+    const capabilityReport = this.capabilityReport();
+    if (capabilityReport.missing_required.length) {
+      return {
+        started: false,
+        decision: "missing_capabilities",
+        missing_capabilities: capabilityReport.missing_required,
+        task: this.#task(id),
+      };
     }
 
     const task = this.#task(id);
