@@ -80,7 +80,7 @@ After first-run personalization, the ACP agent supports these slash commands. Th
 ```text
 /buap help
 /buap profiles
-/buap personalize user="Cody" buddy="Buddy" lil_buddy="Finn" buddy_profile=bmo lil_buddy_profile=finn
+/buap personalize user="Cody" buddy_source=self lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn
 /buap read path=README.md
 /buap patch path=README.md find="old" replace="new"
 /buap apply path=README.md find="old" replace="new"     # permission-gated, fs/write_text_file
