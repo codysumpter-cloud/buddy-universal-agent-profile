@@ -64,13 +64,16 @@ Codex pet hatching:
 - first-run personalization for:
   - `user_display_name`
   - `buddy_display_name`
+  - `buddy_name_source` (`user` or `self`)
   - `lil_buddy_display_name`
+  - `lil_buddy_name_source` (`user` or `self`)
   - `buddy_profile_id`
   - `lil_buddy_profile_id`
 - guarded runtime commands:
   - `/buap help`
   - `/buap profiles`
-  - `/buap personalize user="..." buddy="..." lil_buddy="..." buddy_profile=bmo lil_buddy_profile=finn`
+  - `/buap personalize user="..." buddy="Atlas" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn`
+  - omit `buddy=` or `lil_buddy=` when the matching `*_source=self`; the ACP agent will choose and persist a name
   - `/buap read path=README.md`
   - `/buap patch path=README.md find="old" replace="new"`
   - `/buap apply path=README.md find="old" replace="new"` (permission-gated, editor-mediated `fs/write_text_file`)

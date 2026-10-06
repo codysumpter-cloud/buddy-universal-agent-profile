@@ -1,10 +1,14 @@
 # Lil Buddy Profile Summary
 
-BUAP setup now includes three labels:
+BUAP setup includes three display-name fields:
 
 - what the assistant calls the user
-- the main Buddy name
-- the Lil Buddy name
+- the main Buddy's individual name
+- the Lil Buddy's individual name
+
+"Buddy" and "Lil Buddy" remain relationship/role labels. Each individual name may be
+chosen by the user or self-selected by the agent, recorded with optional
+`buddy_name_source` / `lil_buddy_name_source` values of `user` or `self`.
 
 It also includes two profile selections:
 

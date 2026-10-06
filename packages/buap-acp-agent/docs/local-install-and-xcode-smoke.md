@@ -86,8 +86,12 @@ If your checkout is somewhere else, replace `/Users/prismtek/Prismtek/buddy-univ
 When the agent starts and asks for setup, reply:
 
 ```text
-/buap personalize user="Cody" buddy="Buddy" lil_buddy="Lil Buddy" buddy_profile=bmo lil_buddy_profile=finn
+/buap personalize user="Cody" buddy_source=self lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn
 ```
+
+That asks the ACP agent to choose both individual names. To provide names yourself,
+pass `buddy="..."` / `lil_buddy="..."` with `buddy_source=user` /
+`lil_buddy_source=user`.
 
 Then run:
 

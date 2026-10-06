@@ -14,7 +14,9 @@ const acpLaunchCommand = `node ${path.join(repoRoot, "packages", "buap-acp-agent
 const defaultPersonalization = {
   user_display_name: "Cody",
   buddy_display_name: "Buddy",
+  buddy_name_source: "user",
   lil_buddy_display_name: "Lil Buddy",
+  lil_buddy_name_source: "user",
   buddy_profile_id: "bmo",
   lil_buddy_profile_id: "finn",
   selected_profile_pack_id: "bmo-council-v1"

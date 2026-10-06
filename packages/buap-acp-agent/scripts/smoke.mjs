@@ -91,7 +91,10 @@ const indexMarkers = [
   "advertisedCommands",
   "pendingClientRequests",
   "requestClient(method",
-  "handleClientResponse"
+  "handleClientResponse",
+  "buddy_source",
+  "lil_buddy_source",
+  "chooseSelfName"
 ];
 for (const expected of indexMarkers) {
   if (!indexSource.includes(expected)) {

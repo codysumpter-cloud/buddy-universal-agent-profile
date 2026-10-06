@@ -1,6 +1,6 @@
 # Buddy and Lil Buddy Profile Selection
 
-BUAP personalization has three naming slots and two reusable personality slots.
+BUAP personalization has three display-name slots, two optional naming-source fields, and two reusable personality slots.
 
 ## Active pairing for this repo
 
@@ -14,15 +14,20 @@ This is the locked default for this repo. New sessions should ask the user to
 choose a Buddy/Lil Buddy pairing only when no selection is configured; in this
 repo, default to Buddy=`bmo` / Lil Buddy=`finn` rather than re-prompting.
 
-## Required naming slots
+## Naming and identity fields
 
 1. `user_display_name` - what the agent calls the user.
-2. `buddy_display_name` - what the user calls the main Buddy.
-3. `lil_buddy_display_name` - what the user calls the app-facing Lil Buddy.
+2. `buddy_display_name` - the main Buddy's individual visible name.
+3. `buddy_name_source` - optional `user` or `self`.
+4. `lil_buddy_display_name` - the app-facing Lil Buddy's individual visible name.
+5. `lil_buddy_name_source` - optional `user` or `self`.
+
+"Buddy" and "Lil Buddy" remain role/relationship labels. Their individual names may
+be selected by the user or by the agents themselves.
 
 Recommended first-run prompt:
 
-> Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?
+> Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?
 
 ## Personality slots
 
@@ -36,8 +41,10 @@ Examples:
 ```json
 {
   "buddy_display_name": "BMO",
+  "buddy_name_source": "user",
   "buddy_profile_id": "bmo",
   "lil_buddy_display_name": "Finn",
+  "lil_buddy_name_source": "user",
   "lil_buddy_profile_id": "finn"
 }
 ```
@@ -45,8 +52,10 @@ Examples:
 ```json
 {
   "buddy_display_name": "Prismo",
+  "buddy_name_source": "user",
   "buddy_profile_id": "prismo",
   "lil_buddy_display_name": "NEPTR",
+  "lil_buddy_name_source": "self",
   "lil_buddy_profile_id": "neptr"
 }
 ```

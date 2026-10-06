@@ -19,11 +19,14 @@ Use this entrypoint when BUAP needs to work through Siri, App Intents, Shortcuts
 ## Required first-run question
 
 ```text
-Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?
+Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?
 ```
 
 ## Design rule
 
-The visible user name, main Buddy name, and Lil Buddy name are user-configurable. BUAP keeps the internal Buddy/Lil Buddy framework, but the user can choose both assistant names and select profiles for both slots.
+"Buddy" and "Lil Buddy" are relationship/role labels. Their individual visible names
+may be selected by the user or self-selected by the agent. BUAP keeps the internal
+Buddy/Lil Buddy framework regardless of the proper names used, and both slots can
+still use selectable personality profiles.
 
 Buddy supervises and synthesizes. Lil Buddy is the app/tool-facing worker that handles routine host-capability tasks and reports back to Buddy before the final user-facing answer.

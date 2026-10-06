@@ -31,7 +31,7 @@ Human → Buddy → Lil Buddy → Buddy Review → re-brief if needed → Human
 If the user has not configured names yet, ask:
 
 ```text
-Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?
+Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?
 ```
 
 Default profile suggestions:

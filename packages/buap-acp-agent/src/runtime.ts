@@ -27,7 +27,9 @@ const execFileAsync = promisify(execFile);
 export type PersonalizationState = {
   user_display_name?: string;
   buddy_display_name?: string;
+  buddy_name_source?: "user" | "self";
   lil_buddy_display_name?: string;
+  lil_buddy_name_source?: "user" | "self";
   buddy_profile_id: string;
   lil_buddy_profile_id: string;
   selected_profile_pack_id: string;
@@ -104,7 +106,7 @@ type TerminalWaitResult = { exitCode?: number | null; signal?: string | null };
 const RUNTIME_COMMANDS = [
   { name: "buap help", description: "Show BUAP ACP runtime commands." },
   { name: "buap profiles", description: "List BMO council personality profiles." },
-  { name: "buap personalize", description: "Save Buddy/Lil Buddy/user names and profiles.", input: { hint: 'user="Cody" buddy="Buddy" lil_buddy="Finn" buddy_profile=bmo lil_buddy_profile=finn' } },
+  { name: "buap personalize", description: "Save user/Buddy names, naming sources, and profiles.", input: { hint: 'user="Cody" buddy="Atlas" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn' } },
   { name: "buap read", description: "Read a workspace file safely.", input: { hint: "path=README.md [max_bytes=20000]" } },
   { name: "buap patch", description: "Prepare a diff proposal without writing files.", input: { hint: 'path=README.md find="old" replace="new"' } },
   { name: "buap apply", description: "Ask permission, then write through ACP fs/write_text_file.", input: { hint: 'path=README.md find="old" replace="new"' } },
@@ -803,7 +805,7 @@ function renderHelp(): string {
     "BUAP ACP commands:",
     "",
     "- `/buap profiles` — list BMO council profile IDs",
-    "- `/buap personalize user=\"Cody\" buddy=\"Buddy\" lil_buddy=\"Finn\" buddy_profile=bmo lil_buddy_profile=finn`",
+    "- `/buap personalize user=\"Cody\" buddy=\"Atlas\" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn`",
     "- `/buap read path=README.md [max_bytes=20000]` — read a workspace file safely",
     "- `/buap patch path=README.md find=\"old\" replace=\"new\"` — propose a diff only; no file write",
     "- `/buap apply path=README.md find=\"old\" replace=\"new\"` — request permission and write through ACP fs/write_text_file",
