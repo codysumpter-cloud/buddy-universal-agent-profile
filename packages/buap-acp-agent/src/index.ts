@@ -166,12 +166,36 @@ function extractTextContent(prompt: unknown): string {
 
 function parseKeyValues(input: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /(user|buddy|lil_buddy|buddy_profile|lil_buddy_profile|profile_pack)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
+  const regex = /(user|buddy_source|lil_buddy_source|buddy_profile|lil_buddy_profile|profile_pack|buddy|lil_buddy)=("([^"]*)"|'([^']*)'|([^\s]+))/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(input))) {
     result[match[1]] = match[3] ?? match[4] ?? match[5] ?? "";
   }
   return result;
+}
+
+function normalizeNameSource(value: string | undefined): "user" | "self" | undefined {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "user" || normalized === "self" ? normalized : undefined;
+}
+
+const SELF_NAME_CANDIDATES = {
+  buddy: ["Atlas", "Rowan", "Milo", "Juno", "Arlo", "Sage", "Hudson", "Remy", "Orion", "Nova", "Ellis", "Piper"],
+  lil_buddy: ["Finn", "Pip", "Scout", "Nico", "Kit", "Rook", "Pixel", "Mochi", "Toby", "Bean", "Wren", "Dash"]
+} as const;
+
+function chooseSelfName(
+  slot: keyof typeof SELF_NAME_CANDIDATES,
+  exclude: Array<string | undefined>
+): string {
+  const blocked = new Set(
+    exclude.filter(Boolean).map((value) => value!.trim().toLowerCase())
+  );
+  const available = SELF_NAME_CANDIDATES[slot].filter(
+    (candidate) => !blocked.has(candidate.toLowerCase())
+  );
+  const pool = available.length ? available : SELF_NAME_CANDIDATES[slot];
+  return pool[crypto.randomInt(pool.length)];
 }
 
 function applyPersonalizationCommand(
@@ -182,15 +206,38 @@ function applyPersonalizationCommand(
   if (!text.toLowerCase().includes("/buap personalize")) return null;
 
   const values = parseKeyValues(text);
+  const userDisplayName = values.user || current.user_display_name;
+  const buddyNameSource =
+    normalizeNameSource(values.buddy_source) ??
+    (values.buddy ? "user" : current.buddy_name_source);
+  const lilBuddyNameSource =
+    normalizeNameSource(values.lil_buddy_source) ??
+    (values.lil_buddy ? "user" : current.lil_buddy_name_source);
+
+  let buddyDisplayName = values.buddy || current.buddy_display_name;
+  let lilBuddyDisplayName = values.lil_buddy || current.lil_buddy_display_name;
+
+  if (!buddyDisplayName && buddyNameSource === "self") {
+    buddyDisplayName = chooseSelfName("buddy", [userDisplayName, lilBuddyDisplayName]);
+  }
+  if (!lilBuddyDisplayName && lilBuddyNameSource === "self") {
+    lilBuddyDisplayName = chooseSelfName("lil_buddy", [userDisplayName, buddyDisplayName]);
+  }
+
   const next: PersonalizationState = {
     ...current,
-    user_display_name: values.user || current.user_display_name,
-    buddy_display_name: values.buddy || current.buddy_display_name,
-    lil_buddy_display_name: values.lil_buddy || current.lil_buddy_display_name,
+    user_display_name: userDisplayName,
+    buddy_display_name: buddyDisplayName,
+    buddy_name_source: buddyNameSource,
+    lil_buddy_display_name: lilBuddyDisplayName,
+    lil_buddy_name_source: lilBuddyNameSource,
     buddy_profile_id: values.buddy_profile || current.buddy_profile_id || "bmo",
     lil_buddy_profile_id: values.lil_buddy_profile || current.lil_buddy_profile_id || "finn",
     selected_profile_pack_id:
       values.profile_pack || current.selected_profile_pack_id || profilePack.profile_pack_id || "bmo-council-v1",
+    first_run_personalization_complete: Boolean(
+      userDisplayName && buddyDisplayName && lilBuddyDisplayName
+    ),
     updated_at: new Date().toISOString()
   };
 
@@ -220,15 +267,23 @@ function renderProfileList(profilePack: ProfilePack): string {
 function renderFirstRun(profilePack: ProfilePack): string {
   const profiles = renderProfileList(profilePack);
   return [
-    "Before I lock in your setup, what should I call you, what do you want your main Buddy to be called, and what do you want your Lil Buddy to be called?",
+    "Before I lock in your setup, what should I call you? For your main Buddy and Lil Buddy, do you want to name them yourself, or should each choose its own name?",
     "",
-    "Reply in this ACP chat with:",
+    "\"Buddy\" and \"Lil Buddy\" are relationship/role labels. Their individual names can be user-selected or self-selected.",
+    "",
+    "User-named example:",
     "",
     "```text",
-    "/buap personalize user=\"Cody\" buddy=\"Buddy\" lil_buddy=\"Finn\" buddy_profile=bmo lil_buddy_profile=finn",
+    "/buap personalize user=\"Cody\" buddy=\"Atlas\" buddy_source=user lil_buddy=\"Finn\" lil_buddy_source=user buddy_profile=bmo lil_buddy_profile=finn",
     "```",
     "",
-    "Defaults if you just want the classic setup:",
+    "Let both agents choose their own names:",
+    "",
+    "```text",
+    "/buap personalize user=\"Cody\" buddy_source=self lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn",
+    "```",
+    "",
+    "Defaults if you just want the classic personality setup:",
     "",
     "- Main Buddy profile: `bmo`",
     "- Lil Buddy profile: `finn`",
