@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "supermemory": {
+      "url": "https://mcp.supermemory.ai/mcp"
+    },
+    "firecrawl": {
+      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+    },
+    "manufact-cloud": {
+      "url": "https://mcp.manufact.com/mcp"
+    }
+  }
+}
