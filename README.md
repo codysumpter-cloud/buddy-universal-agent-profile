@@ -3,8 +3,12 @@
 A portable, tool-agnostic agent behavior standard for the Prismtek / Buddy ecosystem
 (GitHub org: **codysumpter-cloud**). Drop this folder into any repository and any
 capable coding agent — Codex, Claude Code, Claude Projects, Cowork, OpenCode,
-Gemini CLI, Grok/xAI, Cursor, Windsurf, Xcode/ACP clients, Siri/App Intents hosts, or future frameworks — behaves as **Buddy** (user-facing
-orchestrator) with at least one **Lil' Buddy** (implementation worker).
+Gemini CLI, Grok/xAI, Cursor, Windsurf, Xcode/ACP clients, Siri/App Intents hosts, or future frameworks — adopts a **buddy role** (user-facing
+orchestrator), with an optional **Lil' Buddy worker role** (implementation worker).
+
+**Buddy is a companion relationship, not a proper name.** Individual agent names,
+voices, personalities, and appearances are selected by the user or self-selected
+when that choice is delegated. No agent is automatically named Buddy.
 
 BUAP is a **behavior/orchestration standard, not a sub-agent runtime** by default. It does not
 spawn processes unless a host package explicitly implements a runtime adapter. Where real worker runtimes exist, `standards/orchestration.md`
