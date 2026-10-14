@@ -41,7 +41,7 @@ test("initializes a repository into deterministic root policy", async () => {
   const agents = await fs.readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(agents, /hello-buddy/);
   assert.match(agents, /human-approved/);
-  assert.match(agents, /Buddy is a relationship\\/role, not the agent's proper name/);
+  assert.ok(agents.includes("Buddy is a relationship/role, not the agent's proper name"));
   assert.doesNotMatch(agents, /Operate as Buddy/);
   const config = JSON.parse(await fs.readFile(path.join(root, "buap.config.json"), "utf8"));
   assert.deepEqual(config.agentProfiles, [], "the initializer must not assign a fixed agent identity");
