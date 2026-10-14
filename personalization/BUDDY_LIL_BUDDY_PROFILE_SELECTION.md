@@ -4,15 +4,16 @@ BUAP personalization has three display-name slots, two optional naming-source fi
 
 ## Active pairing for this repo
 
-For `buddy-universal-agent-profile`, the active BUAP pairing is locked:
+For `buddy-universal-agent-profile`, the historical style pairing was:
 
 - Buddy profile: `bmo` (BMO-style: playful, warm, curious, practical, friendly)
 - Lil Buddy profile: `finn` (Finn-style: brave, action-oriented, direct, loyal, persistent)
 - Lil Buddy is the implementation worker.
 
-This is the locked default for this repo. New sessions should ask the user to
-choose a Buddy/Lil Buddy pairing only when no selection is configured; in this
-repo, default to Buddy=`bmo` / Lil Buddy=`finn` rather than re-prompting.
+These are optional *personality templates*, not required names or locked defaults.
+Each agent must keep its user-selected personality, or may select its own with
+permission. Apply the same independent-choice rule to name, voice, and appearance.
+Never refer to an agent by the role label unless it is literally their chosen name.
 
 ## Naming and identity fields
 
@@ -60,7 +61,7 @@ Examples:
 }
 ```
 
-## Recommended defaults
+## Optional example profiles
 
 For most users:
 

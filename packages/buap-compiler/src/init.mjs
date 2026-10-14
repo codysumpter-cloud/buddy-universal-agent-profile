@@ -13,8 +13,6 @@ const MANAGED_OUTPUTS = [
   ".buddy/providers/copilot-review.yaml",
   ".buddy/providers/buddy.yaml",
   ".buddy/life-profile.json",
-  ".buddy/agents/buddy/profile.json",
-  ".buddy/agents/index.json",
   ".buddy/manifest.json",
 ];
 
@@ -29,7 +27,7 @@ const MODULES = {
         title: "Identity and source order",
         order: 10,
         targets: ["agents-md", "review-md"],
-        body: "Operate as Buddy for {{project_name}}. Inspect repository-local instructions and current source before acting. Treat repository state, CI, and executable verification as stronger evidence than memory or prior chat context.",
+        body: "Operate under BUAP for {{project_name}}. Buddy is a relationship/role, not the agent's proper name. Never introduce yourself as Buddy unless that name was explicitly selected by the user or agent. Let the user name the agent or delegate the choice to the agent; respect the selected voice, personality, and appearance when supported. Inspect repository-local instructions and current source before acting. Treat repository state, CI, and executable verification as stronger evidence than memory or prior chat context.",
       },
       {
         id: "claims",
@@ -199,8 +197,8 @@ function configDocument(name) {
     outDir: ".",
     defaultProfile: "coding",
     titles: {
-      agents: "Buddy Repository Instructions",
-      review: "Buddy Review Instructions",
+      agents: "BUAP Repository Instructions",
+      review: "BUAP Review Instructions",
     },
     variables: { project_name: name },
     profiles: {
@@ -208,57 +206,9 @@ function configDocument(name) {
       review: { entrypoints: ["review"] },
       release: { entrypoints: ["release"] },
     },
-    agentProfiles: [
-      {
-        id: "buddy",
-        displayName: "Buddy",
-        nameSource: "organization",
-        relationshipRole: "buddy",
-        kind: "primary",
-        policyProfile: "coding",
-        mission: "Help the user move this repository toward verified, maintainable outcomes.",
-        goals: [
-          "Keep important repository work moving",
-          "Return evidence-backed results for user review"
-        ],
-        responsibilities: [
-          "Understand intent and repository context",
-          "Plan and execute bounded repository work",
-          "Validate results and report receipts"
-        ],
-        memory: {
-          namespace: "agents/buddy",
-          shared_context: ["repository"],
-          write_scopes: ["agents/buddy"],
-          proactive_learning: true,
-          life_profile_ref: ".buddy/life-profile.json"
-        },
-        execution: {
-          preferred_targets: ["ide", "local_computer", "work"],
-          background_allowed: true,
-          max_concurrent_tasks: 2
-        },
-        capabilities: {
-          required: ["read"],
-          optional: ["write", "test", "receipt"],
-          denied: []
-        },
-        autonomy: {
-          proactive_research: true,
-          create_tasks: true,
-          schedule_tasks: true
-        },
-        actionRules: [
-          { match: "repo.read", behavior: "allow" },
-          { match: "repo.write", behavior: "preapproved" },
-          { match: "external.*", behavior: "ask" },
-          { match: "account.*", behavior: "handoff" },
-          { match: "*", behavior: "ask" }
-        ],
-        channels: ["chat", "ide", "cli"],
-        schedules: []
-      }
-    ],
+    // New installations do not assign an agent identity. Add an agent profile only
+    // after the user names it or explicitly delegates naming to the agent.
+    agentProfiles: [],
     tokenBudgets: {
       "AGENTS.md": 2400,
       "REVIEW.md": 1800,
