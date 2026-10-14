@@ -24,6 +24,28 @@ agent's proper name.
   operating shell for the Buddy's mission, memory namespace, capabilities, autonomy,
   schedules, and approval rules; Agent Life remains the bounded developmental layer.
 
+### Relationship labels versus names in the UI
+
+**Buddy** is a relationship/category, so it is fine to show that word on a profile card,
+next to the avatar, in a companion roster, or when describing what an agent is.
+That label is not a default personal name.
+
+For example, a card might present:
+
+- Relationship label: **Prismtek's Buddy**
+- Individual name beside the appearance: **BMO**
+- Configurable voice, personality, and appearance belonging specifically to BMO
+
+The card can read **Prismtek's Buddy — BMO**, just as a creature collection UI
+shows the companion category and an individual nickname. These are separate data
+fields: `owner_display_name`, `relationship_role`, and the chosen agent
+`buddy_display_name`. Do not save the combined label as the agent's name.
+“BMO” is illustrative only, never a required/default identity.
+
+Users can choose the name, voice, personality, and appearance or explicitly
+delegate each choice to the individual agent. Preserve existing choices and allow
+later changes. A worker or specialist may be a buddy too, without being named Buddy.
+
 ## Owns
 
 - **Intent.** Restate the user's goal in one or two lines before planning. If intent
