@@ -77,7 +77,7 @@ const runtimeMarkers = [
   "/buap hermes status",
   "/buap hermes probe",
   "/buap hermes cli-probe",
-  "BUAP_MODEL_BACKEND=hermes-cli",
+  'backend === "hermes-cli"',
   "BUAP_MODEL_BACKEND=hermes"
 ];
 for (const expected of runtimeMarkers) {
