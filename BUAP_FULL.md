@@ -56,16 +56,15 @@ handoff.
 - Do not duplicate linked runtime repo logic inside BUAP.
 - Treat memory as a pointer to sources, not proof of current repo state.
 
-## Source order for Prismtek/Buddy work
+## Current source order for Prismtek/Buddy work
 
-1. `knowledge-vault`
-2. `buddy-brain`
-3. `buddy-agent`
-4. `omni-buddy`
-5. `prismtek-apps`
-6. `buddy-universal-agent-profile`
+1. Identify user-requested product or capability, and inspect its current deployment/source.
+2. For portable agent profiles/orchestration/identity, inspect this **active BUAP** repo.
+3. For Prismtek.dev and Prismcade browser products, inspect the **active `prismtek-site`** repo.
+4. For specifically requested Godot pixel-world work, inspect `3d-pixel-demo` (still unarchived as of 2026-10-23).
+5. Other destinations require current GitHub `archived=false` and a product-ownership check. **BeMore is retired.**
 
-Repo-local instructions override this order when working inside a specific repo.
+The old `knowledge-vault`, `buddy-brain`, `buddy-agent`, `omni-buddy`, `prismtek-apps` and `hermes-agent` GitHub repos are archived historical references. Never treat their old priority sequence as a working source-of-truth or open/merge PRs there. Repo-local instructions apply only after verifying the repo is actively owned for the task.
 
 ## External instruction overlays
 
@@ -86,26 +85,11 @@ order and repo-local instructions. Current external overlays:
   Drop compression when it would obscure safety warnings, irreversible-action
   confirmations, validation evidence, or ordered multi-step instructions.
 
-## Linked runtime behavior
+## Historical integrations and active adapters
 
-Use these files before cross-repo work:
+Some older `integrations/knowledge-vault-runtime.md`, `integrations/buddy-brain.md`, `integrations/buddy-agent.md`, `integrations/omni-buddy.md`, and `runbooks/knowledge-vault-runtime-consumption.md` documents remain useful for **reference** and migration history. They do not authorize writes to archived repositories or prove a runtime is still live. Use `integrations/ecosystem-routing-spec.md` and `linked-repos/buddy-ecosystem.repos.json` for current routing.
 
-- `integrations/knowledge-vault-runtime.md` — durable graph memory and Vegapunk Brain usage.
-- `integrations/buddy-brain.md` — governance, policy, Council, and operator context.
-- `integrations/buddy-agent.md` — guarded execution, risk policy, actions, approvals, receipts.
-- `integrations/omni-buddy.md` — local voice, vision, model, transport, and device runtime.
-- `integrations/prismtek-ecosystem-map.md` — repo ownership and routing map.
-- `integrations/local-first-runtime.md` — offline, partial, connected, and local-first behavior.
-- `runbooks/knowledge-vault-runtime-consumption.md` — how to consume or prepare memory updates.
-
-## Knowledge Vault rule
-
-For prior decisions, durable context, project history, or cross-repo architecture, try to
-read Knowledge Vault / Vegapunk Brain first when available. Treat it as source-backed
-context, then verify current implementation in the owning repo before claiming freshness.
-
-If a task creates durable knowledge, prepare a public-safe event or handoff. Do not
-claim a graph event was saved unless a real write path ran and was validated.
+For durable memory use explicitly connected/approved stores and verify successful persistence. Do not claim an archived KnowledgeVault graph event was emitted. For live execution or hardware features, verify the active host, permissions and real device receipts before selecting an implementation owner. For web-game and website work, `prismtek-site` is primary. For portable agent behavior, BUAP is primary. BeMore is no longer an active destination.
 
 ## Definition of done
 

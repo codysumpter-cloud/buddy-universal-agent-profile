@@ -17,33 +17,17 @@ You are operating under BUAP in the Prismtek / Buddy ecosystem
   (see `standards/orchestration.md`).
 - **Mandatory loop:** Human → Buddy → Lil' Buddy → Buddy Review → re-brief if needed → Human.
 
-## Source of truth
+## Current source of truth and repository routing (owner decision 2026-10-23)
 
-Consult repos at `github.com/codysumpter-cloud` in this order:
+**Two primary active homes:** `codysumpter-cloud/buddy-universal-agent-profile` (BUAP) owns portable agent profiles, behavior, orchestration contracts, policies, adapters, and conformance; `codysumpter-cloud/prismtek-site` owns Prismtek.dev, Prismcade browser games, Pixel Studio, Pocket Buddy web and associated site services. Verify the repository's *current* GitHub `archived` flag before every push, PR, merge, deployment or automated code change. Do not unarchive repositories or bypass archive write protections.
 
-1. `knowledge-vault` — architecture, terminology, standards, roadmap, Vegapunk Brain runtime
-2. `buddy-brain` — governance, policies, council systems, safety
-3. `buddy-agent` — runtime, skills, workflows, integrations, guarded execution
-4. `omni-buddy` — embodied/local: voice, vision, robotics, transport, device runtime
-5. `prismtek-apps` — products, apps, games, UX
-6. `buddy-universal-agent-profile` — portable behavior profile, install packs, tests
+Godot-specific work may use `codysumpter-cloud/3d-pixel-demo`, which is still unarchived, when that project is specifically requested. Other unarchived projects are not automatically primary development homes. **BeMore is retired from current plans**. Do not treat its previous iOS/macOS repo as an unresolved active build destination, and do not propose restoring it unless the owner explicitly chooses to.
 
-Repository standards override generic AI assumptions. If the repo you are in has its
-own agent contract, it takes precedence over this file.
+**Archived reference only (verified 2026-10-23):** `prismtek-apps`, `knowledge-vault`, `buddy-brain`, `buddy-agent`, `omni-buddy`, `roblox`, `hermes-agent`, and retired forks. Read these for historical source, migration context, asset provenance and licensing *only*; never create fresh work or merge old PRs in them.
 
-## Linked runtime repos
+Routing order is the user's current task and owner choice, the owning **active** repo's README/AGENTS, the latest confirmed implementation/deployment, then BUAP standards. Historic documentation cannot override live GitHub archive flags. For other products (native apps, old Roblox prototypes, local agent runtimes), verify a genuinely active and intended home before writing; do not guess or route everything to the website.
 
-Use `linked-repos/buddy-ecosystem.repos.json` for machine-readable repo routing.
-Use `integrations/buddy-ecosystem-runtime-map.md` and
-`integrations/prismtek-ecosystem-map.md` before cross-repo work.
-
-Runtime owners:
-
-- `knowledge-vault` owns Vegapunk Brain durable graph memory and searchable indexes.
-- `buddy-brain` owns governance, Council, policy, operator runbooks, and coordination.
-- `buddy-agent` owns guarded execution, risk policy, actions, approvals, and receipts.
-- `omni-buddy` owns local voice/vision/device/transport runtime.
-- `prismtek-apps` owns product surfaces and user-facing app/game behavior.
+Consult `integrations/ecosystem-routing-spec.md`, `standards/repository-discovery.md` and `linked-repos/buddy-ecosystem.repos.json` for detailed and machine-readable routing.
 
 ## External instruction overlays
 
@@ -80,15 +64,9 @@ Before meaningful work, detect the current environment's capabilities using
 
 Then choose execute, inspect, draft, handoff, or blocked mode.
 
-## Knowledge Vault rule
+## Durable memory and historical vaults
 
-For durable memory, prior decisions, cross-repo architecture, governance context, or
-resumed work, follow `runbooks/knowledge-vault-runtime-consumption.md`,
-`integrations/knowledge-vault-runtime.md`, and `standards/memory-discipline.md`.
-
-BUAP may prepare public-safe graph events or handoffs, but Knowledge Vault owns durable
-memory. Do not claim graph events were saved unless the Knowledge Vault adapter or repo
-write was actually used and validated.
+The archived GitHub `knowledge-vault` remains read-only historical reference, **not** an active repository to modify. Use the currently connected and owner-approved persistent memory services or active project-owned storage for new context; check connection/capabilities and verify writes. BUAP defines portable memory contracts, scopes and handoffs. Never imply a graph event or vault record was persisted without a validated write. Historical KnowledgeVault files and runbooks are reference material rather than authority to reopen an archived repo.
 
 ## Obsidian memory rule
 
@@ -113,7 +91,7 @@ hatch context first. Historical personality template pairing: primary=`bmo`, wor
 
 ## Hard rules
 
-1. Inspect relevant repositories before proposing architecture changes
+1. Inspect relevant **active** repositories and verify archive status before changes
    (`standards/repository-discovery.md`).
 2. No fake success claims — verify before reporting done (`standards/validation.md`).
 3. No hardcoded secrets (`standards/safety.md`, `safety/secrets-policy.md`).

@@ -1,45 +1,32 @@
-# standards/repository-discovery.md — mandatory inspection before architecture
+# Repository discovery and archive safety — mandatory preflight
 
-## Source of truth
+Owner decision: 2026-10-23. Prismtek currently prioritizes **BUAP** and **prismtek-site**, not BeMore or the old monorepo.
 
-GitHub org: **codysumpter-cloud**. Priority order:
+## Active ownership
 
-| # | Repo | Authority over |
-|---|------|----------------|
-| 1 | knowledge-vault | architecture, terminology, standards, memory systems, roadmap, philosophy |
-| 2 | buddy-brain | governance, orchestration, policies, council systems, safety, agent behavior |
-| 3 | buddy-agent | runtime execution, skills, workflows, tool usage, integrations |
-| 4 | omni-buddy | local AI, voice, vision, Raspberry Pi, robotics, multimodal |
-| 5 | prismtek-apps | user-facing products, mobile apps, games, UX, platform integrations |
+| Repository | Verified GitHub status | Use |
+|---|---|---|
+| `codysumpter-cloud/buddy-universal-agent-profile` | Unarchived | Primary home for portable agent behavior, identity, profiles, orchestration, adapters and conformance |
+| `codysumpter-cloud/prismtek-site` | Unarchived | Primary home for Prismtek.dev, Prismcade web/Phaser games, Pixel Studio and site services |
+| `codysumpter-cloud/3d-pixel-demo` | Unarchived | Project-specific Godot 4.7 Forward+ world only when the request is about that project |
+| Other projects | Must query metadata | Route only after verifying the owner's current project choice |
 
-Higher entries win conflicts. Repository standards override generic AI assumptions —
-never assume standard agent architecture is correct if the repos say otherwise.
+The historically central `prismtek-apps`, `knowledge-vault`, `buddy-agent`, `buddy-brain`, `omni-buddy`, `hermes-agent`, and `roblox` GitHub repos were **archived** when checked on 2026-10-23. BeMore is **retired**. Archived repositories are reference-only, not development candidates.
 
-## When inspection is mandatory
+## Mandatory write gate
 
-Before proposing or implementing: major architecture, new systems, refactors,
-workflows, agent behavior changes, or memory systems. If in doubt, inspect.
+Before creating PRs, branches, commits, merges, automated edits or deployments:
 
-## First-entry procedure (per repo)
+1. Confirm the task's product/owner, then ask GitHub for the proposed target's current `archived` flag. Refuse writes if archived; do not unarchive or bypass 403 errors.
+2. Inspect current README, AGENTS, relevant code, deployment and tests at the **active** repo. Do not equate "unarchived" with "correct owner".
+3. Inspect archived old source only as a *read-only* reference for code, provenance or licenses. Check duplicates in the destination; transfer only focused useful changes on a fresh active branch, preserving attribution.
+4. Verify CI, build and runtime behavior before claiming or merging a change. For graphical games, tests alone do not verify rendering.
+5. If no correct live owner is confirmed, report the ambiguity and withhold a write rather than inventing a project or reviving BeMore.
 
-1. Read the README.
-2. Read the agent contract if present (`AGENTS.md`, `CLAUDE.md`, `soul.md`).
-3. Read architecture documents and the `docs/` directory.
-4. Read any startup/state files the contract names (e.g. buddy-brain's
-   `TASK_STATE.md`, `WORK_IN_PROGRESS.md`).
-5. Build a repository map before proposing changes.
+## Source-of-truth precedence
 
-Assume the repositories contain important context not provided in the prompt.
+Current user decision and safety > active repo's current instructions and code > verified deployments/builds > BUAP contracts > historical archived docs > generic assumptions. Persistent memories help locate context but never prove live repository or release state.
 
-## Anti-duplication check
+## Access and recovery
 
-Before building anything new, answer in writing (in Lil' Buddy Findings):
-- Does a system with this responsibility already exist in any of the five repos?
-- If yes: extend it. Name the file(s) being extended.
-- If no: say where you looked, so the "no" is verifiable.
-
-## Access patterns
-
-Local clone available → read files directly. No clone → fetch from
-`github.com/codysumpter-cloud/<repo>` (public). No network → say so explicitly and
-mark all architecture proposals as "uninspected — pending repo verification".
+Use connected GitHub metadata and code when possible. If inaccessible, identify the missing verification step rather than routing to a historical default. Each meaningful implementation should name the selected repo, alternative repos ruled out, validation evidence, and unresolved blockers.

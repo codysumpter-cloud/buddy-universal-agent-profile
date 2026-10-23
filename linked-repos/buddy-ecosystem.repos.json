@@ -1,21 +1,18 @@
 {
   "name": "buddy-ecosystem-linked-repos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "owner": "Prismtek",
-  "purpose": "Machine-readable linked-repo map for BUAP routing across the Buddy ecosystem.",
+  "purpose": "BUAP current ownership and historical reference map. Active primary homes: BUAP and prismtek-site; BeMore retired.",
   "default_source_order": [
-    "knowledge-vault",
-    "prismtek-apps",
-    "buddy-brain",
-    "buddy-agent",
-    "omni-buddy",
-    "buddy-universal-agent-profile"
+    "buddy-universal-agent-profile",
+    "prismtek-site",
+    "3d-pixel-demo"
   ],
   "repos": [
     {
       "name": "knowledge-vault",
       "repository": "codysumpter-cloud/knowledge-vault",
-      "role": "durable knowledge graph, Vegapunk Brain runtime, event-sourced shared memory, searchable indexes",
+      "role": "HISTORICAL REFERENCE ONLY: durable knowledge graph, Vegapunk Brain runtime, event-sourced shared memory, searchable indexes",
       "read_first": [
         "99-System/Vegapunk Brain/ARCHITECTURE-SUMMARY.md",
         "99-System/Vegapunk Brain/scripts/README.md",
@@ -32,12 +29,17 @@
       ],
       "validation": [
         "bash \"99-System/Vegapunk Brain/scripts/run-vegapunk-brain.sh\""
-      ]
+      ],
+      "status": "archived-reference-only",
+      "reference_only": true,
+      "verified_archived_on": "2026-10-23",
+      "historical_role": "durable knowledge graph, Vegapunk Brain runtime, event-sourced shared memory, searchable indexes",
+      "do_not_write": true
     },
     {
       "name": "buddy-brain",
       "repository": "codysumpter-cloud/prismtek-apps",
-      "role": "operator brain, policy, council, memory, runbooks, cross-repo coordination, skills registry",
+      "role": "HISTORICAL REFERENCE ONLY: operator brain, policy, council, memory, runbooks, cross-repo coordination, skills registry",
       "read_first": [
         "tools/buddy-brain/README.md",
         "tools/buddy-brain/AGENTS.md",
@@ -52,12 +54,17 @@
       ],
       "path": "tools/buddy-brain",
       "consolidated_from": "codysumpter-cloud/buddy-brain",
-      "consolidated_at": "22bdfd4067635c0aa242565a652329bf509802e9"
+      "consolidated_at": "22bdfd4067635c0aa242565a652329bf509802e9",
+      "status": "archived-reference-only",
+      "reference_only": true,
+      "verified_archived_on": "2026-10-23",
+      "historical_role": "operator brain, policy, council, memory, runbooks, cross-repo coordination, skills registry",
+      "do_not_write": true
     },
     {
       "name": "buddy-agent",
       "repository": "codysumpter-cloud/prismtek-apps",
-      "role": "guarded execution boundary, Orchestrator/Worker runtime, action validation, risk policy, receipts",
+      "role": "HISTORICAL REFERENCE ONLY: guarded execution boundary, Orchestrator/Worker runtime, action validation, risk policy, receipts",
       "read_first": [
         "services/buddy-agent/README.md",
         "services/buddy-agent/AGENTS.md",
@@ -70,12 +77,17 @@
       ],
       "path": "services/buddy-agent",
       "consolidated_from": "codysumpter-cloud/buddy-agent",
-      "consolidated_at": "83244d3ce70830d6f142db8ab09ce543875db31b"
+      "consolidated_at": "83244d3ce70830d6f142db8ab09ce543875db31b",
+      "status": "archived-reference-only",
+      "reference_only": true,
+      "verified_archived_on": "2026-10-23",
+      "historical_role": "guarded execution boundary, Orchestrator/Worker runtime, action validation, risk policy, receipts",
+      "do_not_write": true
     },
     {
       "name": "omni-buddy",
       "repository": "codysumpter-cloud/prismtek-apps",
-      "role": "Raspberry Pi / local multimodal voice, vision, local model, transport, and device runtime",
+      "role": "HISTORICAL REFERENCE ONLY: Raspberry Pi / local multimodal voice, vision, local model, transport, and device runtime",
       "read_first": [
         "services/omni-buddy/README.md",
         "services/omni-buddy/docs/VALIDATION_MATRIX.md",
@@ -87,12 +99,17 @@
       ],
       "path": "services/omni-buddy",
       "consolidated_from": "codysumpter-cloud/omni-buddy",
-      "consolidated_at": "9299607731bd7adfc05687a6f0597b2d5759304f"
+      "consolidated_at": "9299607731bd7adfc05687a6f0597b2d5759304f",
+      "status": "archived-reference-only",
+      "reference_only": true,
+      "verified_archived_on": "2026-10-23",
+      "historical_role": "Raspberry Pi / local multimodal voice, vision, local model, transport, and device runtime",
+      "do_not_write": true
     },
     {
       "name": "prismtek-apps",
       "repository": "codysumpter-cloud/prismtek-apps",
-      "role": "canonical product and runtime monorepo: product surfaces, apps, games, Buddy runtime, governance, adapters, visual/core contracts, and verification tooling",
+      "role": "HISTORICAL REFERENCE ONLY: canonical product and runtime monorepo: product surfaces, apps, games, Buddy runtime, governance, adapters, visual/core contracts, and verification tooling",
       "read_first": [
         "README.md",
         "AGENTS.md",
@@ -108,12 +125,17 @@
         "omni-adapters": "packages/omni-adapters",
         "omni-buddy": "services/omni-buddy",
         "trust-fabric": "tools/trust-fabric"
-      }
+      },
+      "status": "archived-reference-only",
+      "reference_only": true,
+      "verified_archived_on": "2026-10-23",
+      "historical_role": "canonical product and runtime monorepo: product surfaces, apps, games, Buddy runtime, governance, adapters, visual/core contracts, and verification tooling",
+      "do_not_write": true
     },
     {
       "name": "buddy-universal-agent-profile",
       "repository": "codysumpter-cloud/buddy-universal-agent-profile",
-      "role": "portable agent behavior profile, install packs, conformance tests, handoff and routing docs",
+      "role": "primary portable agent behavior, profiles, orchestration, standards, conformance, adapters",
       "read_first": [
         "README.md",
         "AGENTS.md",
@@ -122,6 +144,43 @@
       ],
       "validation": [
         "Run tests/conformance prompts against target AI environment"
+      ],
+      "status": "active-primary",
+      "reference_only": false,
+      "do_not_write": false
+    },
+    {
+      "name": "prismtek-site",
+      "repository": "codysumpter-cloud/prismtek-site",
+      "status": "active-primary",
+      "reference_only": false,
+      "do_not_write": false,
+      "role": "primary Prismtek.dev website, Prismcade web games, Pixel Studio, web UI and site services",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "docs/REPO_ROUTING.md"
+      ],
+      "validation": [
+        "npm run check:stack",
+        "npm test",
+        "npm run build"
+      ]
+    },
+    {
+      "name": "3d-pixel-demo",
+      "repository": "codysumpter-cloud/3d-pixel-demo",
+      "status": "active-project-specific",
+      "reference_only": false,
+      "do_not_write": false,
+      "role": "Godot 4.7 Forward+ pixel-world, only for explicitly scoped Godot work",
+      "read_first": [
+        "README.md",
+        "AGENTS.md",
+        "docs/CURRENT_HANDOFF.md"
+      ],
+      "validation": [
+        "tools/ci/godot_strict.sh"
       ]
     }
   ],
@@ -161,6 +220,24 @@
   "consolidation": {
     "date": "2026-08-04",
     "tracker": "codysumpter-cloud/prismtek-apps#359",
-    "note": "buddy-brain, buddy-agent, and omni-buddy are capability entries hosted inside the prismtek-apps monorepo, not separate repositories. Their former repositories are archived read-only. Route work to the paths, not the archived URLs."
+    "note": "HISTORICAL ONLY: prior Buddy components were consolidated into prismtek-apps, but prismtek-apps is now archived. That migration is not a current code destination. BeMore is retired; BUAP and prismtek-site are primary."
+  },
+  "last_verified": "2026-10-23",
+  "owner_decision": "BUAP and prismtek-site are primary. BeMore retired. GitHub-archived repos reference-only.",
+  "routing_policy": {
+    "mandatory_live_archive_check": true,
+    "archived_repositories_reference_only": true,
+    "never_unarchive_as_workaround": true,
+    "retired_products": [
+      "BeMore"
+    ],
+    "primary_active_repositories": [
+      "codysumpter-cloud/buddy-universal-agent-profile",
+      "codysumpter-cloud/prismtek-site"
+    ],
+    "project_specific_active_repositories": [
+      "codysumpter-cloud/3d-pixel-demo"
+    ],
+    "unknown_product_requires_owner_resolution": true
   }
 }
