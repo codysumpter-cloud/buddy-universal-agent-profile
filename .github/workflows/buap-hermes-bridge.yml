@@ -1,0 +1,38 @@
+name: BUAP Hermes bridge
+
+on:
+  pull_request:
+    paths:
+      - 'packages/buap-hermes-bridge/**'
+      - 'packages/buap-acp-agent/**'
+      - '.github/workflows/buap-hermes-bridge.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/buap-hermes-bridge/**'
+      - 'packages/buap-acp-agent/**'
+      - '.github/workflows/buap-hermes-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test Hermes bridge (mocked, no external calls)
+        run: node --test packages/buap-hermes-bridge/test/*.test.mjs
+      - name: Verify ACP TypeScript compilation
+        working-directory: packages/buap-acp-agent
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run build
+      - name: Run ACP smoke
+        working-directory: packages/buap-acp-agent
+        run: npm run smoke

@@ -3,6 +3,7 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import os from "node:os";
+import { askHermes, hermesConfig, hermesStatus, probeHermes } from "@prismtek/buap-hermes-bridge";
 import {
   buildIndex,
   searchIndex,
@@ -105,12 +106,14 @@ type TerminalWaitResult = { exitCode?: number | null; signal?: string | null };
 
 const RUNTIME_COMMANDS = [
   { name: "buap help", description: "Show BUAP ACP runtime commands." },
+  { name: "buap hermes status", description: "Show safe Hermes runtime configuration and delegated capability inventory." },
+  { name: "buap hermes probe", description: "Probe the configured Hermes API /models without changing server state." },
   { name: "buap profiles", description: "List BMO council personality profiles." },
   { name: "buap personalize", description: "Save user/Buddy names, naming sources, and profiles.", input: { hint: 'user="Cody" buddy="Atlas" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn' } },
   { name: "buap read", description: "Read a workspace file safely.", input: { hint: "path=README.md [max_bytes=20000]" } },
   { name: "buap patch", description: "Prepare a diff proposal without writing files.", input: { hint: 'path=README.md find="old" replace="new"' } },
   { name: "buap apply", description: "Ask permission, then write through ACP fs/write_text_file.", input: { hint: 'path=README.md find="old" replace="new"' } },
-  { name: "buap ask", description: "Ask the configured model backend.", input: { hint: 'prompt="summarize this workspace"' } },
+  { name: "buap ask", description: "Ask the configured model backend (Hermes when BUAP_MODEL_BACKEND=hermes).", input: { hint: 'prompt="summarize this workspace"' } },
   { name: "buap run", description: "Ask permission, then run through ACP terminal/create.", input: { hint: 'cmd="npm" args="test"' } },
   { name: "buap git status", description: "Show read-only Git status." },
   { name: "buap git diff", description: "Show read-only Git diff.", input: { hint: "[path=README.md]" } },
@@ -338,6 +341,10 @@ async function modelAnswer(args: RuntimeArgs): Promise<string> {
   const promptFromValue = parseKeyValues(args.text).prompt;
   const userPrompt = promptFromValue || stripCommandPrefix(args.text, "/buap ask");
   const backend = process.env.BUAP_MODEL_BACKEND || "mock";
+  if (backend === "hermes") {
+    const result = await askHermes({ prompt: userPrompt || "Introduce yourself and list your verified capabilities.", systemContext: compactBuapContext(args), config: hermesConfig(), timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+    return result.text;
+  }
   if (backend !== "openai-compatible") return ["Model backend is not configured yet, so Buddy stayed in safe local mode.", "", "To enable an OpenAI-compatible backend, set:", "", "```bash", "BUAP_MODEL_BACKEND=openai-compatible", "BUAP_MODEL_BASE_URL=https://api.openai.com/v1", "BUAP_MODEL_NAME=gpt-4.1-mini", "BUAP_MODEL_API_KEY=...", "```", "", "Then retry:", "", "```text", `/buap ask ${userPrompt || "summarize this workspace"}`, "```"].join("\n");
   const baseUrl = process.env.BUAP_MODEL_BASE_URL;
   const model = process.env.BUAP_MODEL_NAME;
@@ -804,6 +811,8 @@ function renderHelp(): string {
   return [
     "BUAP ACP commands:",
     "",
+    "- `/buap hermes status` — inspect configuration and delegated feature list (no network call)",
+    "- `/buap hermes probe` — verify authenticated Hermes /v1/models reachability",
     "- `/buap profiles` — list BMO council profile IDs",
     "- `/buap personalize user=\"Cody\" buddy=\"Atlas\" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn`",
     "- `/buap read path=README.md [max_bytes=20000]` — read a workspace file safely",
@@ -831,6 +840,13 @@ function renderHelp(): string {
 export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeResult> {
   const lower = args.text.trim().toLowerCase();
   if (lower.includes("/buap help")) return { handled: true, response: renderHelp() };
+  if (lower.includes("/buap hermes status")) {
+    return { handled: true, response: JSON.stringify(hermesStatus(), null, 2) };
+  }
+  if (lower.includes("/buap hermes probe")) {
+    const result = await probeHermes(hermesConfig(), { timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+    return { handled: true, response: JSON.stringify(result, null, 2) + "\nThis confirms API reachability, not that Hermes toolsets, memory, cron, or messaging accounts are configured." };
+  }
   if (lower.includes("/buap read")) return { handled: true, response: await readWorkspaceFile(args) };
   if (lower.includes("/buap patch")) return { handled: true, response: await proposePatch(args) };
   if (lower.includes("/buap apply")) return { handled: true, response: await applyPatchThroughClient(args) };
