@@ -6,7 +6,7 @@ This package now implements the next ACP permissioned actions upgrade on top of 
 
 ## Hermes runtime backend
 
-This ACP agent now supports **`BUAP_MODEL_BACKEND=hermes`** to delegate a conversational turn to an already running Hermes API server. It sends BUAP identity context, keeps up to 20 non-durable prior user/assistant turns in memory per ACP session, and supports ordinary natural-language chat after personalization. It does **not** install Hermes, start its gateway, sync its external sessions, or directly manage Hermes tools and cron jobs.
+This ACP agent now supports **`BUAP_MODEL_BACKEND=hermes`** (authenticated API server) and **`BUAP_MODEL_BACKEND=hermes-cli`** (local CLI one-shot, with explicit per-turn ACP permission) to delegate a conversational turn to an already running Hermes API server. It sends BUAP identity context, keeps up to 20 non-durable prior user/assistant turns in memory per ACP session, and supports ordinary natural-language chat after personalization. It does **not** install Hermes, start its gateway, sync its external sessions, or directly manage Hermes tools and cron jobs.
 
 Set `BUAP_HERMES_BASE_URL=http://127.0.0.1:8642/v1`, `BUAP_HERMES_API_KEY` (matching Hermes `API_SERVER_KEY`) and `BUAP_HERMES_MODEL_NAME=hermes-agent`. Then `/buap hermes status` for a no-network configuration inventory and `/buap hermes probe` for read-only authenticated model detection. For host capability coverage, risks and setup, see [../../docs/hermes-parity-and-runtime.md](../../docs/hermes-parity-and-runtime.md).
 

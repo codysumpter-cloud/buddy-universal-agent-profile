@@ -4,6 +4,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import os from "node:os";
 import { askHermes, hermesConfig, hermesStatus, probeHermes } from "@prismtek/buap-hermes-bridge";
+import { askHermesCli, probeHermesCli } from "@prismtek/buap-hermes-bridge/cli";
 import {
   buildIndex,
   searchIndex,
@@ -110,6 +111,7 @@ const RUNTIME_COMMANDS = [
   { name: "buap help", description: "Show BUAP ACP runtime commands." },
   { name: "buap hermes status", description: "Show safe Hermes runtime configuration and delegated capability inventory." },
   { name: "buap hermes probe", description: "Probe the configured Hermes API /models without changing server state." },
+  { name: "buap hermes cli-probe", description: "Check local Hermes CLI version without invoking tools or changing state." },
   { name: "buap profiles", description: "List BMO council personality profiles." },
   { name: "buap personalize", description: "Save user/Buddy names, naming sources, and profiles.", input: { hint: 'user="Cody" buddy="Atlas" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn' } },
   { name: "buap read", description: "Read a workspace file safely.", input: { hint: "path=README.md [max_bytes=20000]" } },
@@ -343,6 +345,22 @@ async function modelAnswer(args: RuntimeArgs): Promise<string> {
   const promptFromValue = parseKeyValues(args.text).prompt;
   const userPrompt = promptFromValue || stripCommandPrefix(args.text, "/buap ask");
   const backend = process.env.BUAP_MODEL_BACKEND || "mock";
+  if (backend === "hermes-cli") {
+    const prompt = userPrompt || "Introduce yourself and list your verified capabilities.";
+    if (!args.session || !args.client) return "Hermes CLI requires an ACP client to request explicit per-turn permission.";
+    const callId = randomId("hermes-cli");
+    const title = "Delegate a potentially tool-enabled turn to local Hermes CLI";
+    const allowed = await requestToolPermission(args, callId, title, "execute", { tool: "hermes chat", promptLength: prompt.length, workingDirectory: workspaceRoot(args.buap, args.session) });
+    if (!allowed) return "Hermes CLI turn blocked: ACP permission was not granted.";
+    try {
+      const result = await askHermesCli({ prompt, systemContext: compactBuapContext(args).slice(0,16000), cwd: workspaceRoot(args.buap, args.session), timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+      sendToolCallUpdate(args, callId, { status: "completed", rawOutput: { engine: "hermes-cli", resultLength: result.text.length } });
+      return result.text;
+    } catch (error) {
+      sendToolCallUpdate(args, callId, { status: "failed", rawOutput: { engine: "hermes-cli", error: error instanceof Error ? error.message : "Hermes CLI failed" } });
+      throw error;
+    }
+  }
   if (backend === "hermes") {
     const prompt = userPrompt || "Introduce yourself and list your verified capabilities.";
     const history = args.session?.hermesHistory || [];
@@ -823,6 +841,7 @@ function renderHelp(): string {
     "",
     "- `/buap hermes status` — inspect configuration and delegated feature list (no network call)",
     "- `/buap hermes probe` — verify authenticated Hermes /v1/models reachability",
+    "- `/buap hermes cli-probe` — check local Hermes CLI install/version (no model turn)",
     "- `/buap profiles` — list BMO council profile IDs",
     "- `/buap personalize user=\"Cody\" buddy=\"Atlas\" buddy_source=user lil_buddy_source=self buddy_profile=bmo lil_buddy_profile=finn`",
     "- `/buap read path=README.md [max_bytes=20000]` — read a workspace file safely",
@@ -852,6 +871,10 @@ export async function handleRuntimeCommand(args: RuntimeArgs): Promise<RuntimeRe
   if (lower.includes("/buap help")) return { handled: true, response: renderHelp() };
   if (lower.includes("/buap hermes status")) {
     return { handled: true, response: JSON.stringify(hermesStatus(), null, 2) };
+  }
+  if (lower.includes("/buap hermes cli-probe")) {
+    const result = await probeHermesCli({ timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+    return { handled: true, response: JSON.stringify(result, null, 2) + "\nCLI version is only an installation check, not a verified model/provider/toolset." };
   }
   if (lower.includes("/buap hermes probe")) {
     const result = await probeHermes(hermesConfig(), { timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });

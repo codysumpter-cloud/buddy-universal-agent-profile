@@ -43,3 +43,9 @@ All tool execution and approval policy is under the Hermes host's control; use i
 ## ACP conversation context
 
 BUAP ACP keeps a bounded in-memory conversation history per session and sends prior user/assistant turns to Hermes with the next request. The history is **not durable**, and is cleared on ACP session close; Hermes may separately retain its own server-side records. Never claim that this bridge syncs conversations across messaging apps or reinstates crashed processes. Request timeouts cannot guarantee cancellation of work already accepted by Hermes; do not blindly retry side-effecting requests.
+
+## Direct local Hermes CLI fallback
+
+A running Hermes API server is **not required** on the same host if the official `hermes` command is installed and authenticated. Use `BUAP_MODEL_BACKEND=hermes-cli`. BUAP ACP then delegates with `hermes chat --oneshot --query-file - --quiet`; input is sent through **stdin**, never shell-interpreted or embedded in the process arguments. The Hermes gateway, skill registry, tools, permissions, memory, models, cron and messaging remain Hermes-managed.
+
+Check the binary with `/buap hermes cli-probe` (local version only). An ACP client must explicitly grant `session/request_permission` **for each CLI agent turn** because a Hermes host may have side-effecting tools. The CLI helper does not automatically install Hermes, configure a gateway, change the Hermes permission policy or retry timed-out tasks. It launches a finite one-shot Hermes turn, not a persistent streaming session; Hermes maintains any durable memory on its side. A local CLI model/provider and Hermes gateway must be configured for real results.

@@ -8,7 +8,7 @@ BUAP's native ACP adapter can run guarded file operations, commands, agent perso
 
 | Hermes capability | BUAP handling after this change | Validation needed to call it working |
 | --- | --- | --- |
-| Agent inference, reasoning/model tool turns | **Implemented adapter**: API `/v1/chat/completions` with BUAP persona and bounded ACP conversation context | Live Hermes server + authenticated probe/ask with model/provider |
+| Agent inference, reasoning/model tool turns | **Implemented adapters**: API `/v1/chat/completions` with BUAP persona/ACP history, or local Hermes CLI `--query-file -` as permission-gated one-shot | Live Hermes server + authenticated probe/ask with model/provider |
 | Model providers, routing/fallback and credential pools | **Hermes-managed**, not BUAP native | Live Hermes model/fallback config and observed failover |
 | Terminal/process/file edit and checkpoint/rollback | **Hermes-managed** with Hermes-specific approvals, plus separate ACP guarded read/write/terminal tools | Tool-enabled Hermes server, permission challenge, test edit + rollback |
 | Web search, extraction, X search | **Hermes-managed** | Configured toolset/provider and test search |
@@ -23,7 +23,7 @@ BUAP's native ACP adapter can run guarded file operations, commands, agent perso
 | Bot Mode team agents, personas, per-bot memory | **Hermes-managed** with BUAP agent profiles as intent layer | Bot-mode configuration and routed session test |
 | CLI/TUI/Desktop/native multi-platform app | **Not replaced by BUAP**; use Hermes interfaces alongside BUAP | Native host installation and UI smoke |
 | Batch trajectories, code-execution RPC, training | **Hermes-managed** | Host capability check and sample finite run |
-| OpenAI-compatible API server | **Implemented client integration**, disabled by default | `/buap hermes probe` and live completion |
+| OpenAI-compatible API server | **Implemented authenticated API and local CLI clients**, both opt-in and disabled by default | `/buap hermes probe` and live completion |
 | ACP editor protocol, BUAP identity and guardrails | **BUAP native** | ACP build, smoke, permission-handling tests |
 | Automatic full feature detection | **Not implemented**: `/models` handshake proves API reachability only | Actual tool registry and runtime policy must be verified inside Hermes |
 
@@ -63,3 +63,7 @@ After local setup in ACP: `/buap hermes status` (offline safe), `/buap hermes pr
 **Implemented in BUAP source:** authenticated API transport, hardened endpoint policy, model handshake, model turn delegation, bounded non-durable ACP context, safe configuration report, mocked tests.
 
 **Not verified here:** a reachable installed Hermes instance, configured providers or credentials, actual terminal/browser/cron/delegation/messaging workflows, cross-platform apps. Those still depend on host setup and real integration tests.
+
+## Local CLI execution mode
+
+Where Hermes is installed on the same machine, set `BUAP_MODEL_BACKEND=hermes-cli`, then invoke `/buap hermes cli-probe` and, after explicit ACP permission for each turn, `/buap ask prompt="..."` or ordinary chat. BUAP invokes `hermes chat --oneshot --query-file - --quiet` through Node child_process with `shell:false`, bounded stdout and timeout. BUAP context is included in the **query text**, not a privileged system message: install the BUAP AGENTS/SOUL profile in the Hermes working directory for authoritative agent identity. A one-shot turn isn't an interactive persistent client session; Hermes owns long-term state, toolsets and gateway settings. No external agent or tool is launched until the user configures the host and grants ACP permission.

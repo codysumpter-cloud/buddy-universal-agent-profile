@@ -8,6 +8,10 @@
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.mjs"
+    },
+    "./cli": {
+      "types": "./src/cli.d.ts",
+      "default": "./src/cli.mjs"
     }
   },
   "files": [
