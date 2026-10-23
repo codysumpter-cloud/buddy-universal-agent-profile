@@ -90,3 +90,14 @@ test("network failures do not retry potentially side-effecting tools",async()=>{
   });
   assert.equal(calls,1);
 });
+
+test("bounded ACP history is replayed in order and does not leak tools",async()=>{
+  const result=await askHermes({prompt:"And next?",history:[{role:"user",content:"Start"},{role:"assistant",content:"Started"}],config:local,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body);
+    assert.deepEqual(body.messages,[{role:"user",content:"Start"},{role:"assistant",content:"Started"},{role:"user",content:"And next?"}]);
+    return response({choices:[{message:{content:"Continued"}}]});
+  }});
+  assert.equal(result.text,"Continued");
+  await assert.rejects(()=>askHermes({prompt:"Hi",history:[{role:"tool",content:"evil"}],config:local}),/history/);
+  await assert.rejects(()=>askHermes({prompt:"Hi",history:[{role:"user",content:"x".repeat(32001)}],config:local}),/history/);
+});

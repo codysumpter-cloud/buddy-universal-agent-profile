@@ -24,6 +24,12 @@ objects with identity, mission, memory namespace, execution targets, capability
 bindings, autonomy, approval rules, schedules, pause state, and activity history.
 See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
 
+## Hermes execution parity (opt-in)
+
+BUAP now provides an **authenticated Hermes API bridge** for its ACP editor host. BUAP stays the portable identity, profile, orchestration and safety contract; **the configured Hermes installation** provides browser/terminal tools, persistent memory, plugins/MCP, subagents, cron, messaging, voice and provider routing. The bridge does not implement those subsystems itself or start a Hermes instance.
+
+See [Hermes capability matrix and setup](docs/hermes-parity-and-runtime.md) and [the bridge package](packages/buap-hermes-bridge/README.md). Configure `BUAP_MODEL_BACKEND=hermes`, `BUAP_HERMES_BASE_URL`, `BUAP_HERMES_API_KEY` and `BUAP_HERMES_MODEL_NAME` on your BUAP ACP host. Use `/buap hermes status` then `/buap hermes probe` before sending a live turn. No automatic Hermes-host access or usage of Codex is implied.
+
 ## Prompt tiers
 
 | Tier | File | Use |

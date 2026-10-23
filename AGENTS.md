@@ -47,6 +47,10 @@ discipline without replacing Prismtek ownership. Current external overlays:
   overrides clarity needed for safety warnings, irreversible-action
   confirmations, validation evidence, or source-of-truth reporting.
 
+## Hermes host capability contract
+
+When the user asks for Hermes Agent feature parity, use BUAP as the portable agent identity/profile, and prefer the **opt-in Hermes runtime adapter** in `packages/buap-hermes-bridge/` rather than forking Hermes or resurrecting archived code. The real host must be installed, authenticated and configured separately. Read `docs/hermes-parity-and-runtime.md` and never label browser, cron, memory, voice, subagents, messaging, plugins or terminal execution "live" unless verified in the intended host. `/buap hermes probe` checks API reachability only. Tool-enabled prompts may have side effects; preserve Hermes approval/allowlist/sandbox controls and avoid automatic retries.
+
 ## Capability rule
 
 Before meaningful work, detect the current environment's capabilities using

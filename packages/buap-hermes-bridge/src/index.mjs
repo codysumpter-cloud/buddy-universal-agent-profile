@@ -98,11 +98,14 @@ function extractContent(value) {
 }
 
 /** Send ONE message to Hermes. All tools/memory/scheduled jobs remain in Hermes; no implicit retries. */
-export async function askHermes({prompt,systemContext = "",config = hermesConfig(),fetchImpl = fetch,timeoutMs = 120000} = {}) {
+export async function askHermes({prompt,systemContext = "",history = [],config = hermesConfig(),fetchImpl = fetch,timeoutMs = 120000} = {}) {
   if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 100000) throw new Error("Hermes prompt must be nonempty and at most 100000 characters.");
   if (typeof systemContext !== "string" || systemContext.length > 32000) throw new Error("BUAP system context exceeds 32000 characters.");
+  if (!Array.isArray(history) || history.length > 20 || history.some(x=>!x || !["user","assistant"].includes(x.role) || typeof x.content !== "string" || x.content.length > 10000)) throw new Error("Hermes history must be 20 or fewer bounded user/assistant turns.");
+  if (history.reduce((n,x)=>n+x.content.length,0) > 32000) throw new Error("Hermes history exceeds 32000 characters.");
   const messages = [
     ...(systemContext ? [{role:"system",content:systemContext}] : []),
+    ...history.map(x=>({role:x.role,content:x.content})),
     {role:"user",content:prompt}
   ];
   const json = await requestHermes(config,"chat/completions",{

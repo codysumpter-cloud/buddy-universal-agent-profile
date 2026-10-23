@@ -31,7 +31,7 @@ jobs:
       - name: Verify ACP TypeScript compilation
         working-directory: packages/buap-acp-agent
         run: |
-          npm install --ignore-scripts --no-audit --no-fund
+          npm install --force --ignore-scripts --no-audit --no-fund
           npm run build
       - name: Run ACP smoke
         working-directory: packages/buap-acp-agent

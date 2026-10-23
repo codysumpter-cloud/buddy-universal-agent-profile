@@ -65,6 +65,8 @@ export type SessionState = {
   cwd?: string;
   mcpServers: unknown[];
   createdAt: string;
+  /** Bounded non-durable chat history scoped to one ACP session; Hermes retains its own state separately. */
+  hermesHistory?: Array<{ role: "user" | "assistant"; content: string }>;
 };
 
 export type AcpClientBridge = {
@@ -342,7 +344,15 @@ async function modelAnswer(args: RuntimeArgs): Promise<string> {
   const userPrompt = promptFromValue || stripCommandPrefix(args.text, "/buap ask");
   const backend = process.env.BUAP_MODEL_BACKEND || "mock";
   if (backend === "hermes") {
-    const result = await askHermes({ prompt: userPrompt || "Introduce yourself and list your verified capabilities.", systemContext: compactBuapContext(args), config: hermesConfig(), timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+    const prompt = userPrompt || "Introduce yourself and list your verified capabilities.";
+    const history = args.session?.hermesHistory || [];
+    const result = await askHermes({ prompt, systemContext: compactBuapContext(args), history, config: hermesConfig(), timeoutMs: Number(process.env.BUAP_HERMES_TIMEOUT_MS || 120000) });
+    // Store only successful bounded chat turns. Never persist credentials, tool payloads or user files.
+    if (args.session) {
+      const turns = [...history, { role: "user" as const, content: prompt }, { role: "assistant" as const, content: result.text }];
+      while (turns.length > 20 || turns.reduce((n, x) => n + x.content.length, 0) > 30000 || turns.some(x=>x.content.length>10000)) turns.shift();
+      args.session.hermesHistory = turns;
+    }
     return result.text;
   }
   if (backend !== "openai-compatible") return ["Model backend is not configured yet, so Buddy stayed in safe local mode.", "", "To enable an OpenAI-compatible backend, set:", "", "```bash", "BUAP_MODEL_BACKEND=openai-compatible", "BUAP_MODEL_BASE_URL=https://api.openai.com/v1", "BUAP_MODEL_NAME=gpt-4.1-mini", "BUAP_MODEL_API_KEY=...", "```", "", "Then retry:", "", "```text", `/buap ask ${userPrompt || "summarize this workspace"}`, "```"].join("\n");
