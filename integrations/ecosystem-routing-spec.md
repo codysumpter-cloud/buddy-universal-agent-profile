@@ -1,56 +1,48 @@
-# BUAP Ecosystem Routing Spec
+# BUAP ecosystem routing: current primary homes
 
-This is the canonical routing spec for deciding which Prismtek/Buddy repo owns a question, behavior, or implementation surface.
+This document is the **canonical routing spec** for active Prismtek projects.
 
-## Core rule
+**Owner decision (2026-10-23): BUAP and prismtek-site are the active priorities. BeMore is retired.** This file supersedes older Buddy/BeMore monorepo routing claims in historical documentation. A repository's real-time GitHub archive status and the user's current decision override old reference maps.
 
-BUAP routes work to owning repositories. BUAP should define portable behavior and prompt contracts, not duplicate runtime implementation details.
+## Mandatory write preflight
 
-## Repository ownership
+For any PR, push, branch update, automated code change, merge, or deployment: identify the requested product and verify the *intended* GitHub repository is not archived. Archived repositories can be read for references, migration history, provenance, and licenses, **never written to**. Never unarchive one or bypass a 403 to push work. An unarchived repo can still be the wrong destination. Verify ownership and inspect active code/tests for duplicates.
 
-| Repo | Owns | Route here when |
-|---|---|---|
-| `knowledge-vault` | Durable knowledge, Vegapunk Brain, memory/event architecture, terminology, long-term roadmap | The task involves durable memory, graph events, knowledge architecture, or canonical project records |
-| `buddy-brain` | Governance, policy, council systems, orchestration doctrine, operator runbooks | The task changes Buddy behavior, council rules, operating policy, or planning doctrine |
-| `buddy-agent` | Guarded execution, action risk, receipts, skills, tool usage, adapters | The task changes runtime execution, tools, approvals, action receipts, or skill behavior |
-| `omni-buddy` | Local device runtime, voice, vision, transport, multimodal behavior | The task involves local models, device behavior, embodied runtime, or multimodal transport |
-| `prismtek-apps` | Products, apps, games, UX, platform downloads | The task changes shipped app/game behavior, assets, builds, releases, or user surfaces |
-| `buddy-universal-agent-profile` | Portable profile, prompt tiers, adapters, conformance tests | The task changes how Buddy behavior is installed or carried across AI tools |
-| `prismtek-site` | Public website and marketing surface | The task changes public site content, messaging, or portfolio presentation |
+## Current owners
 
-## Conflict order
+| Need | Destination |
+|---|---|
+| Portable AI agent standards, BUAP profiles, identity, memory contracts, orchestration behavior, capability negotiation, install/client adapters, conformance | `codysumpter-cloud/buddy-universal-agent-profile` (active primary) |
+| Prismtek.dev website, Prismcade web games and Phaser runtime, Pixel Studio, Pocket Buddy web, site Cloudflare Functions/Workers and website integrations | `codysumpter-cloud/prismtek-site` (active primary) |
+| Individual PixelLab Game Builder project source/history | The owning PixelLab project; selectively sync tested web exports to `prismtek-site` |
+| Godot 4.7 Forward+ pixel-world/shader/scene work | `codysumpter-cloud/3d-pixel-demo` (still unarchived; project-specific, not the default) |
+| Current running device/agent services outside BUAP or site | **Verify the live owning deployment, agent host and writable repo first**; do not infer it from retired Hermes/Buddy repos |
+| BeMore native apps / former monorepo | **Retired**, no automatic successor or build work |
+| Historical PvP Roblox prototype | **Reference only** while old `roblox` repo is archived; no asserted successor |
 
-1. Current user request.
-2. Safety, privacy, and verification rules.
-3. Target repo-local instructions.
-4. Owning repo source files.
-5. BUAP standards.
-6. External overlays.
-7. General AI assumptions.
+**Archived reference-only as verified on 2026-10-23:** `prismtek-apps`, `knowledge-vault`, `buddy-agent`, `buddy-brain`, `omni-buddy`, `roblox`, `hermes-agent` and numerous forks. Historic consolidation records point to `prismtek-apps` but that repository is itself archived; never interpret those records as an active route.
 
-## Routing examples
+## Source precedence
 
-| User asks for | First repo | Notes |
-|---|---|---|
-| Add memory events | `knowledge-vault` | BUAP may describe the portable contract, but implementation belongs in Knowledge Vault or its adapters |
-| Improve Buddy council behavior | `buddy-brain` | BUAP can carry the behavior to tools after governance is defined |
-| Add a new execution tool | `buddy-agent` | Runtime and receipts belong with guarded execution |
-| Add local voice behavior | `omni-buddy` | Local/device validation belongs there |
-| Improve a game | `prismtek-apps` | Verify source/build/playability in product repo |
-| Update ChatGPT/Codex/Claude instructions | `buddy-universal-agent-profile` | This repo owns install surfaces and conformance |
+1. Current user intent, safety and approval boundaries.
+2. Current owning project's GitHub `archived` state, README/AGENTS and working code.
+3. Verified running services, deployments, build/test receipts.
+4. BUAP portable contracts, this routing spec and the linked manifest.
+5. Old integration docs, archived project READMEs and historical agent handoffs (read-only reference).
+6. External overlays and generic assumptions.
 
-## Relationship to existing integration docs
+## Example routing
 
-- `integrations/buddy-ecosystem-runtime-map.md` remains the runtime-owner detail map.
-- `integrations/prismtek-ecosystem-map.md` remains the readable repo overview.
-- This file is the routing decision spec that ties both together.
+| User requests | Work in |
+|---|---|
+| Create a new persistent agent profile / update agent prompt tiers | BUAP |
+| Update Pixel Studio, WorldBox-style browser game, Prismcade UI | `prismtek-site` (and corresponding PixelLab project when relevant) |
+| Fix a Godot Forward+ material or terrain plugin | `3d-pixel-demo`, with strict Godot tests |
+| Retrieve old KnowledgeVault notes or former Buddy Agent behavior | Read archived references, then persist *new* memory in connected approved memory service or active code home |
+| Reopen BeMore development | Do **not** start unless the owner explicitly reverses retirement and chooses a new active home |
 
-## Validation
+## Migration and verification
 
-For routing-sensitive changes, final reports should state:
+Old open PRs targeting archives cannot be simply redirected in GitHub; review historical diffs and carry only useful, licensed, nonduplicated changes into newly scoped PRs in the correct active repo. Report tests and source provenance. If no current owner is verifiable, stop the write, not the explanation.
 
-- owning repo selected;
-- files or sources inspected;
-- conflicting repos or docs considered;
-- reason for final route;
-- validation or handoff required.
+Supporting material: `linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`, `integrations/prismtek-ecosystem-map.md`, and `standards/repository-discovery.md`.

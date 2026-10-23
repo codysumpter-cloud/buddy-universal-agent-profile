@@ -1,61 +1,40 @@
-# Buddy Ecosystem Runtime Map
+# BUAP runtime and repo routing map (updated 2026-10-23)
 
-## Purpose
+BUAP defines portable agent contracts, profiles, permissions, worker protocols, and adapters. It does not claim ownership of all live runtime systems. The owner currently prioritizes **BUAP** and **prismtek-site**; **BeMore is retired**.
 
-Give BUAP-compatible agents a concrete routing map for the Buddy ecosystem.
+| Need | Primary active owner |
+|---|---|
+| Portable agent identity, profiles, delegation, conformance, memory policy and portable adapters | `buddy-universal-agent-profile` |
+| Website, Prismcade web games, Pixel Studio, Pocket Buddy web, site Workers | `prismtek-site` |
+| PixelLab-created games | The relevant PixelLab Game Builder project for source history; tested website integration in `prismtek-site` |
+| Godot 4.7 Forward+ world project (when explicitly in scope) | `3d-pixel-demo` |
+| Connected durable memory, local agent execution, device voice/vision | The *actual verified* connected memory service, live host, or owning active repo — **not** an old archive by default |
+| Retired BeMore product and old `prismtek-apps` monorepo | Historical read-only reference; no ongoing development target |
 
-BUAP is the portable behavior profile. It should not become the runtime owner. Instead,
-it routes to the repo that owns the relevant truth or execution surface.
+## Reference archives
 
-## Runtime ownership map
+`knowledge-vault`, `buddy-brain`, `buddy-agent`, `omni-buddy`, `prismtek-apps` and `hermes-agent` were archived in GitHub when checked on 2026-10-23. Earlier documentation attributes graph memory, governance, execution, device runtimes and products to these repos; **those are historical mappings**. Their code can inform a *new, explicitly scoped* migration but may not receive writes, workflow updates, or PR merges.
 
-| Need | Owning repo | BUAP action |
-|---|---|---|
-| Durable graph memory, public-safe knowledge, searchable decisions/tasks | `knowledge-vault` | Read Vegapunk Brain context; prepare public-safe events/handoffs. |
-| Governance, policy, council, operator runbooks, skills registry | `buddy-brain` | Load operator rules; defer policy/council decisions. |
-| Guarded execution, action/session validation, risk policy, receipts | `buddy-agent` | Route executable work through Orchestrator/Worker contracts. |
-| Device voice/vision/local model/transport runtime | `omni-buddy` | Route hardware/runtime claims to Omni validation and receipts. |
-| User-facing products, apps, games, downloads | `prismtek-apps` | Verify product behavior in product repo, not profile docs. |
-| Portable install prompts, conformance tests, adapters | `buddy-universal-agent-profile` | Provide behavior and routing standard only. |
+## Task routing
 
-## External instruction overlays
+1. Identify the user's target and check the active repo's current GitHub `archived=false` metadata before writing.
+2. Verify real runtime/connector availability and the product-specific code owner; do not silently treat an unarchived repo as primary for unrelated work.
+3. Inspect active README/AGENTS, code and prior changes; don't duplicate features. Historic vault/agent archives may be consulted read-only.
+4. Use available execution adapters only with verified host permissions and approval guards; don't infer live deployments from source docs.
+5. Validate CI/builds and real UI or hardware where appropriate; record source-linked receipts, blockers and explicit handoffs.
+6. Persist long-term memory in actually connected approved services; archived KnowledgeVault repository is not a writable memory sink.
 
-| Need | Owning repo | BUAP action |
-|---|---|---|
-| Minimal-code implementation discipline, YAGNI pressure, stdlib/native-first coding, over-engineering review | `DietrichGebert/ponytail` | Load as an optional external overlay after BUAP and repo-local instructions; do not treat it as Prismtek runtime ownership. |
-| Terse technical communication, output-token compression, compact reviews and commit-message work | `JuliusBrussee/caveman` | Load as an optional external overlay after BUAP and repo-local instructions; do not treat it as Prismtek runtime ownership. |
+## External overlays
 
-Ponytail can reduce code size and dependency bloat, but BUAP still owns
-capability detection, safety, validation, response format, and source-of-truth
-routing. Ponytail never removes required checks for trust boundaries, data loss,
-security, accessibility, or real hardware calibration.
-
-Caveman can reduce response length and output-token use, but BUAP still owns
-clarity for safety warnings, irreversible-action confirmations, validation
-evidence, source-backed labels, blockers, and ordered instructions.
-
-## Default cross-repo task flow
-
-1. **Capability check** — determine what repos/tools are accessible.
-2. **Knowledge Vault read** — search durable graph/index context when available.
-3. **Buddy Brain policy check** — load governance/council/runbook context for decisions.
-4. **Owning repo inspection** — inspect the implementation repo for current truth.
-5. **Buddy Agent execution** — route executable actions through guarded runtime when available.
-6. **Omni validation** — use Omni only for local/device runtime claims.
-7. **Receipt capture** — record validation, blockers, and source paths.
-8. **Knowledge Vault event** — prepare or emit a public-safe graph event after meaningful work.
+The optional `DietrichGebert/ponytail` minimal-code and `JuliusBrussee/caveman` concise-communication overlays may assist, but they never override this active ownership map, agent safety or repo-local rules.
 
 ## Status labels
 
-- **Source-backed:** supported by repo docs/source files.
-- **Runtime-verified:** checked by owning runtime command/tool.
-- **Device-verified:** checked on actual target device/hardware.
-- **Blocked:** missing repo access, tool, runtime, device, or credential.
-- **Handoff-ready:** BUAP produced a complete next-agent/human handoff.
+- **Source-backed:** present in inspected source.
+- **Runtime-verified:** tested in actual working host.
+- **Device-verified:** validated on device/hardware.
+- **Historical reference:** archived code/docs, *not current implementation*.
+- **Blocked:** missing owner, permission, CI, runtime or required account access.
+- **Handoff-ready:** actionable handoff with current owner and evidence.
 
-## Anti-duplication rule
-
-If a feature belongs to Knowledge Vault, Buddy Brain, Buddy Agent, Omni Buddy, or
-Prismtek Apps, BUAP must link to that owner and route work there. BUAP may define
-portable behavior, install prompts, test prompts, and handoffs, but it should not fork
-or duplicate runtime logic.
+`integrations/ecosystem-routing-spec.md` is the canonical decision spec. `linked-repos/buddy-ecosystem.repos.json` is the machine-readable active/history map.

@@ -39,32 +39,27 @@ See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
 Roles:   Buddy = user-facing orchestrator (intent, plan, delegate, review, communicate)
          Lil' Buddy = worker (research, implementation, validation, reporting)
 Loop:    Human → Buddy → Lil' Buddy → Buddy Review → re-brief if needed → Human
-Truth:   github.com/codysumpter-cloud →
-         knowledge-vault → buddy-brain → buddy-agent → omni-buddy → prismtek-apps
+Truth:   user intent → active repo + deployment reality → BUAP standards
+         primary: buddy-universal-agent-profile + prismtek-site
+         old knowledge-vault / buddy-agent / prismtek-apps: reference only
 Rules:   inspect repos before architecture changes · repo standards override generic
          AI assumptions · no fake success claims · no hardcoded secrets ·
          no duplicate systems · extend, don't replace
 ```
 
-## Runtime routing
+## Current routing (owner confirmed 2026-10-23)
 
-BUAP links to, but does not vendor or replace, the owning runtime repos:
+BUAP and `prismtek-site` are the two primary active GitHub homes. **BeMore is no longer an active product target.** Older `prismtek-apps` and separate Buddy/Hermes repositories have been archived and must be used only as historical references, not current owners of production implementations.
 
-| Runtime need | Owner |
+| Task | Verified current destination |
 |---|---|
-| Durable graph memory / Vegapunk Brain | `codysumpter-cloud/knowledge-vault` |
-| Governance / policy / council / operator runbooks | `codysumpter-cloud/prismtek-apps` -> `tools/buddy-brain` + `packages/buddy-governance` |
-| Guarded execution / action risk / receipts | `codysumpter-cloud/prismtek-apps` -> `services/buddy-agent` |
-| Buddy MCP bridge for Codex/Odysseus/local MCP clients | `codysumpter-cloud/prismtek-apps` -> `services/buddy-agent` |
-| Local device voice / vision / transport runtime | `codysumpter-cloud/prismtek-apps` -> `services/omni-buddy` + `packages/omni-adapters` |
-| Product surfaces / games / app UX | `codysumpter-cloud/prismtek-apps` |
-| Buddy object/visual contracts | `codysumpter-cloud/prismtek-apps` -> `packages/buddy-core` |
-| Trust fabric / Alderaan / VADER certification | `codysumpter-cloud/prismtek-apps` -> `tools/trust-fabric` |
+| Portable agent behavior, identity, profiles, orchestration, permissions, cross-tool standards and adapters | [`buddy-universal-agent-profile`](https://github.com/codysumpter-cloud/buddy-universal-agent-profile) — this repo |
+| Prismtek.dev, Prismcade browser games, Pixel Studio, site Workers/Functions, website app UI | [`prismtek-site`](https://github.com/codysumpter-cloud/prismtek-site) |
+| Individual PixelLab Game Builder projects | Their respective PixelLab project for original source history; tested web exports/syncs go to the site |
+| Godot 4.7 Forward+ pixel-world game | [`3d-pixel-demo`](https://github.com/codysumpter-cloud/3d-pixel-demo), if Godot work is requested |
+| Other products, local device runtimes or archived native BeMore source | No assumed destination: verify currently active product owner and repo first |
 
-Read `integrations/ecosystem-routing-spec.md` first for canonical routing. Use
-`linked-repos/buddy-ecosystem.repos.json`, `integrations/buddy-ecosystem-runtime-map.md`,
-`integrations/buddy-mcp-server.md`, and `integrations/prismtek-ecosystem-map.md` for
-supporting machine-readable links and detail.
+**Write gate:** check live GitHub `archived=false`, confirm product ownership, avoid duplicates, preserve licenses and run destination tests **before** opening/merging a PR. Do not bypass archive 403s. The machine-readable linked-repo manifest marks historical links as `reference_only`. Start with `integrations/ecosystem-routing-spec.md` and `standards/repository-discovery.md`; older integration docs may describe historical architecture, not active routing.
 
 ## Resilience and negotiation standards
 
