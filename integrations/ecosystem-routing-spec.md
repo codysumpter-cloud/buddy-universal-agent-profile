@@ -1,5 +1,7 @@
 # BUAP ecosystem routing: current primary homes
 
+This document is the **canonical routing spec** for active Prismtek projects.
+
 **Owner decision (2026-10-23): BUAP and prismtek-site are the active priorities. BeMore is retired.** This file supersedes older Buddy/BeMore monorepo routing claims in historical documentation. A repository's real-time GitHub archive status and the user's current decision override old reference maps.
 
 ## Mandatory write preflight
