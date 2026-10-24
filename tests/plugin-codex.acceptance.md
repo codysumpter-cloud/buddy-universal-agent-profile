@@ -10,7 +10,7 @@ Run from repo root:
 node scripts/buap-lint.mjs
 node tools/buap-doctor.mjs
 node scripts/buap-conformance-check.mjs
-python3 /Users/prismtek/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/buap
+python3 $HOME/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/buap
 ```
 
 Expected:
