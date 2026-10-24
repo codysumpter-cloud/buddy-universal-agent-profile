@@ -41,13 +41,13 @@ $hatch-pet create a pet based on what you know about me
 load Cody's hatch context first:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 When useful, also load the high-level memory file:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
 ```
 
 Repo fallback pointers are stored in `personalization/BUAP_HATCH_CONTEXT.md` and
@@ -202,7 +202,7 @@ credits.
 PixelLab MCP config:
 
 ```text
-/Users/prismtek/.codex/config.toml
+$HOME/.codex/config.toml
 ```
 
 The doctor reads this file only to test for safe lowercase substrings (`pixellab`,
@@ -214,7 +214,7 @@ doctor's `API probe` is `skipped, would spend credits` (no credits spent).
 LibreSprite JS adapter (the active LibreSprite runtime path):
 
 ```text
-/Users/prismtek/Library/Application Support/LibreSprite/scripts/PixelLab.js
+$HOME/Library/Application Support/LibreSprite/scripts/PixelLab.js
 ```
 
 This LibreSprite JS adapter supports a PixelLab balance check and Pixflux image
@@ -223,7 +223,7 @@ generation.
 Aseprite PixelLab extension reference (reference only):
 
 ```text
-/Users/prismtek/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension
+$HOME/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension
 ```
 
 This is Lua-based Aseprite code kept as a reference for the LibreSprite JS adapter;
