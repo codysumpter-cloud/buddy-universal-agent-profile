@@ -66,7 +66,7 @@ export async function requestGitHub({
 }) {
   const name = ensureRepo(repo, env);
   if (!["GET", "POST"].includes(method)) throw new Error("Unsupported GitHub method.");
-  if (typeof path !== "string" || !path.startsWith("/") ||
+  if (typeof path !== "string" || (path !== "" && !path.startsWith("/")) ||
       path.includes("://") || path.includes("..") || path.includes("\\") ||
       path.includes("#") || path.includes("?") || path.includes("//")) {
     throw new Error("Invalid GitHub API path.");
@@ -134,9 +134,9 @@ export async function getRepository(repo, ctx = {}) {
   return { full_name: j.full_name, archived: j.archived, private: j.private,
     default_branch: j.default_branch, html_url: j.html_url, description: safePreview(j.description || "", 600) };
 }
-export async function readFile(repo, filePath, ref = "HEAD", ctx = {}) {
+export async function readFile(repo, filePath, ref = undefined, ctx = {}) {
   checkedPath(filePath);
-  const query = { ref: checkedRef(ref) };
+  const query = ref === undefined ? null : { ref: checkedRef(ref) };
   const j = await requestGitHub({ ...ctx, repo, path: "/contents/" + checkedPath(filePath), search: query });
   if (j?.type !== "file" || typeof j.content !== "string" || j.encoding !== "base64") {
     throw new Error("GitHub returned a directory, binary or unsupported content.");
