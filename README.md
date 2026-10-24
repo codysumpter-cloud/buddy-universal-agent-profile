@@ -1,5 +1,17 @@
 # Buddy Universal Agent Profile (BUAP)
 
+<p align="center">
+  <img src="assets/buddy-animated.svg" alt="Animated Buddy mascot cycling through idle, happy, thinking, and sleepy states" width="350">
+</p>
+
+<p align="center"><strong>Persistent identity · Safe delegation · Verified agentic missions</strong></p>
+<p align="center">
+  <a href="#mission-control-for-real-agentic-work">Mission Control</a> ·
+  <a href="#hermes-execution-parity-opt-in">Hermes</a> ·
+  <a href="integrations/xerj-reference-retrieval.md">XERJ</a> ·
+  <a href="runbooks/agentic-mission-control.md">Agentic Runbook</a>
+</p>
+
 A portable, tool-agnostic agent behavior standard for the Prismtek / Buddy ecosystem
 (GitHub org: **codysumpter-cloud**). Drop this folder into any repository and any
 capable coding agent — Codex, Claude Code, Claude Projects, Cowork, OpenCode,
@@ -23,6 +35,23 @@ BUAP also defines **first-class Agent Profiles**: persistent, host-portable agen
 objects with identity, mission, memory namespace, execution targets, capability
 bindings, autonomy, approval rules, schedules, pause state, and activity history.
 See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
+
+## Mission Control for real agentic work
+
+BUAP's optional [Mission Control runtime](packages/buap-mission-control/README.md) adds durable, DAG-shaped work plans with dependency gates, verified capability checks, conservative tool authorization, token/cost reservations, evidence-backed completion, resumable snapshots, portable scoped handoffs, and SHA-256-chained activity. It **composes** the existing first-class Agent Profile runtime rather than replacing its tasks or policy.
+
+| Agentic capability | What BUAP delivers | What still belongs to the host |
+|---|---|---|
+| Multi-step missions | Dependency DAG, explicit step claims, resume/checkpoint state | Worker processes and durable snapshot storage |
+| Trust-aware tools | Fail-closed capability check, approval decisions, untrusted-source guard | Authentication, sandbox, MCP/A2A transport |
+| Budgets | Token and cost estimate reservation in integer cents | Actual provider usage ceilings and billing |
+| Quality gates | Named test/evidence requirements before completion | Running tests, reviewing diffs, independent human PR approval |
+| Delegation | Versioned, provenance-carrying handoff envelopes | Agent discovery, A2A implementation, worker isolation |
+| Provenance | Mission/profile hashes and chained audit records | Secure storage, signed external logs, runtime observability |
+
+Start with [the runbook](runbooks/agentic-mission-control.md), [typed handoff contract](contracts/prismtek-agent-handoff-v1.md), and the existing [Agent Profile docs](docs/agent-profiles.md). Missing features must remain **unverified**, not silently labelled live.
+
+**Artwork:** Buddy's four-state animated ASCII mascot was adapted from the archived [Buddy Brain](https://github.com/codysumpter-cloud/buddy-brain/blob/main/assets/buddy-brain-mascot.svg) README artwork, preserving its pixel identity and reduced-motion support. Historical code remains read-only.
 
 ## Hermes execution parity (opt-in)
 
