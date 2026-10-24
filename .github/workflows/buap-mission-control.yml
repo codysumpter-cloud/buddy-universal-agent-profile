@@ -1,0 +1,32 @@
+name: BUAP Mission Control
+
+on:
+  pull_request:
+    paths:
+      - "packages/buap-mission-control/**"
+      - "contracts/prismtek-agent-handoff-v1.md"
+      - "runbooks/agentic-mission-control.md"
+      - "assets/buddy-animated.svg"
+      - ".github/workflows/buap-mission-control.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/buap-mission-control/**"
+      - ".github/workflows/buap-mission-control.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Mission graph, budgets, trust and receipts
+        run: node --test packages/buap-mission-control/test/*.test.mjs
+      - name: First-class Agent Profile regression
+        run: node --test packages/buap-agent-profile/test/*.test.mjs
+      - name: Core conformance and lint
+        run: |
+          node scripts/buap-conformance-check.mjs
+          node scripts/buap-lint.mjs
