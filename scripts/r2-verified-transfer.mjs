@@ -34,14 +34,14 @@ function validate(args) {
   const { transferId, stageKey, destinationId, expectedSha256, expectedBytes, stage, destination, authorized } = args;
   if (authorized !== true) throw new TypeError('Destination/account authorization required');
   if (typeof transferId !== 'string' || !TRANSFER_ID.test(transferId)) throw new TypeError('Invalid transfer ID');
-  if (typeof stageKey !== 'string' || !stageKey.startsWith(\`transfers/\${transferId}/\`) || stageKey.endsWith('/')) throw new TypeError('Stage key must be scoped to this transfer');
-  const tail = stageKey.slice(\`transfers/\${transferId}/\`.length);
+  if (typeof stageKey !== 'string' || !stageKey.startsWith(`transfers/${transferId}/`) || stageKey.endsWith('/')) throw new TypeError('Stage key must be scoped to this transfer');
+  const tail = stageKey.slice(`transfers/${transferId}/`.length);
   if (!tail || tail.includes('\\') || tail.split('/').some(s => !s || s === '.' || s === '..') || !/^[a-zA-Z0-9._/-]+$/.test(tail)) throw new TypeError('Invalid stage object path');
   if (typeof destinationId !== 'string' || destinationId.trim().length < 3) throw new TypeError('Durable destination ID required');
   if (typeof expectedSha256 !== 'string' || !SHA256.test(expectedSha256)) throw new TypeError('Expected SHA-256 required, not ETag');
   if (!Number.isSafeInteger(expectedBytes) || expectedBytes < 0 || expectedBytes > MAX_SAFE_SIZE) throw new TypeError('Expected byte size required');
   for (const [owner, methods] of [[stage, ['open', 'head', 'delete']], [destination, ['write', 'open']]]) {
-    for (const method of methods) if (typeof owner?.[method] !== 'function') throw new TypeError(\`Storage adapter missing \${method}\`);
+    for (const method of methods) if (typeof owner?.[method] !== 'function') throw new TypeError(`Storage adapter missing ${method}`);
   }
 }
 
@@ -109,6 +109,6 @@ export async function transferStagedObject(args) {
     if (await stage.head(stageKey)) throw new Error('Staged object still exists after delete');
     return { ok: true, transferId, destinationId, bytes: expectedBytes, sha256: sha, destinationVerified: true, stagingDeletionConfirmed: true };
   } catch (error) {
-    throw new TransferVerificationError(\`Transfer failed at \${phase}: \${error.message}\`, phase, verified, error);
+    throw new TransferVerificationError(`Transfer failed at ${phase}: ${error.message}`, phase, verified, error);
   }
 }
