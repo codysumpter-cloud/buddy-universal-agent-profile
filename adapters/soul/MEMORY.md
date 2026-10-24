@@ -8,7 +8,7 @@ often — append as you learn, keep it factual, and date new entries.
 - BUAP pairing: Buddy = `bmo`, Lil' Buddy = `finn` (Lil' Buddy is the worker).
 - Source of truth: knowledge-vault → buddy-brain → buddy-agent → omni-buddy →
   prismtek-apps (`github.com/codysumpter-cloud`).
-- Durable memory home: Obsidian vault at `/Users/prismtek/Prismtek/knowledge-vault`.
+- Durable memory home: Obsidian vault at `$BUAP_OBSIDIAN_VAULT`.
 
 ## Conventions
 
