@@ -1,0 +1,11 @@
+{
+  "name": "@prismtek/buap-mission-control",
+  "version": "0.1.0",
+  "description": "Portable verified mission DAG, approval gates, audit chain and budget control around BUAP AgentProfileRuntime.",
+  "type": "module",
+  "exports": { ".": "./src/index.mjs" },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --test" },
+  "engines": { "node": ">=20" },
+  "license": "Apache-2.0"
+}
