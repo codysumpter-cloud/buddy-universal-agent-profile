@@ -90,15 +90,15 @@ toolchain. The doctor detects each capability by existence only — it never cal
 the PixelLab API and never spends credits (`API probe: skipped, would spend
 credits`).
 
-- PixelLab MCP config: `/Users/prismtek/.codex/config.toml`. Read only for safe
+- PixelLab MCP config: `$HOME/.codex/config.toml`. Read only for safe
   lowercase substrings (`pixellab`, `pixflux`, `mcp`) to set
   `PixelLab MCP entry: present|missing|unknown`. Config contents and tokens are
   never printed — secrets redacted. Generation allowance is verified manually.
 - LibreSprite JS adapter:
-  `/Users/prismtek/Library/Application Support/LibreSprite/scripts/PixelLab.js`.
+  `$HOME/Library/Application Support/LibreSprite/scripts/PixelLab.js`.
   Supports a balance check and Pixflux image generation.
 - Aseprite PixelLab extension reference:
-  `/Users/prismtek/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension`.
+  `$HOME/Library/Application Support/LibreSprite/PixelLab-Aseprite-extension`.
   Lua-based Aseprite code; reference only for LibreSprite, not an active runtime.
 - LibreSprite CLI: `/Applications/LibreSprite.app/Contents/MacOS/libresprite`.
 
