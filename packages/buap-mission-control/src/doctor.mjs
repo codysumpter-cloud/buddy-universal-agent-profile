@@ -107,8 +107,11 @@ export function inspectMission(mission) {
     state.spent.cost_cents > mission.manifest.budget.max_cost_cents;
   if (exhausted) discrepancies.push({ code: "actual_usage_over_budget", step_id: null });
   const allBlocked = !completed && !needsReconciliation.length && !ready.length;
+  const hasCapabilityGap = steps.some(s => s.blockers.some(b =>
+    ["missing_capability", "capability_denied", "missing_required_profile_capability"].includes(b.code)));
   const health = discrepancies.length ? "needs_attention"
     : completed ? "completed"
+    : hasCapabilityGap && !ready.length ? "blocked"
     : agent.lifecycle_status !== "active" ? "paused"
     : needsReconciliation.length ? "reconcile"
     : pendingApprovals.length ? "approval_pending"
