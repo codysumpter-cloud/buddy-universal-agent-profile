@@ -232,3 +232,7 @@ and script changes.
 ## Versioning
 
 BUAP-1 (2026-06). Changes to roles, loop, or rules bump the major version.
+
+## XERJ reference search (optional)
+
+BUAP integrates [XERJ](https://github.com/xerj-org/xerj) as an opt-in, read-only code and documentation retrieval provider. The new [Node search bridge](packages/buap-xerj-bridge/README.md) queries explicitly allowed local indexes; [Corpus Hub](integrations/xerj-reference-retrieval.md) references flow through XERJ's native MCP tools and signed, locally cached packs. Neither XERJ nor its service is installed or started by BUAP, and agents must validate their actual connections before declaring `xerj_search` or `xerj_corpus_hub` available. For Codex see the [MCP host template](adapters/codex-xerj-mcp.template.toml).

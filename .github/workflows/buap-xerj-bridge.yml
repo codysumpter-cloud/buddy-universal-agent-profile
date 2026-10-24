@@ -1,0 +1,27 @@
+name: BUAP XERJ bridge tests
+
+on:
+  pull_request:
+    paths:
+      - "packages/buap-xerj-bridge/**"
+      - "integrations/xerj-reference-retrieval.md"
+      - "adapters/codex-xerj-mcp.template.toml"
+      - ".github/workflows/buap-xerj-bridge.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/buap-xerj-bridge/**"
+      - ".github/workflows/buap-xerj-bridge.yml"
+
+jobs:
+  xerj-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Test mock XERJ HTTP bridge and safe capability binding
+        run: node --test packages/buap-xerj-bridge/test/*.test.mjs
+      - name: Confirm existing Agent Profile tests remain passing
+        run: node --test packages/buap-agent-profile/test/*.test.mjs
