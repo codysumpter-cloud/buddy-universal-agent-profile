@@ -25,22 +25,22 @@ If no:
 
 ## Cody / Prismtek Default
 
-For Cody, the vault is:
+Configure your private vault location:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault
+$BUAP_OBSIDIAN_VAULT
 ```
 
 Primary memory:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
 ```
 
 Hatch context:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 Active profile pairing:
