@@ -190,5 +190,5 @@ test("requires explicit permission overrides", () => {
 
 test("detects secret-like strings", () => {
   assert.equal(findSecretLikeStrings({ safe: "hello" }).length, 0);
-  assert.equal(findSecretLikeStrings({ api_key: "sk-proj-abcdefghijklmnopqrstuvwxyz" }).length, 1);
+  assert.equal(findSecretLikeStrings({ api_key: ("sk-proj-" + "abcdefghijklmnopqrstuvwxyz") }).length, 1);
 });
