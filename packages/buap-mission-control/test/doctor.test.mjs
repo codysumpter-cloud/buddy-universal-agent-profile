@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { AgentProfileRuntime } from "../../buap-agent-profile/src/index.mjs";
-import { MissionControl } from "./index.mjs";
+import { MissionControl } from "../src/index.mjs";
 import {
   inspectMission, captureMissionCheckpoint, verifyMissionCheckpoint, renderMissionReport,
-} from "./doctor.mjs";
+} from "../src/doctor.mjs";
 
 const profile = {
   schema: "prismtek-agent-profile-v1", id: "portable-agent",
