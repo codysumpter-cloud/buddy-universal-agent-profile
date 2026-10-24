@@ -6,15 +6,22 @@
   },
   "metadata": {
     "description": "Buddy Universal Agent Profile as an installable Claude Code plugin: the Buddy/Lil' Buddy orchestration loop, BUAP runbooks as skills, and safety guardrails as hooks.",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "buap",
       "source": "./plugins/buap",
-      "description": "Operate as Buddy (orchestrator) with a real lil-buddy worker subagent, BUAP runbook skills, BUAP slash commands, and safety/receipts hooks.",
-      "version": "1.0.0",
-      "keywords": ["orchestration", "subagent", "buddy", "buap", "safety", "runbooks"]
+      "description": "BUAP skills, agent delegation, receipts, safety hooks and native GitHub MCP tools",
+      "version": "1.1.0",
+      "keywords": [
+        "orchestration",
+        "subagent",
+        "buddy",
+        "buap",
+        "safety",
+        "runbooks"
+      ]
     }
   ]
 }
