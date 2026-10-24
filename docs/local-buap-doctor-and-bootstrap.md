@@ -108,7 +108,7 @@ export BUAP_MODEL_TEMPERATURE=0.2
 After building the ACP package:
 
 ```bash
-node /Users/prismtek/Prismtek/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
+node /path/to/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
 ```
 
 If the repo is cloned elsewhere, replace the path with your absolute checkout

@@ -17,13 +17,13 @@ BUAP can still run without Obsidian, but the complete experience is better with 
 ## Cody / Prismtek Memory Home
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault
+$BUAP_OBSIDIAN_VAULT
 ```
 
 Primary BUAP directory:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP
 ```
 
 Key files:
@@ -51,13 +51,13 @@ $hatch-pet create a pet based on what you know about me
 agents should load:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 When useful, also load:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
 ```
 
 Do not regenerate pets just to refresh memory. Hatching should still follow the official hatch-pet skill and final verification contract.

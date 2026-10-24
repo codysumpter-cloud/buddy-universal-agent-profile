@@ -12,8 +12,8 @@ const context = [
   "without explicit human confirmation.",
   "",
   "BUAP memory: ask whether the user has an Obsidian vault if unknown. Prefer",
-  "Obsidian for durable local-first personalization. Cody's vault:",
-  "/Users/prismtek/Prismtek/knowledge-vault. Load WHAT_YOU_KNOW_ABOUT_ME.md and",
+  "Obsidian for durable local-first personalization. the user's configured vault:",
+  "$BUAP_OBSIDIAN_VAULT. Load WHAT_YOU_KNOW_ABOUT_ME.md and",
   "BUAP_HATCH_CONTEXT.md for personalization or pet hatching. Active pairing:",
   "Buddy=bmo, Lil Buddy=finn."
 ].join("\n");

@@ -3,7 +3,7 @@
 Primary source:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 Load the primary vault file before running:

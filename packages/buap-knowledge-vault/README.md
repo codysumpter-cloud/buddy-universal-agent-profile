@@ -7,7 +7,7 @@ Local Markdown indexer for Prismtek's KnowledgeVault.
 ```ts
 import { buildIndex, searchIndex, loadAndSearch } from "@prismtek/buap-knowledge-vault";
 
-const index = await buildIndex("/Users/prismtek/Prismtek/knowledge-vault");
+const index = await buildIndex("$BUAP_OBSIDIAN_VAULT");
 const hits = searchIndex(index, "meeting");
 ```
 

@@ -104,8 +104,8 @@ project continuity, and pet hatching are better with a vault.
 For Cody / Prismtek, load local-first memory from:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 Before `$hatch-pet create a pet based on what you know about me`, load the hatch

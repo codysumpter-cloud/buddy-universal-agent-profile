@@ -84,7 +84,7 @@ const requiredText = [
   // PixelLab + LibreSprite fallback wiring (docs + code, no secrets).
   ['docs/hatch-pet-integration.md', 'PixelLab.js'],
   ['docs/hatch-pet-integration.md', 'Pixflux'],
-  ['docs/hatch-pet-integration.md', '/Users/prismtek/.codex/config.toml'],
+  ['docs/hatch-pet-integration.md', '$HOME/.codex/config.toml'],
   ['docs/hatch-pet-integration.md', '/Applications/LibreSprite.app/Contents/MacOS/libresprite'],
   ['docs/hatch-pet-integration.md', 'PixelLab-Aseprite-extension'],
   ['docs/hatch-pet-integration.md', 'Lua-based Aseprite code'],
@@ -117,8 +117,8 @@ const requiredText = [
   ['docs/buap-onboarding.md', 'Do you have an Obsidian vault'],
   ['docs/memory-and-obsidian.md', 'WHAT_YOU_KNOW_ABOUT_ME.md'],
   ['docs/hatch-pet-integration.md', '$hatch-pet create a pet based on what you know about me'],
-  ['personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md', '/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md'],
-  ['personalization/BUAP_HATCH_CONTEXT.md', '/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md'],
+  ['personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md', '$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md'],
+  ['personalization/BUAP_HATCH_CONTEXT.md', '$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md'],
   ['tools/buap-doctor.mjs', 'BUAP memory'],
   ['tools/buap-doctor.mjs', 'primary vault hatch context present'],
   ['tools/buap-doctor.mjs', 'strongly recommend Obsidian']

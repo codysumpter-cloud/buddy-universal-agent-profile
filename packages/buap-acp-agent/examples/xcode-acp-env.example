@@ -1,14 +1,14 @@
 # Copy this to your shell profile, launch script, or editor environment config.
 # Keep secrets out of Git.
 
-BUAP_REPO_ROOT=/Users/prismtek/Prismtek/buddy-universal-agent-profile
-BUAP_WORKSPACE_ROOT=/Users/prismtek/Prismtek/buddy-universal-agent-profile
-BUAP_PERSONALIZATION_FILE=/Users/prismtek/.buap/personalization.json
+BUAP_REPO_ROOT=/path/to/buddy-universal-agent-profile
+BUAP_WORKSPACE_ROOT=/path/to/buddy-universal-agent-profile
+BUAP_PERSONALIZATION_FILE=$HOME/.buap/personalization.json
 BUAP_MAX_READ_BYTES=20000
 BUAP_GIT_TIMEOUT_MS=10000
 BUAP_TERMINAL_OUTPUT_LIMIT=1048576
 BUAP_CLIENT_REQUEST_TIMEOUT_MS=300000
-KNOWLEDGE_VAULT_PATH=/Users/prismtek/Prismtek/knowledge-vault
+KNOWLEDGE_VAULT_PATH=$BUAP_OBSIDIAN_VAULT
 
 # Optional OpenAI-compatible backend for /buap ask.
 # BUAP_MODEL_BACKEND=openai-compatible

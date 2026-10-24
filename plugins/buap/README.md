@@ -93,13 +93,13 @@ BUAP can still operate without it.
 For Cody / Prismtek, the local-first memory home is:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md
 ```
 
 Before `$hatch-pet create a pet based on what you know about me`, load:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md
+$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md
 ```
 
 Repo-tracked pointers live under `personalization/`.
@@ -107,7 +107,7 @@ Repo-tracked pointers live under `personalization/`.
 ## Hatch-pet PixelLab + LibreSprite fallback
 
 The bundled hatch-pet skill documents a `pixellab-libresprite-fallback` mode wired to a
-local PixelLab MCP config (`/Users/prismtek/.codex/config.toml`), a LibreSprite JS adapter
+local PixelLab MCP config (`$HOME/.codex/config.toml`), a LibreSprite JS adapter
 (`PixelLab.js`, balance check + Pixflux generation), a reference-only Lua-based Aseprite
 extension (`PixelLab-Aseprite-extension`), and the LibreSprite CLI
 (`/Applications/LibreSprite.app/Contents/MacOS/libresprite`). The doctor never calls the

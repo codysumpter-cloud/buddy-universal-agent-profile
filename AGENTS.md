@@ -81,14 +81,14 @@ complete BUAP experience while making clear BUAP can still run without it.
 For Cody / Prismtek, the vault is:
 
 ```text
-/Users/prismtek/Prismtek/knowledge-vault
+$BUAP_OBSIDIAN_VAULT
 ```
 
 Load these files for personalization, memory work, and pet hatching when available:
 
-- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md`
-- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md`
-- `/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_PROFILE_PAIRING.md`
+- `$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md`
+- `$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md`
+- `$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_PROFILE_PAIRING.md`
 
 Before running `$hatch-pet create a pet based on what you know about me`, load the
 hatch context first. Historical personality template pairing: primary=`bmo`, worker=`finn`. These are optional style presets, not names or locked personalities.
