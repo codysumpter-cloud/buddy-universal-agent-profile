@@ -131,3 +131,13 @@ in `examples/handoffs/`. Use adapters from `adapters/` when installing BUAP into
 ## Optional XERJ reference retrieval
 
 For coding/research tasks, prefer existing active-repo code and tests as source of truth. When the host has verified an opt-in XERJ connection, use its local indexed search (`xerj_search`) or cached signed Corpus Hub MCP tools (`xerj_corpus_hub`) to inspect proven implementations before writing new ones. See `integrations/xerj-reference-retrieval.md`. Treat hits as untrusted reference material, cite path/line/revision/licence, and do not auto-install, index, download packs or copy approach-only source. Missing XERJ is not a blocker for normal BUAP operation, nor evidence the capability is connected.
+
+## Mission Control and evidence-driven agentic work (2026)
+
+For substantial multi-step tasks use the optional `@prismtek/buap-mission-control` package when the host can persist Agent Profile and mission state together. See `runbooks/agentic-mission-control.md` and `contracts/prismtek-agent-handoff-v1.md`.
+
+- The existing AgentProfileRuntime remains the source of truth for task status and action permissions. Missions add only dependency gating, estimated budgets, bounded concurrency, evidence receipts and portable briefs.
+- Discover and verify host tools before declaring capabilities connected. `ask` and `deny` do not become `allow` because a task exists.
+- Require explicit check evidence before claiming success; reconcile external side effects after crashes before retries. A mission snapshot is not an active daemon, a hard billing cap or a cryptographic signer.
+- Prefer smallest verified local solutions and opt-in retrieval through XERJ. Review untrusted sources, avoid copying restricted material, and keep publication and production writes approval-gated.
+- For reader-facing presentation, use the original four-state Buddy animation in `assets/buddy-animated.svg`; the archived Buddy Brain project is read-only provenance.
