@@ -1,14 +1,14 @@
 {
   "name": "buap",
-  "version": "1.0.0",
-  "description": "Buddy Universal Agent Profile for Codex. Adds BUAP runbook skills, slash-command prompts, Lil Buddy worker profile assets, and safety plus receipts hooks.",
+  "version": "1.1.0",
+  "description": "BUAP Codex plugin with advanced agentic skills and an optional real GitHub MCP stdio server.",
   "author": {
-    "name": "Cody Sumpter",
-    "url": "https://github.com/codysumpter-cloud"
+    "name": "Prismtek",
+    "url": "https://prismtek.dev"
   },
   "homepage": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
   "repository": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "buap",
     "buddy",
