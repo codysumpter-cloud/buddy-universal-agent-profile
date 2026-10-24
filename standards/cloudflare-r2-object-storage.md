@@ -34,6 +34,10 @@ Both buckets were **empty at last verification**. No existing production Workers
 - No retention beyond the short transfer window, no default public URLs, and no blanket permissions for the Buddy agent fleet.
 - Do not turn on Infrequent Access storage for 72-hour objects: retrieval fees/minimum duration are a poor fit for short-lived transfers.
 
+## Reusable verified-transfer implementation
+
+Use [`scripts/r2-verified-transfer.mjs`](../scripts/r2-verified-transfer.mjs) through the adapter contract documented in [`runbooks/r2-verified-transfer.md`](../runbooks/r2-verified-transfer.md). Its Node tests cover checksum mismatch, incomplete writes, and failed deletion confirmation. This helper does **not** establish a live transfer pipeline or grant storage access on its own.
+
 ## Change control and evidence
 
 Before altering live R2 lifecycle rules, inspect the existing rules and preserve unrelated ones. Record Cloudflare API success **and then GET read-back**; a write response alone is not proof of applied policy. Never confuse R2 activation/subscription with bucket creation, stored objects, a live upload pipeline, or a configured Worker binding.
