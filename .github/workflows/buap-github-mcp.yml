@@ -1,0 +1,36 @@
+name: BUAP GitHub MCP plugin
+
+on:
+  pull_request:
+    paths:
+      - "plugins/buap/mcp/github/**"
+      - "plugins/buap/.mcp.json"
+      - "plugins/buap/.claude-plugin/plugin.json"
+      - "plugins/buap/.codex-plugin/plugin.json"
+      - "plugins/buap/skills/buap-github-mcp/**"
+      - "adapters/codex-buap-github-mcp.template.toml"
+      - ".github/workflows/buap-github-mcp.yml"
+  push:
+    branches: [main]
+    paths:
+      - "plugins/buap/mcp/github/**"
+      - "plugins/buap/.mcp.json"
+      - ".github/workflows/buap-github-mcp.yml"
+
+jobs:
+  plugin-smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify zero-dependency MCP protocol, policy, and GitHub REST mapping
+        run: node --test plugins/buap/mcp/github/test/*.test.mjs
+      - name: Validate plugin manifests and GitHub MCP config
+        run: |
+          node -e "for(const p of ['plugins/buap/.mcp.json','plugins/buap/.claude-plugin/plugin.json','plugins/buap/.codex-plugin/plugin.json','.claude-plugin/marketplace.json']) JSON.parse(require('node:fs').readFileSync(p,'utf8'))"
+          node scripts/buap-lint.mjs
+          node scripts/buap-conformance-check.mjs
