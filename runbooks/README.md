@@ -14,6 +14,7 @@ instructions still take precedence.
 - `create-github-project-pack.md`
 - `game-platform-readiness.md`
 - `asset-intake.md`
+- `r2-verified-transfer.md` — verify final object bytes before deleting temporary R2 staging
 - `readme-download-links.md`
 - `knowledge-vault-update.md`
 - `knowledge-vault-runtime-consumption.md`
