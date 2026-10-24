@@ -155,6 +155,19 @@ BUAP and `prismtek-site` are the two primary active GitHub homes. **BeMore is no
 | `docs/diagrams/` | Mermaid diagrams for the Buddy loop, capability flow, receipts, and Symphony map |
 | `templates/` | Bootstrap, install, and onboarding templates |
 
+## Native GitHub MCP plugin
+
+**Installable from GitHub:** [BUAP native GitHub MCP](plugins/buap/mcp/github/README.md)
+bundles a Node.js stdio MCP tool server inside the Claude Code marketplace plugin.
+It performs real, allowlisted GitHub repository, file, PR and CI requests.
+PR creation is disabled by default and requires explicit host authorization and
+a human approval code. There is no npm runtime dependency and no access to a
+user's private GitHub connection merely because the plugin is installed.
+
+The [Claude host config](plugins/buap/.mcp.json), [Codex MCP template](adapters/codex-buap-github-mcp.template.toml)
+and [MCP protocol tests](plugins/buap/mcp/github/test/github.test.mjs) ship in
+this repository. No merge, deployment, or destructive tool is exposed.
+
 ## Installation
 
 **Any repo (all tools):** copy `buddy-universal-agent-profile/` into the repo root.

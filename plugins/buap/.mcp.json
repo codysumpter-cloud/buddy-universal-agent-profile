@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "buap-github": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp/github/server.mjs"
+      ]
+    }
+  }
+}

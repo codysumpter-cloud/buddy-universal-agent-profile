@@ -1,0 +1,8 @@
+# BUAP native GitHub MCP. Use this in trusted Codex ~/.codex/config.toml
+# after cloning the public BUAP repository; replace the absolute path below.
+# Install Node 20+. Do not put actual tokens or approval codes in this file.
+# The MCP subprocess inherits BUAP_GITHUB_REPOS, BUAP_GITHUB_TOKEN and
+# optional BUAP_GITHUB_WRITE_ENABLED from the launching shell/credential manager.
+[mcp_servers.buap-github]
+command = "node"
+args = ["/absolute/path/to/buddy-universal-agent-profile/plugins/buap/mcp/github/server.mjs"]

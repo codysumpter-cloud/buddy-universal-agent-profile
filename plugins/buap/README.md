@@ -1,4 +1,14 @@
-# BUAP Claude Code and Codex plugin
+# BUAP — Claude Code, Codex and native GitHub MCP plugin
+
+BUAP now ships an actual GitHub MCP server with real GitHub REST API access, not just prompts.
+Read [the server setup and security contract](mcp/github/README.md) and
+[the Codex MCP template](../../adapters/codex-buap-github-mcp.template.toml).
+The native server is bundled in the GitHub-hosted marketplace plugin, requires
+no npm dependencies, and defaults to read-only and an empty repository allowlist.
+An installed plugin does not automatically inherit credentials from ChatGPT's
+GitHub connection.
+
+
 
 This is the Buddy Universal Agent Profile packaged as native Claude Code and Codex plugin
 assets. It turns the BUAP prose contract into harness primitives so the Buddy -> Lil'
