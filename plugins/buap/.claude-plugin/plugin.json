@@ -1,13 +1,20 @@
 {
   "name": "buap",
-  "version": "1.0.0",
-  "description": "Buddy Universal Agent Profile for Claude Code. Makes the Buddy -> Lil' Buddy -> review loop structural: a real lil-buddy worker subagent, BUAP runbooks as skills, BUAP slash commands, and safety + receipts hooks.",
+  "version": "1.1.0",
+  "description": "BUAP Claude Code plugin with real Lil Buddy workers, agentic skills, safety hooks and native GitHub MCP tools.",
   "author": {
-    "name": "Cody Sumpter",
-    "url": "https://github.com/codysumpter-cloud"
+    "name": "Prismtek",
+    "url": "https://prismtek.dev"
   },
   "homepage": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
   "repository": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile",
-  "license": "MIT",
-  "keywords": ["buap", "buddy", "orchestration", "subagent", "safety", "runbooks"]
+  "license": "Apache-2.0",
+  "keywords": [
+    "buap",
+    "buddy",
+    "orchestration",
+    "subagent",
+    "safety",
+    "runbooks"
+  ]
 }
