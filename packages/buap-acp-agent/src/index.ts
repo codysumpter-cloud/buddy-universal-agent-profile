@@ -380,6 +380,13 @@ async function renderPromptResponse(
     return { state, response: runtime.response };
   }
 
+  // Opted-in Hermes host turns ordinary ACP chat into a real agent turn.
+  // Unknown /buap commands remain local to avoid accidental remote execution.
+  if (["hermes", "hermes-cli"].includes(process.env.BUAP_MODEL_BACKEND || "") && text.trim() && !text.trim().toLowerCase().startsWith("/buap")) {
+    const hermes = await handleRuntimeCommand({ text: "/buap ask " + text, state, profilePack, buap, session, client });
+    if (hermes.handled) return { state, response: hermes.response };
+  }
+
   return { state, response: renderOnline(state, profilePack) };
 }
 

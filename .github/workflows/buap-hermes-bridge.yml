@@ -1,0 +1,45 @@
+name: BUAP Hermes bridge
+
+on:
+  pull_request:
+    paths:
+      - 'packages/buap-hermes-bridge/**'
+      - 'packages/buap-acp-agent/**'
+      - '.github/workflows/buap-hermes-bridge.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/buap-hermes-bridge/**'
+      - 'packages/buap-acp-agent/**'
+      - '.github/workflows/buap-hermes-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test Hermes bridge (mocked, no external calls)
+        run: node --test packages/buap-hermes-bridge/test/*.test.mjs
+      - name: Build ACP local packages with isolated TypeScript toolchain
+        run: |
+          set -euo pipefail
+          npm install --prefix /tmp/buap-toolchain --ignore-scripts --no-audit --no-fund typescript@5.5.4 @types/node@20
+          mkdir -p /tmp/buap-toolchain/node_modules/@prismtek
+          for pkg in buap-knowledge-vault buap-apple-notes-reminders buap-hatch-pet buap-hermes-bridge buap-acp-agent; do
+            ln -s "${PWD}/packages/${pkg}" "/tmp/buap-toolchain/node_modules/@prismtek/${pkg}"
+            ln -s /tmp/buap-toolchain/node_modules "packages/${pkg}/node_modules"
+          done
+          for pkg in buap-knowledge-vault buap-apple-notes-reminders buap-hatch-pet buap-acp-agent; do
+            /tmp/buap-toolchain/node_modules/.bin/tsc -p "packages/${pkg}/tsconfig.json"
+          done
+      - name: Run ACP smoke (mock client, no Apple account or Hermes server)
+        working-directory: packages/buap-acp-agent
+        run: npm run smoke

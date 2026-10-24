@@ -72,7 +72,13 @@ const runtimeMarkers = [
   "terminal/release",
   "terminal/wait_for_exit",
   "terminal/output",
-  "BUAP_MODEL_BACKEND=openai-compatible"
+  "BUAP_MODEL_BACKEND=openai-compatible",
+  "@prismtek/buap-hermes-bridge",
+  "/buap hermes status",
+  "/buap hermes probe",
+  "/buap hermes cli-probe",
+  'backend === "hermes-cli"',
+  "BUAP_MODEL_BACKEND=hermes"
 ];
 for (const expected of runtimeMarkers) {
   if (!runtimeSource.includes(expected)) {

@@ -1,8 +1,8 @@
 {
   "name": "@prismtek/buap-acp-agent",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Local stdio Agent Client Protocol server that loads BUAP and exposes Buddy/Lil Buddy personalization, guarded workspace tools, and model backend routing for Xcode and ACP clients.",
+  "description": "BUAP ACP editor agent with guarded actions and an opt-in authenticated Hermes runtime bridge.",
   "type": "module",
   "bin": {
     "buap-acp-agent": "dist/index.js"
@@ -21,7 +21,8 @@
   "dependencies": {
     "@prismtek/buap-apple-notes-reminders": "file:../buap-apple-notes-reminders",
     "@prismtek/buap-hatch-pet": "file:../buap-hatch-pet",
-    "@prismtek/buap-knowledge-vault": "file:../buap-knowledge-vault"
+    "@prismtek/buap-knowledge-vault": "file:../buap-knowledge-vault",
+    "@prismtek/buap-hermes-bridge": "file:../buap-hermes-bridge"
   },
   "engines": {
     "node": ">=20"
