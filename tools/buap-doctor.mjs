@@ -233,7 +233,7 @@ if (configuredPersonalization) {
 }
 
 console.log("\nBUAP memory:");
-const defaultVaultPath = "/Users/prismtek/Prismtek/knowledge-vault";
+const defaultVaultPath = path.join(process.env.HOME || process.cwd(), "Documents", "BUAP-Vault");
 const configuredVaultPath = process.env.BUAP_OBSIDIAN_VAULT || process.env.KNOWLEDGE_VAULT_PATH || "";
 const vaultPath = configuredVaultPath || defaultVaultPath;
 const whatYouKnowPath = path.join(vaultPath, "99-System", "BUAP", "WHAT_YOU_KNOW_ABOUT_ME.md");
@@ -244,7 +244,7 @@ const repoHatchContextPath = "personalization/BUAP_HATCH_CONTEXT.md";
 const repoMemoryPointerPath = "personalization/WHAT_YOU_KNOW_ABOUT_ME_POINTER.md";
 
 console.log(`Obsidian vault path: ${vaultPath}`);
-console.log(`Obsidian vault source: ${configuredVaultPath ? "configured" : "default Cody path"}`);
+console.log(`Obsidian vault source: ${configuredVaultPath ? "configured" : "default portable vault path"}`);
 absoluteExists(vaultPath)
   ? pass("Obsidian vault path detected")
   : warn("Obsidian vault path missing; BUAP still runs, but Obsidian is strongly recommended for the complete experience");
