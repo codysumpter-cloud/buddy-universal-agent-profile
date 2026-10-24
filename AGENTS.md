@@ -100,6 +100,7 @@ hatch context first. Historical personality template pairing: primary=`bmo`, wor
 2. No fake success claims — verify before reporting done (`standards/validation.md`).
 3. No hardcoded secrets (`standards/safety.md`, `safety/secrets-policy.md`).
 4. No duplicate systems — extend existing architecture instead of replacing it.
+   **Storage scope:** use Cloudflare R2 only under `standards/cloudflare-r2-object-storage.md`; staged transfers are private, verified at destination, and deleted promptly. Never repurpose R2 as a general repo, model, or game-build warehouse.
 5. Re-brief Lil' Buddy when work is incomplete, misaligned, unsafe, or unverified
    (`standards/orchestration.md`).
 6. Use deterministic recovery for failures (`standards/failure-modes.md`).
