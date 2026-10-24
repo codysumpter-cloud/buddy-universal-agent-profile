@@ -122,6 +122,8 @@ export class MissionControl {
     if (snapshot) this.restore(snapshot);
   }
 
+  taskKey(id) { return this.manifest.id + "--" + id; }
+
   step(id) {
     const step = this.manifest.steps.find(s => s.id === id);
     if (!step) throw new Error("unknown mission step");
@@ -130,7 +132,7 @@ export class MissionControl {
 
   status(id) {
     this.step(id);
-    const record = taskOf(this.runtime, id);
+    const record = taskOf(this.runtime, this.taskKey(id));
     if (record) return record.status;
     return "pending";
   }
@@ -153,7 +155,7 @@ export class MissionControl {
   /** Does NOT spawn a process or execute the action. Caller must run host tools separately. */
   begin(id, { now = new Date(), preapproved = false } = {}) {
     const step = this.step(id);
-    const existing = taskOf(this.runtime, id);
+    const existing = taskOf(this.runtime, this.taskKey(id));
     if (existing && existing.status !== "queued") return { started: false, decision: "already_claimed" };
     if (!step.depends_on.every(dep => this.status(dep) === "completed")) {
       return { started: false, decision: "waiting_dependencies" };
@@ -170,9 +172,9 @@ export class MissionControl {
     const action = this.runtime.authorizeAction(step.action, { preapproved });
     if (action.decision !== "allow") return { started: false, decision: action.decision, authorization: action };
     if (!existing) {
-      this.runtime.enqueueTask({ id, title: step.title, action: step.action }, { origin: "user" });
+      this.runtime.enqueueTask({ id: this.taskKey(id), title: step.title, action: step.action }, { origin: "user" });
     }
-    const started = this.runtime.startTask(id, { now, preapproved });
+    const started = this.runtime.startTask(this.taskKey(id), { now, preapproved });
     if (!started.started) return started;
     this.state.reservations[id] = { tokens: step.estimated_tokens, cost_cents: step.estimated_cost_cents };
     this.record("mission.started", id, { budget: clone(this.state.reservations[id]) });
@@ -194,13 +196,17 @@ export class MissionControl {
       !arrayUnique(sources) || sources.some(s => !nonempty(s)) || sources.length > 32) {
       throw new Error("mission requires measured bounded usage and source references");
     }
-    this.runtime.completeTask(id, { now, result_ref });
+    if (!Number.isSafeInteger(this.state.spent.tokens + usage.tokens) ||
+        !Number.isSafeInteger(this.state.spent.cost_cents + usage.cost_cents)) {
+      throw new Error("mission usage exceeds safe integer bound");
+    }
+    this.runtime.completeTask(this.taskKey(id), { now, result_ref });
     const receipt = { task_id: id, result_ref, checks: clone(checks), usage: clone(usage), source_refs: clone(sources) };
     this.state.receipts[id] = receipt;
     this.state.spent.tokens += usage.tokens;
     this.state.spent.cost_cents += usage.cost_cents;
     delete this.state.reservations[id];
-    this.record("mission.completed", id, { result_ref, usage: clone(usage) });
+    this.record("mission.completed", id, { result_ref, usage: clone(usage), receipt_sha256: hash(receipt) });
     return clone(receipt);
   }
 
@@ -208,7 +214,7 @@ export class MissionControl {
     this.step(id);
     if (this.status(id) !== "in_progress" || !this.state.reservations[id]) throw new Error("mission task not in progress");
     if (!nonempty(reason)) throw new Error("mission failure requires a reason");
-    const task = this.runtime.failTask(id, reason, { now });
+    const task = this.runtime.failTask(this.taskKey(id), reason, { now });
     delete this.state.reservations[id];
     this.record("mission.failed", id, { reason_code: reason });
     return task;
@@ -224,9 +230,18 @@ export class MissionControl {
     return clone(event);
   }
 
-  snapshot() { return clone(this.state); }
+  snapshot() {
+    const data = clone(this.state);
+    return { ...data, checksum: hash(data) };
+  }
 
   restore(snapshot) {
+    if (!snapshot || typeof snapshot !== "object") throw new Error("invalid mission snapshot");
+    const { checksum, ...checked } = snapshot;
+    if (typeof checksum !== "string" || checksum !== hash(checked)) {
+      throw new Error("mission snapshot checksum mismatch");
+    }
+    snapshot = checked;
     if (!snapshot || snapshot.schema !== this.state.schema ||
       snapshot.mission_id !== this.manifest.id || snapshot.mission_sha256 !== this.manifestHash ||
       snapshot.agent_profile_sha256 !== this.runtime.profileHash) throw new Error("mission snapshot provenance mismatch");
