@@ -1,0 +1,10 @@
+# Optional XERJ MCP registration for a trusted Codex project or ~/.codex/config.toml
+# Replace the binary path with the ACTUAL local absolute path. A running XERJ
+# node and a cached hub catalogue/packs are separate prerequisites.
+# Never commit XERJ_AUTH or an API key to this file.
+[mcp_servers.xerj]
+command = "/absolute/path/to/xerj"
+args = ["mcp"]
+[mcp_servers.xerj.env]
+XERJ_URL = "http://127.0.0.1:9200"
+# Inject XERJ_AUTH="ApiKey <key>" from a private host credential store.
