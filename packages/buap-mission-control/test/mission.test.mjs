@@ -148,7 +148,7 @@ test("resume requires matching runtime and verifies event hash chain", () => {
   assert.deepEqual(resumed.remainingBudget(), { tokens: 3000, cost_cents: 20 });
   const mutated = mission.snapshot();
   mutated.audit[0].payload.budget.tokens = 999;
-  assert.throws(() => new MissionControl(runtimeCopy, spec(), mutated), /audit integrity/);
+  assert.throws(() => new MissionControl(runtimeCopy, spec(), mutated), /integrity|checksum/);
   const wrong = spec(); wrong.title = "Changed mission";
   assert.throws(() => new MissionControl(runtimeCopy, wrong, mission.snapshot()), /provenance mismatch/);
 });
@@ -163,4 +163,30 @@ test("portable handoff carries scope, provenance, budget and policy without impe
   assert.deepEqual(handoff.required_checks, ["repo-scanned"]);
   assert.equal(handoff.authorization.decision, "allow");
   assert.throws(() => createHandoff(runtime, spec(), "inspect", { scope: "read", requestId: "id", sources: ["", "x"] }), /invalid/);
+});
+
+test("two missions with the same local step IDs remain isolated in one Agent Profile", () => {
+  const runtime = new AgentProfileRuntime(profile);
+  runtime.bindCapability("github", { evidence_ref: "connector:github" });
+  const first = new MissionControl(runtime, spec());
+  const otherSpec = spec(); otherSpec.id = "upgrade-hermes";
+  const second = new MissionControl(runtime, otherSpec);
+  assert.equal(first.begin("inspect").started, true);
+  assert.equal(second.begin("inspect").started, true);
+  const keys = runtime.snapshot().tasks.map(t => t.id).sort();
+  assert.deepEqual(keys, ["ship-buap--inspect", "upgrade-hermes--inspect"]);
+  first.complete("inspect", { result_ref: "ci:first", checks: checked(["repo-scanned"]),
+    usage: { tokens: 1500, cost_cents: 4 } });
+  assert.equal(first.status("inspect"), "completed");
+  assert.equal(second.status("inspect"), "in_progress");
+});
+test("snapshot checksum covers receipts and measured usage, not just audit entries", () => {
+  const { runtime, mission } = make();
+  runtime.bindCapability("github", { evidence_ref: "connector:github" });
+  mission.begin("inspect");
+  mission.complete("inspect", { result_ref: "ci:1", checks: checked(["repo-scanned"]),
+    usage: { tokens: 200, cost_cents: 1 } });
+  const snap = mission.snapshot();
+  snap.receipts.inspect.result_ref = "forged";
+  assert.throws(() => new MissionControl(new AgentProfileRuntime(profile, runtime.snapshot()), spec(), snap), /checksum/);
 });
