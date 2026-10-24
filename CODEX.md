@@ -92,9 +92,9 @@ files, raw private prompts, browser state, private local paths, or ignored
 private notes into prompts, public repos, receipts, or memory events.
 
 Before `$hatch-pet create a pet based on what you know about me`, load
-`/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/BUAP_HATCH_CONTEXT.md`
+`$BUAP_OBSIDIAN_VAULT/99-System/BUAP/BUAP_HATCH_CONTEXT.md`
 and, when useful, the high-level
-`/Users/prismtek/Prismtek/knowledge-vault/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md`.
+`$BUAP_OBSIDIAN_VAULT/99-System/BUAP/WHAT_YOU_KNOW_ABOUT_ME.md`.
 Active Cody profile pairing: Buddy=`bmo`, Lil Buddy=`finn`.
 
 ## OpenCode
