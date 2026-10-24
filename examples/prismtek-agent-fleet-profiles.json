@@ -1,0 +1,1586 @@
+[
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "buddy-command",
+    "display_name": "Buddy Command",
+    "relationship_role": "buddy",
+    "kind": "primary",
+    "mission": "Coordinates priorities, delegated work, approvals, evidence and the owner's schedule.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Coordinates priorities, delegated work, approvals, evidence and the owner's schedule.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/buddy-command",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/buddy-command"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "inbox-guardian",
+    "display_name": "Inbox Guardian",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Notices urgent human communications without sending any messages.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Notices urgent human communications without sending any messages.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/inbox-guardian",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/inbox-guardian"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "calendar-keeper",
+    "display_name": "Calendar Keeper",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Finds calendar conflicts and deadlines and prepares reminders.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Finds calendar conflicts and deadlines and prepares reminders.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/calendar-keeper",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/calendar-keeper"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "signal-triage",
+    "display_name": "Signal Triage",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Ranks new alerts, deduplicates messages and suppresses noise.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Ranks new alerts, deduplicates messages and suppresses noise.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/signal-triage",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/signal-triage"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "hermes-developer",
+    "display_name": "Hermes Developer",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Prepares scoped coding plans and delegates only with host-granted execution capability.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Prepares scoped coding plans and delegates only with host-granted execution capability.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/hermes-developer",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/hermes-developer"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "qa-sentinel",
+    "display_name": "QA Sentinel",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Validates tests and evidence before claiming working builds.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Validates tests and evidence before claiming working builds.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/qa-sentinel",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/qa-sentinel"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "release-watch",
+    "display_name": "Release Watch",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Tracks releases, deployments, and rollback readiness.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Tracks releases, deployments, and rollback readiness.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/release-watch",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/release-watch"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "reliability-watch",
+    "display_name": "Reliability Watch",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Reviews outages, queue backlogs, and recovery receipts.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Reviews outages, queue backlogs, and recovery receipts.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/reliability-watch",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/reliability-watch"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "security-watch",
+    "display_name": "Security Watch",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Reviews access and suspicious events with least privilege.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Reviews access and suspicious events with least privilege.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/security-watch",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/security-watch"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "content-writer",
+    "display_name": "Content Writer",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Writes original fact-checked Prismtek posts and technical tutorials.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Writes original fact-checked Prismtek posts and technical tutorials.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/content-writer",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/content-writer"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "shorts-producer",
+    "display_name": "Shorts Producer",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Creates short-form video scripts and original shot plans, not paid video renders.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Creates short-form video scripts and original shot plans, not paid video renders.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/shorts-producer",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/shorts-producer"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "social-editor",
+    "display_name": "Social Editor",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Adapts approved drafts to social platforms without publishing.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Adapts approved drafts to social platforms without publishing.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/social-editor",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/social-editor"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "product-marketer",
+    "display_name": "Product Marketer",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Designs valuable, ethical product offers and conversion tests.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Designs valuable, ethical product offers and conversion tests.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/product-marketer",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/product-marketer"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "market-researcher",
+    "display_name": "Market Researcher",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Finds market needs without scraping private contacts or fabricating demand.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Finds market needs without scraping private contacts or fabricating demand.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/market-researcher",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/market-researcher"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "customer-relations",
+    "display_name": "Customer Relations",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Drafts helpful responses and escalates messages requiring human approval.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Drafts helpful responses and escalates messages requiring human approval.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/customer-relations",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/customer-relations"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "memory-curator",
+    "display_name": "Memory Curator",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Maintains source-linked context, private namespaces, and conflict/freshness checks.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Maintains source-linked context, private namespaces, and conflict/freshness checks.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/memory-curator",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/memory-curator"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "analytics-scout",
+    "display_name": "Analytics Scout",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Explains actual product metrics and funnels without inventing revenue.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Explains actual product metrics and funnels without inventing revenue.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/analytics-scout",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/analytics-scout"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  },
+  {
+    "schema": "prismtek-agent-profile-v1",
+    "id": "workflow-auditor",
+    "display_name": "Workflow Auditor",
+    "relationship_role": "specialist",
+    "kind": "specialist",
+    "mission": "Verifies retries, idempotency, approvals and receipts across agent jobs.",
+    "goals": [
+      "Deliver source-backed, useful Prismtek work within the agent's own scope."
+    ],
+    "responsibilities": [
+      "Verifies retries, idempotency, approvals and receipts across agent jobs.",
+      "Return evidence, uncertainties, and a clear handoff to the coordinating Buddy."
+    ],
+    "identity": {
+      "name_source": "organization"
+    },
+    "memory": {
+      "namespace": "prismtek/agents/workflow-auditor",
+      "shared_context": [
+        "prismtek/approved-project-context"
+      ],
+      "write_scopes": [
+        "prismtek/agents/workflow-auditor"
+      ],
+      "proactive_learning": false
+    },
+    "execution": {
+      "preferred_targets": [
+        "daemon"
+      ],
+      "background_allowed": false,
+      "max_concurrent_tasks": 1
+    },
+    "capabilities": {
+      "required": [],
+      "optional": [
+        "prismtek-inference-broker",
+        "prismtek-approved-memory",
+        "prismtek-mission-control"
+      ],
+      "denied": [
+        "codex-cloud",
+        "outbound-publish",
+        "outbound-send",
+        "expense"
+      ]
+    },
+    "autonomy": {
+      "proactive_research": false,
+      "create_tasks": false,
+      "schedule_tasks": false
+    },
+    "action_rules": [
+      {
+        "match": "research.read",
+        "behavior": "allow"
+      },
+      {
+        "match": "draft.create",
+        "behavior": "allow"
+      },
+      {
+        "match": "repo.write",
+        "behavior": "ask"
+      },
+      {
+        "match": "external.*",
+        "behavior": "ask"
+      },
+      {
+        "match": "account.*",
+        "behavior": "handoff"
+      },
+      {
+        "match": "expense.*",
+        "behavior": "deny"
+      },
+      {
+        "match": "*",
+        "behavior": "ask"
+      }
+    ],
+    "channels": [
+      "app"
+    ],
+    "schedules": []
+  }
+]
