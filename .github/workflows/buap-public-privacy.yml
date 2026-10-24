@@ -1,0 +1,23 @@
+name: BUAP Public Privacy Guard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  public-privacy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Scan tracked public files for private paths and secret patterns
+        run: node scripts/buap-public-privacy-check.mjs
+      - name: Verify BUAP conformance and links
+        run: |
+          node scripts/buap-conformance-check.mjs
+          node scripts/buap-lint.mjs
