@@ -76,10 +76,10 @@ export BUAP_MODEL_TEMPERATURE=0.2
 Use this command as the local agent entrypoint:
 
 ```bash
-node /Users/prismtek/Prismtek/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
+node /path/to/buddy-universal-agent-profile/packages/buap-acp-agent/dist/index.js
 ```
 
-If your checkout is somewhere else, replace `/Users/prismtek/Prismtek/buddy-universal-agent-profile` with the absolute path to the repo.
+If your checkout is somewhere else, replace `/path/to/buddy-universal-agent-profile` with the absolute path to the repo.
 
 ## 5. First-run personalization
 
