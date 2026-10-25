@@ -1,0 +1,10 @@
+name: prismtek-buddy
+version: 0.1.0
+description: "Prismtek Buddy identity, BUAP orchestration, and evidence-based handoffs for Hermes"
+author: Prismtek
+provides_tools:
+  - buddy_self_test
+  - buddy_identity
+  - buddy_buap_contract
+  - buddy_project_sources
+  - buddy_prepare_handoff
