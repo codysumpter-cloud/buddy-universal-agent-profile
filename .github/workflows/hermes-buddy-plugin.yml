@@ -1,0 +1,21 @@
+name: Hermes Buddy plugin
+on:
+  pull_request:
+    paths:
+      - "plugins/hermes-buddy/**"
+      - ".github/workflows/hermes-buddy-plugin.yml"
+  workflow_dispatch:
+jobs:
+  buddy-plugin:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python syntax
+        run: python -m compileall -q plugins/hermes-buddy
+      - name: Plugin registration and tool smoke tests
+        run: python -m unittest discover -s plugins/hermes-buddy -p "test_plugin.py" -v
