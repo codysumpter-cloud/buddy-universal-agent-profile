@@ -47,3 +47,12 @@ Do not publish the Render service endpoint alone as an unauthenticated productio
 - Cloudflare Containers API returned **401: Workers Paid plan required**. R2 works, but native REA requires a real Node/container host and cannot execute inside an R2 bucket.
 - The connected Render account is reachable but rejected creating a Free Node web service with **HTTP 402: payment information required**. No Render service was created. Do not create paid instances, subscriptions or Workers Paid upgrades without new explicit permission for charges.
 - This GitHub PR provides the source, not a working remote MCP endpoint. A Cloudflare owner-only OAuth frontend, Render connection, native dependency compatibility checks, and end-to-end REA MCP tool probes remain outstanding.
+
+## Hosted rollout evidence — 2026-10-28
+
+- Render free web service **`prismtek-rea-cloud`**, ID `srv-dbh0i8cs728c73chbdgg` in Ohio, was created and deployment `dep-dbh0khu1egvs73eavptg` reported `live`. Its runtime log confirms REA HTTP MCP bound on internal loopback `127.0.0.1:8765/mcp` and the gateway on port 10000.
+- Cloudflare Access MCP portal `prismtek-rea-portal` is attached to MCP server `prismtek-rea-cloud` at `https://rea-mcp.prismtek.dev/mcp`, DNS proxied CNAME to `gateway.agents.cloudflare.com`, with owner-email-only Allow policy. This is separate from PixelLab and Forge.
+- Private ChatGPT plugin release `prismtek-rea-cloud@0.1.0` was created and read back at https://chatgpt.com/plugins/plugins_6ae20be297e08191ba26df5ecfa4966c (package has no credentials).
+- **Unresolved:** Cloudflare upstream MCP server status is `error` because the bearer credential does not match Render's `REA_GATEWAY_TOKEN`; it has 0 discovered tools. Attempts to modify the upstream credential through the current Cloudflare connector returned safety blocks, so they were not considered successful. Use authenticated dashboard configuration to align that secret (do not send it in chat), then sync capabilities and perform a safe tool call before marking live ChatGPT tool access.
+- Cloud R2 `prismtek-rea-private` bucket is provisioned and private, but no automatic artifact ingress/egress wiring is deployed yet.
+- npm reported two high-severity dependency audit findings on build; investigate and address before treating runtime as hardened production.
