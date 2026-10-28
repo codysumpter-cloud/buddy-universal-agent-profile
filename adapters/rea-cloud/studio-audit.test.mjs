@@ -54,3 +54,32 @@ test('Cloud audit executes the actual REA analyze_javascript_application MCP too
  await new Promise(resolve=>upstream.listen(0,'127.0.0.1',resolve));
  try{const outcome=await inspectWithRea({root:'/tmp/test-owned-preview',sourcePaths:['assets/app.js']},upstream.address().port);assert.equal(outcome.evidenceId,'ev_mock');assert.equal(outcome.statistics.findings,7);assert.equal(outcome.tool,'analyze_javascript_application');}finally{await new Promise(resolve=>upstream.close(resolve));}
 });
+
+test('REA transport capacity errors reuse retained evidence instead of re-running the analyzer',async()=>{
+ const {inspectWithRea}=await import('./studio-audit.mjs');
+ let analyzeCount=0,inspectCount=0;
+ const upstream=http.createServer(async(req,res)=>{
+  let body='';for await(const c of req)body+=c;
+  const msg=JSON.parse(body);
+  res.setHeader('content-type','application/json');
+  if(msg.method==='initialize'){
+   res.setHeader('mcp-session-id','test-capacity');
+   res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{serverInfo:{name:'rea'},capabilities:{}}}));return;
+  }
+  if(msg.method==='notifications/initialized'){res.writeHead(202);res.end();return;}
+  if(msg.params?.name==='analyze_javascript_application'){
+   analyzeCount++;
+   const error={code:'resource_constraint',retryable:false,details:{resource:'transport',reported_limits:{evidence_reference:{kind:'retained-evidence',evidence_id:'ev_captured'}}}};
+   res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{isError:true,content:[{type:'text',text:JSON.stringify(error)}]}}));return;
+  }
+  if(msg.params?.name==='inspect_analysis_view'){
+   inspectCount++;assert.equal(msg.params.arguments.source.evidence_id,'ev_captured');
+   res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{structuredContent:{normalized_result:{parent_evidence_id:'ev_captured',summary:{statistics:{findings:9},coverage:{application:{status:'partial'}}}}}}}));return;
+  }
+  assert.fail('unexpected method');
+ });
+ await new Promise(resolve=>upstream.listen(0,'127.0.0.1',resolve));
+ try{const result=await inspectWithRea({root:'/tmp/owner-app',sourcePaths:['assets/app.js']},upstream.address().port);
+ assert.equal(result.evidenceId,'ev_captured');assert.equal(result.statistics.findings,9);assert.equal(analyzeCount,1);assert.equal(inspectCount,1);
+ }finally{await new Promise(resolve=>upstream.close(resolve));}
+});
