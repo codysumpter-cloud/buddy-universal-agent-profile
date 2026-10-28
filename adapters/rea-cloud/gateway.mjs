@@ -23,6 +23,25 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
     throw new Error('REA_GATEWAY_TOKEN must be at least 32 characters');
   }
   return http.createServer((req, res) => {
+    const startTime = Date.now();
+    // Log only protocol/status metadata, never credentials, payloads or session IDs.
+    let upstreamStatus = null;
+    let upstreamContentType = null;
+    let reported = false;
+    const report = (event) => {
+      if (reported || (req.url !== '/mcp' && req.url !== '/healthz')) return;
+      reported = true;
+      console.log('[rea-gateway]', JSON.stringify({
+        event, method: req.method, route: req.url, status: res.statusCode,
+        upstreamStatus, upstreamContentType,
+        ms: Date.now() - startTime,
+        accept: String(req.headers.accept || '').slice(0, 96),
+        protocol: String(req.headers['mcp-protocol-version'] || '').slice(0, 40),
+        authorized: req.url === '/mcp' ? validBearer(req.headers.authorization, token) : null,
+      }));
+    };
+    res.once('finish', () => report('finished'));
+    res.once('close', () => report('closed'));
     if (req.url === '/healthz' && req.method === 'GET') {
       const up = isUpstreamReady();
       res.writeHead(up ? 200 : 503, { 'content-type': 'application/json', 'cache-control': 'no-store' });
@@ -45,10 +64,13 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
       if (req.headers[key]) headers[key] = req.headers[key];
     }
     // Never forward caller-supplied Authorization, cookies or Host to REA.
+    console.log('[rea-gateway:start]', JSON.stringify({ method: req.method, route: '/mcp', accept: String(req.headers.accept || '').slice(0, 96), protocol: String(req.headers['mcp-protocol-version'] || '').slice(0, 40) }));
     const upstream = http.request({
       hostname: '127.0.0.1', port: upstreamPort, path: '/mcp', method: req.method,
       headers, timeout: 5 * 60 * 1000,
     }, response => {
+      upstreamStatus = response.statusCode;
+      upstreamContentType = String(response.headers['content-type'] || '').slice(0, 96);
       const safeHeaders = {};
       for (const key of responseHeaders) {
         if (response.headers[key]) safeHeaders[key] = response.headers[key];
