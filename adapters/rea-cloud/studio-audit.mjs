@@ -56,7 +56,7 @@ export async function inspectWithRea({root,sourcePaths},port=8765){
  if(init.result?.error||!init.result?.result||!init.sessionId)throw Error('REA MCP initialize failed');
  await rpc(port,{jsonrpc:'2.0',method:'notifications/initialized'},init.sessionId,15000);
  const result=await rpc(port,{jsonrpc:'2.0',id:302,method:'tools/call',params:{name:'analyze_javascript_application',arguments:{input_path:root,format:'directory',source_paths:sourcePaths,max_semantic_nodes:20000,max_semantic_unknowns:20000,max_heap_mb:384,analysis_timeout_ms:55000,detail:'summary'}}},init.sessionId,105000);
- if(result.result?.error||result.result?.result?.isError||!result.result?.result)throw Error('REA analyze_javascript_application returned an error');
+ if(result.result?.error||result.result?.result?.isError||!result.result?.result){const t=result.result?.result?.content?.find(x=>x.type==='text')?.text||'';let diagnostic='core-tool-failure';try{const parsed=JSON.parse(t);diagnostic=String(parsed.error?.code||parsed.code||parsed.error?.message||parsed.message||diagnostic);}catch{if(t)diagnostic=t.slice(0,140).replace(/[^\w .:-]/g,' ');}throw Error('REA analyze_javascript_application '+diagnostic.slice(0,140));}
  const response=result.result.result;
  let payload=response.structuredContent;
  if(!payload){const text=response.content?.find(x=>x.type==='text')?.text||'';try{payload=JSON.parse(text)}catch{payload={note:text.slice(0,600)}}}
