@@ -18,7 +18,7 @@ bash adapters/rea-codex/install-rea-codex.sh --apply
 bash adapters/rea-codex/install-rea-codex.sh --verify
 ```
 
-The host must already have `codex`, npm and compatible Node.js (22.19+, 24.11+, or 26+). The script intentionally does not upgrade Node, install Codex, modify unrelated clients, or install Hopper.
+The host must already have `codex`, npm and compatible Node.js (22.23.4+, 24.22.1+, or 26.12.1+; only those major release lines). The script intentionally does not upgrade Node, install Codex, modify unrelated clients, or install Hopper.
 
 - `--dry-run` executes `npx -y rea-agents@latest setup --client codex --dry-run --json` and writes a private plan to `~/.local/state/prismtek/rea-codex` (or `$XDG_STATE_HOME`).
 - `--apply` reruns the same plan, then invokes `setup --client codex --yes --json`. REA owns the backup, conflict checking, version-pinned MCP registration and matching skill deployment.
