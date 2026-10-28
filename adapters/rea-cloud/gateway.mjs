@@ -59,6 +59,15 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
     if (!isUpstreamReady()) {
       res.writeHead(503); res.end('REA is starting'); return;
     }
+    // Streamable HTTP allows POST-only servers to reject optional GET/SSE
+    // with 405. The upstream REA server is single-session and its persistent
+    // GET subscription can starve the concurrent POST capability scans made
+    // by Cloudflare's MCP portal. Keep REA's upstream session for POSTs.
+    if (req.method === 'GET') {
+      res.writeHead(405, { 'allow': 'POST, DELETE', 'cache-control': 'no-store' });
+      res.end();
+      return;
+    }
     const headers = {};
     for (const key of requestHeaders) {
       if (req.headers[key]) headers[key] = req.headers[key];
