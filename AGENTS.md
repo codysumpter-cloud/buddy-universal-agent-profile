@@ -93,6 +93,10 @@ Load these files for personalization, memory work, and pet hatching when availab
 Before running `$hatch-pet create a pet based on what you know about me`, load the
 hatch context first. Historical personality template pairing: primary=`bmo`, worker=`finn`. These are optional style presets, not names or locked personalities.
 
+## Pull request completion policy (Prismtek owner directive — 2026-10-28)
+
+Prismtek development agents must **stop creating draft PRs as a default workflow**. Check the active repo's open PRs before writing, complete and validate focused changes first, then open a ready-for-review PR only if one is necessary. Finish existing drafts in place and merge only when branch protections, CI, reviews, provenance, runtime/security gates and owner approvals permit; do not create replacement drafts, leave unfinished work marked done, or force a merge to empty the queue. Do not touch archived repositories. A blocker must be reported with concrete evidence and a repair path, not concealed by flipping a draft flag.
+
 ## Hard rules
 
 1. Inspect relevant **active** repositories and verify archive status before changes
