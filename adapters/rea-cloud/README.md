@@ -56,3 +56,14 @@ Do not publish the Render service endpoint alone as an unauthenticated productio
 - **Unresolved:** Cloudflare upstream MCP server status is `error` because the bearer credential does not match Render's `REA_GATEWAY_TOKEN`; it has 0 discovered tools. Attempts to modify the upstream credential through the current Cloudflare connector returned safety blocks, so they were not considered successful. Use authenticated dashboard configuration to align that secret (do not send it in chat), then sync capabilities and perform a safe tool call before marking live ChatGPT tool access.
 - Cloud R2 `prismtek-rea-private` bucket is provisioned and private, but no automatic artifact ingress/egress wiring is deployed yet.
 - npm reported two high-severity dependency audit findings on build; investigate and address before treating runtime as hardened production.
+
+## MCP connectivity repair and verified sync — 2026-10-28
+
+- Rotated the gateway's bearer credential and aligned **Cloudflare MCP server** and **Render** environment values using scoped providers. The credential is not committed to this repository.
+- REA free-instance cold startup can take around 30 seconds after Render starts the HTTP gateway. Immediately initiating Cloudflare sync during that interval yields `503 REA is starting`; retry only after the internal listener is up.
+- Cloudflare MCP capability synchronization initially timed out after opening a GET SSE stream followed by concurrent capability POST requests. Safe protocol/status logs recorded 15-second aborted requests; no credentials, session identifiers, or request bodies were logged.
+- Gateway now returns MCP-standard HTTP 405 for optional GET SSE requests, preserving authenticated POST/DELETE handling. See `gateway.mjs` and `gateway.test.mjs`.
+- Render deployment `dep-dbh189142hec73e78d50` became **live**. Cloudflare MCP server **`prismtek-rea-cloud`** returned **`ready`**, successfully synchronized **229 tools and 6 prompts** at 2026-10-28 15:28:02 UTC, and reported no error.
+- Verified portal `prismtek-rea-portal` includes the REA server with tools enabled, Managed OAuth DCR enabled, explicit One-Time PIN identity provider, ChatGPT callback allowlist, private owner-only Access policies on BOTH portal and server, and proxied `rea-mcp.prismtek.dev` CNAME to `gateway.agents.cloudflare.com`.
+- **ChatGPT UI sign-in not directly tested**: user must retry/complete the ChatGPT OAuth redirect; Cloudflare Ready is evidence of upstream discovery, not a guaranteed in-app connection. Direct MCP URL: `https://rea-mcp.prismtek.dev/mcp`.
+- Remaining hardening: review the dependency scanner's reported high-severity issues and assess Render Free cold-start latency. R2 artifact workflows are still not wired and should not be claimed active.
