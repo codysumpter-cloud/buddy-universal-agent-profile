@@ -50,23 +50,29 @@ export async function captureOwnedPreview(slug,{fetcher=fetch}={}){
  }catch(e){await fs.rm(root,{recursive:true,force:true});throw e;}
 }
 /** Native REA MCP tool call. Does not execute downloaded target JavaScript. */
-export async function inspectWithRea({root,sourcePaths},port=8765){
+export async function inspectWithRea({root,sourcePaths,files=[]},port=8765){
+ // The free Render host cannot safely retain 20k semantic nodes in the parent MCP heap.
+ // Inspect the smallest source first; preserve the full captured manifest as unexamined scope.
+ const listed=Array.isArray(files)?files.filter(f=>sourcePaths.includes(f.path)):[];
+ const ordered=listed.length?[...listed].sort((a,b)=>a.bytes-b.bytes||a.path.localeCompare(b.path)).map(f=>f.path):sourcePaths;
+ const selectedPaths=ordered.slice(0,1);
+ if(!selectedPaths.length)throw Error('No JavaScript source to analyze');
  const version='2025-11-25';
  const init=await rpc(port,{jsonrpc:'2.0',id:301,method:'initialize',params:{protocolVersion:version,capabilities:{},clientInfo:{name:'prismtek-studio-owner-audit',version:'1.0.0'}}},undefined,25000);
  if(init.result?.error||!init.result?.result||!init.sessionId)throw Error('REA MCP initialize failed');
  await rpc(port,{jsonrpc:'2.0',method:'notifications/initialized'},init.sessionId,15000);
- const result=await rpc(port,{jsonrpc:'2.0',id:302,method:'tools/call',params:{name:'analyze_javascript_application',arguments:{input_path:root,format:'directory',source_paths:sourcePaths,max_semantic_nodes:20000,max_semantic_unknowns:20000,max_heap_mb:384,analysis_timeout_ms:55000,detail:'summary'}}},init.sessionId,105000);
+ const result=await rpc(port,{jsonrpc:'2.0',id:302,method:'tools/call',params:{name:'analyze_javascript_application',arguments:{input_path:root,format:'directory',source_paths:selectedPaths,max_semantic_nodes:256,max_semantic_nodes_per_file:128,max_semantic_unknowns:128,max_semantic_unknowns_per_file:64,max_heap_mb:256,analysis_timeout_ms:45000,detail:'summary'}}},init.sessionId,105000);
  if(result.result?.error||result.result?.result?.isError||!result.result?.result){
   const t=result.result?.result?.content?.find(x=>x.type==='text')?.text||'';
   let failure={};try{const obj=JSON.parse(t);failure=obj.error||obj;}catch{failure={message:t.slice(0,120)};}
   const details=failure.details||{};
-  console.warn('[rea-preview-analysis-error]',JSON.stringify({code:String(failure.code||'unknown').slice(0,80),resource:String(details.resource||'unknown').slice(0,80),retryable:failure.retryable===true,reportedLimitKeys:Object.keys(details.reported_limits||{}).slice(0,12),remediationAction:String(failure.remediation?.action||'').slice(0,100)}));
+  console.warn('[rea-preview-analysis-error]',JSON.stringify({code:String(failure.code||'unknown').slice(0,80),resource:String(details.resource||'unknown').slice(0,80),retryable:failure.retryable===true,reportedLimits:Object.fromEntries(Object.entries(details.reported_limits||{}).filter(([k,v])=>typeof v==='number'&&/memory|heap|budget|bytes|timeout/.test(k)).map(([k,v])=>[k,Math.round(v)]).slice(0,8)),remediationAction:String(failure.remediation?.action||'').slice(0,100)}));
   let diagnostic=String(failure.code||failure.message||'core-tool-failure');
   if(failure.code==='resource_constraint'&&details.resource==='transport'&&details.reported_limits?.evidence_reference){
    const ref=details.reported_limits.evidence_reference;
    const source=typeof ref==='string'?{kind:'retained-evidence',evidence_id:ref}:ref;
    const view=await rpc(port,{jsonrpc:'2.0',id:303,method:'tools/call',params:{name:'inspect_analysis_view',arguments:{source,view:{kind:'summary'}}}},init.sessionId,60000);
-   if(!view.result?.error&&!view.result?.result?.isError&&view.result?.result){const v=view.result.result;let payload=v.structuredContent;try{if(!payload)payload=JSON.parse(v.content?.find(x=>x.type==='text')?.text||'{}');}catch{payload={};}const o=payload?.normalized_result||payload;const summary=o?.summary||o;return {tool:'analyze_javascript_application',evidenceId:o?.parent_evidence_id||source.evidence_id||null,statistics:summary?.statistics||{},coverage:summary?.coverage?.application?.status||'partial',limitations:(o?.limitations||[]).slice(0,8),rawResultPresent:true,projection:'retained-evidence-summary'};}
+   if(!view.result?.error&&!view.result?.result?.isError&&view.result?.result){const v=view.result.result;let payload=v.structuredContent;try{if(!payload)payload=JSON.parse(v.content?.find(x=>x.type==='text')?.text||'{}');}catch{payload={};}const o=payload?.normalized_result||payload;const summary=o?.summary||o;return {tool:'analyze_javascript_application',evidenceId:o?.parent_evidence_id||source.evidence_id||null,statistics:summary?.statistics||{},coverage:summary?.coverage?.application?.status||'partial',limitations:(o?.limitations||[]).slice(0,8),rawResultPresent:true,projection:'retained-evidence-summary',sourceSelection:{analyzed:selectedPaths,uninspected:sourcePaths.filter(p=>!selectedPaths.includes(p))}};}
   }
   throw Error('REA analyze_javascript_application '+diagnostic.slice(0,140));
  }
@@ -76,7 +82,7 @@ export async function inspectWithRea({root,sourcePaths},port=8765){
  const resultBody=payload?.result||payload;
  const data=resultBody?.normalized_result||resultBody||{};
  const statistics=data?.summary?.statistics||data?.statistics||data?.summary?.normalized_result?.summary?.statistics||{};
- return {tool:'analyze_javascript_application',evidenceId:resultBody.evidence_id||data.evidence_id||null,statistics,coverage:data?.coverage?.status||data?.summary?.coverage?.application?.status||'partial',limitations:(data.limitations||resultBody.limitations||[]).slice(0,8),rawResultPresent:true};
+ return {tool:'analyze_javascript_application',evidenceId:resultBody.evidence_id||data.evidence_id||null,statistics,coverage:data?.coverage?.status||data?.summary?.coverage?.application?.status||'partial',limitations:(data.limitations||resultBody.limitations||[]).slice(0,8),rawResultPresent:true,sourceSelection:{analyzed:selectedPaths,uninspected:sourcePaths.filter(p=>!selectedPaths.includes(p))}};
 }
 export function createPreviewAudit({runner=inspectWithRea,fetcher=fetch,limitJobs=12}={}){
  const jobs=new Map(),safeJob=job=>({id:job.id,slug:job.slug,status:job.status,stage:job.stage,createdAt:job.createdAt,finishedAt:job.finishedAt||null,manifest:job.manifest||null,result:job.result||null,error:job.error||null});

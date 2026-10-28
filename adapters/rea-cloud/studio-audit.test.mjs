@@ -48,7 +48,7 @@ test('Cloud audit executes the actual REA analyze_javascript_application MCP too
   if(msg.method!=='initialize')assert.equal(req.headers['mcp-session-id'],sid);
   if(msg.method==='initialize'){res.setHeader('mcp-session-id',sid);res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{serverInfo:{name:'rea'},capabilities:{},protocolVersion:'2025-11-25'}}));}
   else if(msg.method==='notifications/initialized'){ready=true;res.writeHead(202);res.end();}
-  else if(msg.method==='tools/call'){assert.equal(ready,true);assert.equal(msg.params.name,'analyze_javascript_application');assert.equal(msg.params.arguments.format,'directory');assert.deepEqual(msg.params.arguments.source_paths,['assets/app.js']);res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{structuredContent:{evidence_id:'ev_mock',normalized_result:{statistics:{parsed_javascript_files:1,findings:7},coverage:{status:'partial'}}}}}));}
+  else if(msg.method==='tools/call'){assert.equal(ready,true);assert.equal(msg.params.name,'analyze_javascript_application');assert.equal(msg.params.arguments.format,'directory');assert.deepEqual(msg.params.arguments.source_paths,['assets/app.js']);assert.ok(msg.params.arguments.max_semantic_nodes<=256);assert.ok(msg.params.arguments.max_semantic_nodes_per_file<=128);assert.ok(msg.params.arguments.max_heap_mb<=256);res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{structuredContent:{evidence_id:'ev_mock',normalized_result:{statistics:{parsed_javascript_files:1,findings:7},coverage:{status:'partial'}}}}}));}
   else assert.fail('unrecognized MCP action');
  });
  await new Promise(resolve=>upstream.listen(0,'127.0.0.1',resolve));
@@ -82,4 +82,11 @@ test('REA transport capacity errors reuse retained evidence instead of re-runnin
  try{const result=await inspectWithRea({root:'/tmp/owner-app',sourcePaths:['assets/app.js']},upstream.address().port);
  assert.equal(result.evidenceId,'ev_captured');assert.equal(result.statistics.findings,9);assert.equal(analyzeCount,1);assert.equal(inspectCount,1);
  }finally{await new Promise(resolve=>upstream.close(resolve));}
+});
+
+test('Bounded real REA scan selects smallest inventoried file and reports incomplete selection',async()=>{
+ const {inspectWithRea}=await import('./studio-audit.mjs');
+ const srv=http.createServer(async(req,res)=>{let body='';for await(const c of req)body+=c;const msg=JSON.parse(body);res.setHeader('content-type','application/json');if(msg.method==='initialize'){res.setHeader('mcp-session-id','test-small');return res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{serverInfo:{name:'rea'},capabilities:{}}}));}if(msg.method==='notifications/initialized'){res.writeHead(202);return res.end();}assert.equal(msg.params.name,'analyze_javascript_application');assert.deepEqual(msg.params.arguments.source_paths,['assets/small.js']);res.end(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{structuredContent:{evidence_id:'ev_small',normalized_result:{summary:{statistics:{findings:1}}}}}}));});
+ await new Promise(resolve=>srv.listen(0,'127.0.0.1',resolve));
+ try{const out=await inspectWithRea({root:'/tmp/owner-preview',sourcePaths:['assets/large.js','assets/small.js'],files:[{path:'assets/large.js',bytes:700000},{path:'assets/small.js',bytes:120}]},srv.address().port);assert.deepEqual(out.sourceSelection.analyzed,['assets/small.js']);assert.deepEqual(out.sourceSelection.uninspected,['assets/large.js']);assert.equal(out.evidenceId,'ev_small');}finally{await new Promise(resolve=>srv.close(resolve));}
 });
