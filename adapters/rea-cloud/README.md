@@ -34,3 +34,16 @@ Before considering deployment complete, prove:
 4. The cloud target file is present and readable by the REA runtime.
 
 Do not publish the Render service endpoint alone as an unauthenticated production MCP.
+
+## Cloudflare R2 scoped storage — verified 2026-10-28
+
+- Primary Cloudflare account now has **`prismtek-rea-private`**, a dedicated Standard-storage R2 bucket. Verified by readback.
+- Managed `r2.dev` public access is **disabled** and no custom domain is attached. Keep the bucket private; it is not an executable hosting platform.
+- Intended scoped key layout once a compute host is running: `jobs/<random-job-id>/inputs/`, `jobs/<random-job-id>/evidence/`, `jobs/<random-job-id>/reports/`. Restrict credentials to this bucket; do not reuse Azeroth, creative-assets, or website backup credentials.
+- Add upload/download/sync support only after selecting the compute host and reviewing sensitive target retention, size limits, encryption, lifecycle and authorized content. Do not claim files are already synced.
+
+### Hosting readiness/blockers
+
+- Cloudflare Containers API returned **401: Workers Paid plan required**. R2 works, but native REA requires a real Node/container host and cannot execute inside an R2 bucket.
+- The connected Render account is reachable but rejected creating a Free Node web service with **HTTP 402: payment information required**. No Render service was created. Do not create paid instances, subscriptions or Workers Paid upgrades without new explicit permission for charges.
+- This GitHub PR provides the source, not a working remote MCP endpoint. A Cloudflare owner-only OAuth frontend, Render connection, native dependency compatibility checks, and end-to-end REA MCP tool probes remain outstanding.
