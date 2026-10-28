@@ -18,7 +18,7 @@ function validBearer(value, secret) {
 
 // Upstream REA has no authentication and can perform stateful operations. Do not
 // expose its internal listener or provide an unauthenticated fallback.
-export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true, auditHandler = null }) {
+export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true, auditHandler = null, discovery = null }) {
   if (typeof token !== 'string' || token.length < 32) {
     throw new Error('REA_GATEWAY_TOKEN must be at least 32 characters');
   }
@@ -73,6 +73,36 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
     if (req.method === 'GET') {
       res.writeHead(405, { 'allow': 'POST, DELETE', 'cache-control': 'no-store' });
       res.end();
+      return;
+    }
+    // Pinned REA 6.8.0 catalog serves authenticated capability discovery immediately.
+    // Real MCP tools/call still goes to the stateful REA server, unchanged.
+    if (req.method === 'POST' && discovery && Number(req.headers['content-length']||0)>0 && Number(req.headers['content-length'])<=2048) {
+      let raw = '';let bytes = 0;
+      req.on('data', chunk => {bytes += chunk.length;if(bytes < 16385)raw += chunk;});
+      req.on('end', () => {
+        if(bytes > 16384){res.writeHead(413, {'cache-control':'no-store'});res.end();return;}
+        let message;try{message=JSON.parse(raw);}catch{message=null;}
+        const kind=message?.method;
+        const items=kind==='tools/list'?discovery.tools:kind==='prompts/list'?discovery.prompts:null;
+        if(items&&message.jsonrpc==='2.0'&&(['number','string'].includes(typeof message.id))&&(!message.params?.cursor)){
+          const payload=JSON.stringify({jsonrpc:'2.0',id:message.id,result:kind==='tools/list'?{tools:items}:{prompts:items}});
+          const headers={'content-type':'application/json','cache-control':'no-store','content-length':Buffer.byteLength(payload)};
+          if(typeof req.headers['mcp-session-id']==='string')headers['mcp-session-id']=req.headers['mcp-session-id'];
+          res.writeHead(200,headers);res.end(payload);return;
+        }
+        // Unsupported discovery request: forward the already buffered bytes without credentials.
+        forward(Buffer.from(raw));
+      });
+      req.on('error',()=>{if(!res.headersSent)res.writeHead(400);res.end();});
+      function forward(body){
+        const headers={};for(const key of requestHeaders){if(req.headers[key])headers[key]=req.headers[key];}
+        headers['content-length']=body.byteLength;
+        const upstream=http.request({hostname:'127.0.0.1',port:upstreamPort,path:'/mcp',method:'POST',headers,timeout:5*60*1000},response=>{const safe={};for(const k of responseHeaders){if(response.headers[k])safe[k]=response.headers[k];}res.writeHead(response.statusCode||502,safe);response.pipe(res);});
+        upstream.on('timeout',()=>upstream.destroy(new Error('Upstream timeout')));
+        upstream.on('error',()=>{if(!res.headersSent)res.writeHead(502);res.end('REA upstream unavailable');});
+        upstream.end(body);
+      }
       return;
     }
     const headers = {};

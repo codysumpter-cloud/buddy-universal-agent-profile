@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import http from 'node:http';
+import {readFileSync} from 'node:fs';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
@@ -10,7 +11,14 @@ const internalPort = 8765;
 // Fail closed before starting a server if configuration is incomplete.
 const status = { ready: false };
 const previewAudits=createPreviewAudit();
-const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits) });
+// Only advertise the checked-in, pinned package catalog; never fabricate extra tools.
+let discovery=null;
+try{
+ const catalog=JSON.parse(readFileSync(new URL('./node_modules/rea-agents/dist/mcp-catalog.json',import.meta.url),'utf8'));
+ if(catalog?.info?.version==='6.8.0'&&catalog.tools?.length===229&&catalog.prompts?.length===6)discovery={tools:catalog.tools,prompts:catalog.prompts};
+ else console.warn('[rea-discovery] pinned catalog did not match installed core; using normal MCP discovery');
+}catch(e){console.warn('[rea-discovery] pinned catalog unavailable; using normal MCP discovery');}
+const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits),discovery });
 const upstream = spawn(process.execPath, [
   'node_modules/rea-agents/scripts/rea.mjs', 'mcp', '--http',
   '--host', '127.0.0.1', '--port', String(internalPort),
