@@ -74,5 +74,36 @@ export function createPreviewAudit({runner=inspectWithRea,fetcher=fetch,limitJob
   start(slug){
    if(!OWNER_PROJECTS.has(slug))throw bad(400,'Unknown owner project slug');
    if(active)throw bad(429,'REA scan already in progress; poll its result before starting another');
-   if(jobs.size>=limitJobs)throw bad(409,'REA job limit reached; restart/copy summaries before crea
-…(truncated — 7854 chars total; log/return less)
+   if(jobs.size>=limitJobs)throw bad(409,'REA job limit reached; restart/copy summaries before creating another');
+   const job={id:randomUUID(),slug,status:'queued',stage:'admission',createdAt:new Date().toISOString()};
+   jobs.set(job.id,job);active=true;
+   void(async()=>{let capture;
+    try{
+     job.status='running';job.stage='capture-source';
+     capture=await captureOwnedPreview(slug,{fetcher});
+     job.manifest={sha256:capture.sha256,files:capture.files};
+     job.stage='rea-mcp-analysis';
+     job.result=await runner(capture);
+     job.status='completed';job.stage='done';
+    }catch(e){job.status='failed';job.stage='failed';job.error=typeof e?.status==='number'?'Admission '+e.status+': '+e.message:String(e?.message||e).slice(0,180);}
+    finally{if(capture)await fs.rm(capture.root,{recursive:true,force:true}).catch(()=>{});job.finishedAt=new Date().toISOString();active=false;}
+   })();
+   return safeJob(job);
+  }
+ };
+}
+export function createAuditHandler(audit){
+ return async(req,res)=>{
+  const url=new URL(req.url,'http://localhost');
+  if(url.pathname==='/audit/preview'&&req.method==='POST'){
+   if(!String(req.headers['content-type']||'').startsWith('application/json'))return report(res,415,{error:'JSON request required'});
+   const chunks=[];let size=0;
+   for await(const chunk of req){size+=chunk.length;if(size>1024)return report(res,413,{error:'Request exceeds 1 KB'});chunks.push(chunk);}
+   let data;try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'))}catch{return report(res,400,{error:'Invalid JSON'});}
+   try{return report(res,202,audit.start(data.slug));}catch(e){return report(res,e.status||500,{error:String(e.message).slice(0,180)});}
+  }
+  const match=url.pathname.match(/^\/audit\/jobs\/([a-f0-9-]{36})$/);
+  if(match&&req.method==='GET'){const job=audit.get(match[1]);return job?report(res,200,job):report(res,404,{error:'Audit not found'});}
+  return report(res,404,{error:'Not found'});
+ };
+}
