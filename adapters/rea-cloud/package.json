@@ -1,0 +1,20 @@
+{
+  "name": "@prismtek/rea-cloud-adapter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Single-owner authenticated HTTPS frontend for the upstream REA HTTP MCP server",
+  "engines": {
+    "node": ">=24.22.1 <25"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test gateway.test.mjs"
+  },
+  "dependencies": {
+    "rea-agents": "6.8.0"
+  },
+  "overrides": {
+    "zod": "4.6.6"
+  }
+}
