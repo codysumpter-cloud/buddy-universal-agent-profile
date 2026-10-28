@@ -33,7 +33,16 @@ const probe = () => {
     // Run a real, read-only REA tool call on the Render host, not the user's computer.
     setTimeout(() => {
       runReaSelfTest(internalPort)
-        .then(result => console.log('[rea-core-verified]', JSON.stringify(result)))
+        .then(result => {
+          console.log('[rea-core-verified]', JSON.stringify(result));
+          if (process.env.REA_RUN_PREVIEW_SMOKE === '1') {
+            try { const job=previewAudits.start('racing-game');
+              console.log('[rea-preview-smoke-start]', JSON.stringify({id:job.id,slug:job.slug}));
+              const check=setInterval(()=>{const current=previewAudits.get(job.id);if(!current||current.status==='completed'||current.status==='failed'){clearInterval(check);console.log('[rea-preview-smoke-end]',JSON.stringify({status:current?.status,evidenceId:current?.result?.evidenceId||null,statistics:current?.result?.statistics||null,error:current?.error||null}));}},3000);
+              check.unref();
+            } catch(error){console.error('[rea-preview-smoke-error]',String(error.message).slice(0,160));}
+          }
+        })
         .catch(error => console.error('[rea-core-unverified]', String(error.message).slice(0, 160)));
     }, 500);
   });
