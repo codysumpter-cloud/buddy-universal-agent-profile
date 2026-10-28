@@ -2,13 +2,15 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
+import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
 const internalPort = 8765;
 // Fail closed before starting a server if configuration is incomplete.
 const status = { ready: false };
-const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready });
+const previewAudits=createPreviewAudit();
+const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits) });
 const upstream = spawn(process.execPath, [
   'node_modules/rea-agents/scripts/rea.mjs', 'mcp', '--http',
   '--host', '127.0.0.1', '--port', String(internalPort),

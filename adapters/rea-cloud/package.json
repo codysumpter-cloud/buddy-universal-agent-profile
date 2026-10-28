@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs"
+    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs"
   },
   "dependencies": {
     "rea-agents": "6.8.0"

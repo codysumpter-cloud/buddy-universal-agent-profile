@@ -18,7 +18,7 @@ function validBearer(value, secret) {
 
 // Upstream REA has no authentication and can perform stateful operations. Do not
 // expose its internal listener or provide an unauthenticated fallback.
-export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true }) {
+export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true, auditHandler = null }) {
   if (typeof token !== 'string' || token.length < 32) {
     throw new Error('REA_GATEWAY_TOKEN must be at least 32 characters');
   }
@@ -46,6 +46,13 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
       const up = isUpstreamReady();
       res.writeHead(up ? 200 : 503, { 'content-type': 'application/json', 'cache-control': 'no-store' });
       res.end(JSON.stringify({ service: 'prismtek-rea-cloud', ready: up }));
+      return;
+    }
+    if (req.url?.startsWith('/audit/')) {
+      if (!validBearer(req.headers.authorization, token)) {res.writeHead(401, {'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify({error:'unauthorized'}));return;}
+      if (!isUpstreamReady()) {res.writeHead(503, {'cache-control':'no-store'});res.end('REA is starting');return;}
+      if (!auditHandler) {res.writeHead(404);res.end();return;}
+      Promise.resolve(auditHandler(req,res)).catch(()=>{if(!res.headersSent)res.writeHead(500,{'cache-control':'no-store'});res.end('Private audit unavailable');});
       return;
     }
     if (req.url !== '/mcp' || !['POST', 'GET', 'DELETE'].includes(req.method)) {
