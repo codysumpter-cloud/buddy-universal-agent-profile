@@ -56,7 +56,20 @@ export async function inspectWithRea({root,sourcePaths},port=8765){
  if(init.result?.error||!init.result?.result||!init.sessionId)throw Error('REA MCP initialize failed');
  await rpc(port,{jsonrpc:'2.0',method:'notifications/initialized'},init.sessionId,15000);
  const result=await rpc(port,{jsonrpc:'2.0',id:302,method:'tools/call',params:{name:'analyze_javascript_application',arguments:{input_path:root,format:'directory',source_paths:sourcePaths,max_semantic_nodes:20000,max_semantic_unknowns:20000,max_heap_mb:384,analysis_timeout_ms:55000,detail:'summary'}}},init.sessionId,105000);
- if(result.result?.error||result.result?.result?.isError||!result.result?.result){const t=result.result?.result?.content?.find(x=>x.type==='text')?.text||'';let diagnostic='core-tool-failure';try{const parsed=JSON.parse(t);diagnostic=String(parsed.error?.code||parsed.code||parsed.error?.message||parsed.message||diagnostic);}catch{if(t)diagnostic=t.slice(0,140).replace(/[^\w .:-]/g,' ');}throw Error('REA analyze_javascript_application '+diagnostic.slice(0,140));}
+ if(result.result?.error||result.result?.result?.isError||!result.result?.result){
+  const t=result.result?.result?.content?.find(x=>x.type==='text')?.text||'';
+  let failure={};try{const obj=JSON.parse(t);failure=obj.error||obj;}catch{failure={message:t.slice(0,120)};}
+  const details=failure.details||{};
+  console.warn('[rea-preview-analysis-error]',JSON.stringify({code:String(failure.code||'unknown').slice(0,80),resource:String(details.resource||'unknown').slice(0,80),retryable:failure.retryable===true,reportedLimitKeys:Object.keys(details.reported_limits||{}).slice(0,12),remediationAction:String(failure.remediation?.action||'').slice(0,100)}));
+  let diagnostic=String(failure.code||failure.message||'core-tool-failure');
+  if(failure.code==='resource_constraint'&&details.resource==='transport'&&details.reported_limits?.evidence_reference){
+   const ref=details.reported_limits.evidence_reference;
+   const source=typeof ref==='string'?{kind:'retained-evidence',evidence_id:ref}:ref;
+   const view=await rpc(port,{jsonrpc:'2.0',id:303,method:'tools/call',params:{name:'inspect_analysis_view',arguments:{source,view:{kind:'summary'}}}},init.sessionId,60000);
+   if(!view.result?.error&&!view.result?.result?.isError&&view.result?.result){const v=view.result.result;let payload=v.structuredContent;try{if(!payload)payload=JSON.parse(v.content?.find(x=>x.type==='text')?.text||'{}');}catch{payload={};}const o=payload?.normalized_result||payload;const summary=o?.summary||o;return {tool:'analyze_javascript_application',evidenceId:o?.parent_evidence_id||source.evidence_id||null,statistics:summary?.statistics||{},coverage:summary?.coverage?.application?.status||'partial',limitations:(o?.limitations||[]).slice(0,8),rawResultPresent:true,projection:'retained-evidence-summary'};}
+  }
+  throw Error('REA analyze_javascript_application '+diagnostic.slice(0,140));
+ }
  const response=result.result.result;
  let payload=response.structuredContent;
  if(!payload){const text=response.content?.find(x=>x.type==='text')?.text||'';try{payload=JSON.parse(text)}catch{payload={note:text.slice(0,600)}}}
