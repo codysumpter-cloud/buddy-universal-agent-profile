@@ -30,6 +30,11 @@ test('proxies MCP only with valid owner bearer; strips sensitive headers', async
     assert.equal(denied.status, 401);
     const wrong = await fetch(base + '/mcp', { headers: { Authorization: 'Bearer wrong' }});
     assert.equal(wrong.status, 401);
+    const noSse = await fetch(base + '/mcp', {
+      headers: { Authorization: 'Bearer ' + token, Accept: 'text/event-stream' },
+    });
+    assert.equal(noSse.status, 405);
+    assert.equal(noSse.headers.get('allow'), 'POST, DELETE');
     const allowed = await fetch(base + '/mcp', {
       method: 'POST', headers: {
         Authorization: 'Bearer ' + token, Cookie: 'sensitive',
