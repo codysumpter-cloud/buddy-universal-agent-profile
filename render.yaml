@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: prismtek-rea-cloud
+    runtime: node
+    plan: free
+    region: ohio
+    rootDir: adapters/rea-cloud
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_VERSION
+        value: 24.22.1
+      - key: REA_GATEWAY_TOKEN
+        sync: false
