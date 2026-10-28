@@ -1,0 +1,38 @@
+name: REA Cloud adapter verification
+
+on:
+  push:
+    paths:
+      - "adapters/rea-cloud/**"
+      - ".github/workflows/rea-cloud-verify.yml"
+  pull_request:
+    paths:
+      - "adapters/rea-cloud/**"
+      - ".github/workflows/rea-cloud-verify.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rea-cloud:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: adapters/rea-cloud
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install production dependencies
+        run: npm install --omit=dev --no-fund
+      - name: Validate syntax
+        run: node --check gateway.mjs && node --check server.mjs
+      - name: Run gateway tests
+        run: npm test
+      - name: Audit production dependency vulnerabilities
+        shell: bash
+        run: |
+          npm audit --omit=dev --json > /tmp/rea-audit.json || true
+          node -e 'const a=require("/tmp/rea-audit.json");const v=a.vulnerabilities||{};for(const [name,info] of Object.entries(v)){if(["high","critical"].includes(info.severity)){console.error(JSON.stringify({name,severity:info.severity,range:info.range,via:info.via,fixAvailable:info.fixAvailable},null,2));}}const n=a.metadata?.vulnerabilities||{};console.log("Production dependency audit",JSON.stringify(n));if((n.high||0)+(n.critical||0)>0)process.exit(1);'
