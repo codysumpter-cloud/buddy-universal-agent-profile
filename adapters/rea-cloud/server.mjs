@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { createGateway } from './gateway.mjs';
+import { runReaSelfTest } from './mcp-selftest.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -27,6 +28,12 @@ const probe = () => {
   if (status.ready || upstream.exitCode !== null) return;
   const req = http.request({ hostname: '127.0.0.1', port: internalPort, path: '/mcp', method: 'GET', timeout: 500 }, (res) => {
     res.resume(); status.ready = true;
+    // Run a real, read-only REA tool call on the Render host, not the user's computer.
+    setTimeout(() => {
+      runReaSelfTest(internalPort)
+        .then(result => console.log('[rea-core-verified]', JSON.stringify(result)))
+        .catch(error => console.error('[rea-core-unverified]', String(error.message).slice(0, 160)));
+    }, 500);
   });
   req.on('error', () => { if (++retries < 120) setTimeout(probe, 1000); });
   req.on('timeout', () => req.destroy());
