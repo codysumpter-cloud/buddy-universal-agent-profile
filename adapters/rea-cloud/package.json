@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node unpack-studio.mjs && node server.mjs",
-    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs studio-web.test.mjs readiness.test.mjs"
+    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs studio-web.test.mjs readiness.test.mjs full-bonk-audit.test.mjs"
   },
   "dependencies": {
     "rea-agents": "6.8.0"
