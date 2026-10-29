@@ -20,8 +20,9 @@ test('REA MCP request covers all captured source paths',async()=>{
  const call=async(port,m)=>{messages.push(m);
   if(m.method==='initialize')return {result:{result:{serverInfo:{name:'REA'}}},sessionId:'session'};
   if(m.method==='notifications/initialized')return {result:null};
-  return {result:{result:{structuredContent:{evidence_id:'ev_mock',
-   normalized_result:{statistics:{parsed_javascript_files:30}}}}}}};
+  return { result: { result: { structuredContent: {
+   evidence_id: 'ev_mock', normalized_result: { statistics: { parsed_javascript_files: 30 } }
+  } } } };
  };
  const result=await inspectWholeBonk({root:'/tmp/bonk-full',codeFiles:30,files:Array(33),
   missingCoverage:[],commit:'a',manifestSha256:'digest'},{call});
