@@ -61,6 +61,34 @@ void openVerifiedGateway({
  status.ready=true;
  console.log('[rea-core-verified]',JSON.stringify(result));
  console.log('REA gateway listening on '+externalPort+' after tool verification');
+
+ // One-shot owner opt-in. Two separately bounded, original REA static analyses,
+ // not a whole-site audit. Off by default; stop before any concurrent Arena scan.
+ if(process.env.REA_RUN_SAFE_LIVE_STUDIO_AUDIT==='1'&&process.env.REA_RUN_SAFE_ARENA_MODE_AUDIT!=='1'){
+  void(async()=>{
+   const {rm}=await import('node:fs/promises');
+   let captured;
+   try{
+    const {captureLivePublicStudio,inspectWithRea}=await import('./studio-audit.mjs');
+    captured=await captureLivePublicStudio();
+    console.log('[rea-live-studio-source]',JSON.stringify({sha256:captured.sha256,files:captured.files}));
+    for(const file of captured.files){
+     try{
+      const audit=await inspectWithRea({root:captured.root,sourcePaths:[file.path],files:[file]});
+      console.log('[rea-live-studio-evidence]',JSON.stringify({
+       path:file.path,sha256:file.sha256,bytes:file.bytes,evidenceId:audit.evidenceId,
+       statistics:audit.statistics,coverage:audit.coverage,sourceSelection:audit.sourceSelection,
+       limitations:['Static inspection of one public JS module only; this is not 1:1 gameplay or source parity']
+      }).slice(0,3500));
+     }catch(error){
+      console.warn('[rea-live-studio-analyze-error]',JSON.stringify({path:file.path,reason:String(error?.message||error).slice(0,220)}));
+     }
+    }
+   }catch(error){console.warn('[rea-live-studio-capture-error]',String(error?.message||error).slice(0,220));}
+   finally{if(captured)await rm(captured.root,{recursive:true,force:true}).catch(()=>{});}
+  })();
+ }
+
  // Small, source-pinned Arena-only REA inspection. Never run a whole game on
  // the 512 MiB free instance. Existing heavy-audit memory guards remain active.
  if(process.env.REA_RUN_SAFE_ARENA_MODE_AUDIT==='1'){

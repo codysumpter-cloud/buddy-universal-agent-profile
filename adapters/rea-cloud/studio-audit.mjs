@@ -4,7 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import {rpc} from './mcp-selftest.mjs';
 
-const OWNER_PROJECTS=new Set(['rea','racing-game','media-maker','dude-creator','pocket-bird','slayblade','prismtek-world','necessities','prismtek-poke-arena','everything-is-prismtek','playground','super-tiny-life','pixel-sand-physics-and-destruction','world-of-pixelcraft','king-of-the-pirates','ninja-game','pokemon-fan-game','super-tiny-farm','wild-pixels','pixel-art-physics','solar-realm-2']);
+const OWNER_PROJECTS=new Set(['prismtek-live-studio','rea','racing-game','media-maker','dude-creator','pocket-bird','slayblade','prismtek-world','necessities','prismtek-poke-arena','everything-is-prismtek','playground','super-tiny-life','pixel-sand-physics-and-destruction','world-of-pixelcraft','king-of-the-pirates','ninja-game','pokemon-fan-game','super-tiny-farm','wild-pixels','pixel-art-physics','solar-realm-2']);
 const MAX_FILE=2*1024*1024,MAX_TOTAL=5*1024*1024,MAX_JS=6;
 const CORS={'cache-control':'no-store','content-type':'application/json','x-content-type-options':'nosniff'};
 const report=(res,code,data)=>{res.writeHead(code,CORS);res.end(JSON.stringify(data));};
@@ -22,7 +22,35 @@ async function safeFetch(url,limit,fetcher){
  if(!response.ok)throw bad(502,'Owner preview resource returned '+response.status);
  return readBounded(response,limit);
 }
+
+/** Public production Studio audit. Bounded, read-only, no executable downloads. */
+export async function captureLivePublicStudio({fetcher=fetch}={}){
+ const page='https://prismtek.dev/pixel-studio/';
+ const html=(await safeFetch(page,1024*1024,fetcher)).toString('utf8');
+ const boot=html.match(/src=["']\/assets\/(index-[A-Za-z0-9_-]+\.js)["']/)?.[1];
+ if(!boot)throw bad(422,'Live Studio page has no known main module');
+ const manifest=(await safeFetch('https://prismtek.dev/assets/'+boot,750000,fetcher)).toString('utf8');
+ const modules=[...new Set([...manifest.matchAll(/["']assets\/(prismStudio(?:ParticleFx|PhaserAuthoring)-[A-Za-z0-9_-]+\.js)["']/g)].map(m=>m[1]))].sort();
+ if(modules.length!==2)throw bad(422,'Studio particle/engine modules not discoverable');
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'rea-live-studio-'));
+ const files=[],sourcePaths=[];let total=0;
+ try{
+  await fs.mkdir(path.join(root,'assets'),{recursive:true});
+  for(const name of modules){
+   const bytes=await safeFetch('https://prismtek.dev/assets/'+name,65000,fetcher);
+   if(!bytes.length)throw bad(422,'Published Studio source is empty');
+   total+=bytes.length;if(total>130000)throw bad(413,'Live Studio intake exceeds 130 KiB budget');
+   await fs.writeFile(path.join(root,'assets',name),bytes,{flag:'wx',mode:0o600});
+   const relative='assets/'+name;sourcePaths.push(relative);
+   files.push({path:relative,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length});
+  }
+  return {root,sourcePaths,files,sha256:createHash('sha256').update(JSON.stringify(files)).digest('hex'),
+   limitation:'Only two public runtime modules; the large Studio layout/renderer chunk and original private source are excluded.'};
+ }catch(e){await fs.rm(root,{recursive:true,force:true});throw e;}
+}
+
 export async function captureOwnedPreview(slug,{fetcher=fetch}={}){
+ if(slug==='prismtek-live-studio')return captureLivePublicStudio({fetcher});
  if(!OWNER_PROJECTS.has(slug))throw bad(400,'Only a listed owner PixelLab project can be scanned');
  const origin='https://'+slug+'.pixellab.run/';
  const html=(await safeFetch(origin,1024*1024,fetcher)).toString('utf8');

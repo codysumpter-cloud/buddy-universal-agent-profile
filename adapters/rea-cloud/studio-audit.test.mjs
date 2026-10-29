@@ -90,3 +90,28 @@ test('Bounded real REA scan selects smallest inventoried file and reports incomp
  await new Promise(resolve=>srv.listen(0,'127.0.0.1',resolve));
  try{const out=await inspectWithRea({root:'/tmp/owner-preview',sourcePaths:['assets/large.js','assets/small.js'],files:[{path:'assets/large.js',bytes:700000},{path:'assets/small.js',bytes:120}]},srv.address().port);assert.deepEqual(out.sourceSelection.analyzed,['assets/small.js']);assert.deepEqual(out.sourceSelection.uninspected,['assets/large.js']);assert.equal(out.evidenceId,'ev_small');}finally{await new Promise(resolve=>srv.close(resolve));}
 });
+
+
+test('production Studio: fetch only the two allowlisted small JS bundles without executing target code',async()=>{
+ const fetcher=async url=>{
+  const u=String(url);
+  if(u==='https://prismtek.dev/pixel-studio/')return new Response('<script type="module" src="/assets/index-Ab12CD.js"></script>');
+  if(u==='https://prismtek.dev/assets/index-Ab12CD.js')return new Response('["assets/prismStudioParticleFx-Aabb1.js","assets/prismStudioPhaserAuthoring-Bbcc2.js","assets/OtherBundle-Bad.js"]');
+  if(u.endsWith('prismStudioParticleFx-Aabb1.js'))return new Response('export const effects=1;');
+  if(u.endsWith('prismStudioPhaserAuthoring-Bbcc2.js'))return new Response('export const engine=2;');
+  return new Response('missing',{status:404});
+ };
+ const captured=await captureOwnedPreview('prismtek-live-studio',{fetcher});
+ try{
+  assert.equal(captured.files.length,2);
+  assert.ok(captured.sourcePaths.every(x=>x.startsWith('assets/prismStudio')));
+  assert.ok(captured.sourcePaths.every(x=>!x.includes('OtherBundle')));
+  assert.match(captured.sha256,/^[a-f0-9]{64}$/);
+  assert.equal((await fs.readdir(captured.root+'/assets')).length,2);
+ }finally{await fs.rm(captured.root,{recursive:true,force:true});}
+ await assert.rejects(captureOwnedPreview('evil.example.com',{fetcher}),/Only a listed owner/);
+});
+test('live Studio intake fails closed if source manifest changed',async()=>{
+ const fetcher=async u=>new Response(String(u).includes('/pixel-studio/')?'<script src="/assets/index-A1.js"></script>':'No known modules');
+ await assert.rejects(captureOwnedPreview('prismtek-live-studio',{fetcher}),/not discoverable/);
+});
