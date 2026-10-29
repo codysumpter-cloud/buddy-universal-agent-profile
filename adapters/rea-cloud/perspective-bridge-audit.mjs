@@ -45,7 +45,7 @@ export async function runPerspectiveBridgeAudit({fetcher=fetch,analyze=inspectWi
     sourceKind='owner-source-handoff';
    }
    if(!content.length||content.length>LIMIT)throw Error('Perspective source exceeds bounds');
-   const gitBlob=createHash('sha1').update('blob '+content.length+'\\0').update(content).digest('hex');
+   const gitBlob=createHash('sha1').update('blob '+content.length+'\0').update(content).digest('hex');
    if(gitBlob!==SOURCE_BLOBS[index])throw Error('Pinned Perspective Git blob mismatch');
    const file=path.join(root,relative),size=content.length;
    await fs.mkdir(path.dirname(file),{recursive:true});
