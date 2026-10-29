@@ -4,7 +4,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {captureFullBonk,inspectWholeBonk,runFullBonkAudit} from './full-bonk-audit.mjs';
-const fakeFetch=async url=>new Response('export const source="'+new URL(url).pathname+'";',{status:200});
+const requested=[];
+const fakeFetch=async url=>{requested.push(String(url));if(String(url).endsWith('/index.html'))throw Error('redirect rejected');return new Response('export const source="'+new URL(url).pathname+'";',{status:200});};
 test('whole BONK archive captures every runtime source, not one preview bundle',async()=>{
  const x=await captureFullBonk({fetcher:fakeFetch});
  try{
@@ -13,6 +14,8 @@ test('whole BONK archive captures every runtime source, not one preview bundle',
   assert.ok(x.files.some(f=>f.path.endsWith('/render3d.mjs')));
   assert.ok(x.files.every(f=>f.sha256.length===64));
   assert.ok(x.missingCoverage.some(f=>f.includes('Worker')));
+  assert.ok(requested.includes('https://5f4b30ee.prismtek-site.pages.dev/prismcade/poke-arena-bonk/'));
+  assert.ok(!requested.some(x=>x.endsWith('/index.html')),'canonical HTML route avoids a 308 redirect');
  }finally{await fs.rm(x.base,{recursive:true,force:true})}
 });
 test('REA MCP request covers all captured source paths',async()=>{
