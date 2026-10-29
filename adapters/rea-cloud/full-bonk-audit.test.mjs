@@ -41,3 +41,31 @@ test('failed full REA job still cleans up the temporary source tree',async()=>{
   manifestSha256:'digest'}),inspect:async()=>{throw Error('injected')},log:()=>{}}),/injected/);
  await assert.rejects(fs.access(root));
 });
+
+test('completed REA audit reads six bounded retained-Evidence views in same session',async()=>{
+ const requests=[],logs=[],id='ev_'+('a'.repeat(64));
+ const call=async(port,m)=>{
+  requests.push(m);
+  if(m.method==='initialize')return {result:{result:{serverInfo:{name:'rea'}}},sessionId:'session'};
+  if(m.method==='notifications/initialized')return {result:null};
+  if(m.params?.name==='analyze_javascript_application')return {
+   result:{result:{structuredContent:{evidence_id:id,normalized_result:{
+    summary:{statistics:{parsed_javascript_files:30},coverage:{application:{status:'partial'}}}}}}}};
+  if(m.params?.name==='inspect_analysis_view')return {
+   result:{result:{structuredContent:{normalized_result:{rows:[{source:'core.mjs'}],coverage:{status:'partial'}}}}}};
+  throw Error('Unknown test request');
+ };
+ const result=await inspectWholeBonk({root:'/tmp/bonk-audit-fixture',codeFiles:30,files:Array(33),
+  missingCoverage:[],commit:'test',manifestSha256:'dummy'},{call,includeViews:true,log:x=>logs.push(x)});
+ assert.equal(result.evidenceId,id);
+ assert.equal(result.statistics.parsed_javascript_files,30);
+ assert.equal(result.detailViews.length,6);
+ assert.ok(result.detailViews.every(x=>x.status==='completed'));
+ const views=requests.filter(x=>x.params?.name==='inspect_analysis_view');
+ assert.equal(views.length,6);
+ assert.deepEqual(views[0].params.arguments.source,{kind:'retained-evidence',evidence_id:id});
+ assert.deepEqual(views[1].params.arguments.view,
+  {kind:'javascript',collection:'modules',projection:'references',offset:0,limit:40});
+ assert.equal(views[2].params.arguments.view.kind,'javascript-facts');
+ assert.ok(logs.some(x=>x==='[rea-bonk-view]'));
+});
