@@ -10,6 +10,7 @@ import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
 import {runFullBonkAudit} from './full-bonk-audit.mjs';
 import {runWorldfallPerspectiveAudit} from './perspective-mod-audit.mjs';
+import {runArenaModeAudit} from './arena-mode-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -60,6 +61,13 @@ void openVerifiedGateway({
  status.ready=true;
  console.log('[rea-core-verified]',JSON.stringify(result));
  console.log('REA gateway listening on '+externalPort+' after tool verification');
+ // Small, source-pinned Arena-only REA inspection. Never run a whole game on
+ // the 512 MiB free instance. Existing heavy-audit memory guards remain active.
+ if(process.env.REA_RUN_SAFE_ARENA_MODE_AUDIT==='1'){
+  void runArenaModeAudit({target:process.env.REA_ARENA_MODE_TARGET||'menu'})
+   .catch(e=>console.warn('[rea-arena-safe-audit-failed]',String(e?.message||e).slice(0,180)));
+ }
+
  // Keep the shared 512 MiB REA MCP gateway available for owner requests.
  // Automatic whole-game audits were previously retriggered after every Render
  // restart, causing repeated OOM kills. Heavy boot jobs now require a separate,
