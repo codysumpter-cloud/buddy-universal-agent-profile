@@ -84,11 +84,5 @@ test('first-party website proxy uses a distinct Studio bearer and preserves MCP 
  const {gateway,url}=await host();
  try{
   const studioHeaders={authorization:'Bearer '+STUDIO_PROXY_TOKEN};
-  const authorized=await fetch(url+'/studio/api/rea/health',{headers:studioHeaders});
-  assert.equal(authorized.status,200);
-  const denied=await fetch(url+'/studio/api/rea/health',{headers:{authorization:'Bearer '+'x'.repeat(48)}});
-  assert.equal(denied.status,401);
-  const upstreamMcp=await fetch(url+'/mcp',{headers:studioHeaders});
-  assert.equal(upstreamMcp.status,401);
- }finally{gateway.closeAllConnections();await new Promise(r=>gateway.close(r));}
-});
+  const authorized=await fetch(url+'/studi
+…(truncated — 8597 chars total; log/return less)
