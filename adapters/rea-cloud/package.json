@@ -8,7 +8,7 @@
     "node": ">=24.22.1 <25"
   },
   "scripts": {
-    "prestart": "node --test full-bonk-audit.test.mjs",
+    "prestart": "node --check server.mjs && node --check studio-web.mjs && node --check studio-upload.mjs && node --check full-bonk-audit.mjs && node --test full-bonk-audit.test.mjs",
     "start": "node unpack-studio.mjs && node server.mjs",
     "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs studio-web.test.mjs readiness.test.mjs full-bonk-audit.test.mjs studio-upload.test.mjs"
   },
