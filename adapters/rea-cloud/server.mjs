@@ -5,6 +5,7 @@ import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
+import {createUploadAudit} from './studio-upload.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -12,6 +13,7 @@ const internalPort = 8765;
 // Fail closed before starting a server if configuration is incomplete.
 const status = { ready: false };
 const previewAudits=createPreviewAudit();
+const uploadAudits=createUploadAudit();
 // Only advertise the checked-in, pinned package catalog; never fabricate extra tools.
 let discovery=null;
 try{
@@ -20,7 +22,7 @@ try{
  else console.warn('[rea-discovery] pinned catalog did not match installed core; using normal MCP discovery');
 }catch(e){console.warn('[rea-discovery] pinned catalog unavailable; using normal MCP discovery');}
 let coreProof=null;
-const studioHandler=createStudioHandler({token,root:new URL('./studio-public/',import.meta.url).pathname,isCoreReady:()=>status.ready,proof:()=>coreProof,audits:previewAudits});
+const studioHandler=createStudioHandler({token,root:new URL('./studio-public/',import.meta.url).pathname,isCoreReady:()=>status.ready,proof:()=>coreProof,audits:previewAudits,uploads:uploadAudits});
 const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits),discovery,studioHandler });
 const upstream = spawn(process.execPath, [
   'node_modules/rea-agents/scripts/rea.mjs', 'mcp', '--http',
