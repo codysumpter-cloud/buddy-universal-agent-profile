@@ -7,6 +7,7 @@ import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
 import {runFullBonkAudit} from './full-bonk-audit.mjs';
+import {runWorldfallPerspectiveAudit} from './perspective-mod-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -58,9 +59,17 @@ void openVerifiedGateway({
  console.log('REA gateway listening on '+externalPort+' after tool verification');
  // Owner-requested whole-game source investigation, opt-in and source-bounded.
  // Uses the real internal REA MCP process, never the PixelLab REA dashboard.
- if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'){
-  void runFullBonkAudit().catch(error=>
-   console.error('[rea-bonk-audit-failed]',String(error?.message||error).slice(0,350)));
+ // REA's stateful MCP is shared. The two audits run sequentially.
+ // Each audit uses the actual internal REA tools/call; no model-generated substitute.
+ if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'||process.env.REA_RUN_WORLDFALL_AUDIT==='1'){
+  void(async()=>{
+   if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'){
+    try{await runFullBonkAudit();}catch(error){console.error('[rea-bonk-audit-failed]',String(error?.message||error).slice(0,350));}
+   }
+   if(process.env.REA_RUN_WORLDFALL_AUDIT==='1'){
+    try{await runWorldfallPerspectiveAudit();}catch(error){console.error('[rea-worldfall-audit-failed]',String(error?.message||error).slice(0,350));}
+   }
+  })();
  }
  // REA Core maintains one stateful MCP session. Do not run the unrelated
  // racing preview smoke alongside the whole BONK analysis.
