@@ -73,7 +73,8 @@ function unwrappedError(response){
   try{const o=JSON.parse(text);return o?.error?.code||o?.code||text.slice(0,180);}catch{return text.slice(0,180);}}
  return null;
 }
-export async function inspectWholeBonk(snapshot,{port=8765,call=rpc}={}){
+export async function inspectWholeBonk(snapshot,{port=8765,call=rpc,
+ includeViews=process.env.REA_BONK_DETAILED_VIEWS==='1',log=console.log}={}){
  const version='2025-11-25';
  const init=await call(port,{jsonrpc:'2.0',id:610,method:'initialize',
   params:{protocolVersion:version,capabilities:{},clientInfo:{name:'prismtek-bonk-whole-game-audit',version:'1.0'}}},undefined,25000);
@@ -93,7 +94,51 @@ export async function inspectWholeBonk(snapshot,{port=8765,call=rpc}={}){
  const summary=data?.summary||data;
  const evidenceId=data.parent_evidence_id||raw.evidence_id||raw.result?.evidence_id||null;
  if(!evidenceId)throw Error('REA did not return authenticated Evidence identity');
- return {tool:'analyze_javascript_application',evidenceId,
+ // A successful summary is NOT the 138 detailed findings. Query retained REA
+ // Evidence in this SAME MCP session, before a future Render restart removes it.
+ const detailViews=[];
+ if(includeViews){
+  const views=[
+   {kind:'summary'},
+   {kind:'javascript',collection:'modules',projection:'references',offset:0,limit:40},
+   {kind:'javascript-facts',property_keys:[],include_available_property_keys:true,offset:0,limit:40},
+   {kind:'javascript-facts',property_keys:['name','path','source','kind','role','imports','exports'],offset:0,limit:40},
+   {kind:'javascript-facts',property_keys:[],include_available_property_keys:true,offset:40,limit:40},
+   {kind:'javascript-facts',property_keys:[],include_available_property_keys:true,offset:80,limit:40}
+  ];
+  for(let i=0;i<views.length;i++){
+   const view=views[i],kind=view.kind+(view.collection?'-'+view.collection:'')+'-'+i;
+   try{
+    const answer=await call(port,{jsonrpc:'2.0',id:620+i,method:'tools/call',
+     params:{name:'inspect_analysis_view',arguments:{
+      source:{kind:'retained-evidence',evidence_id:evidenceId},view
+     }}},init.sessionId,45000);
+    const problem=unwrappedError(answer.result);
+    if(problem)throw Error(problem);
+    const packed=answer.result?.result?.structuredContent||{};
+    let body=packed.normalized_result||packed.result?.normalized_result||packed;
+    if(!Object.keys(body).length){
+     const txt=answer.result?.result?.content?.find(x=>x.type==='text')?.text||'';
+     try{body=JSON.parse(txt)}catch{body={preview:txt.slice(0,800)}}
+    }
+    const serialized=JSON.stringify(body);
+    const digest=createHash('sha256').update(serialized).digest('hex');
+    const sample={kind,status:'completed',bytes:serialized.length,digest,
+     data:serialized.length<=3500?body:JSON.parse(JSON.stringify(body,(key,value)=>{
+      if(Array.isArray(value)&&value.length>12)return value.slice(0,12);
+      return value;
+     }))};
+    // Keep bounded evidence projections in Render logs; never publish private source.
+    log('[rea-bonk-view]',JSON.stringify(sample).slice(0,6500));
+    detailViews.push({kind,status:'completed',bytes:serialized.length,digest});
+   }catch(error){
+    const failure=String(error?.message||error).slice(0,200);
+    detailViews.push({kind,status:'failed',reason:failure});
+    log('[rea-bonk-view-error]',JSON.stringify({kind,error:failure}));
+   }
+  }
+ }
+ return {tool:'analyze_javascript_application',evidenceId,detailViews,
   statistics:summary.statistics||{},coverage:summary.coverage||{},
   limitations:(summary.limitations||raw.limitations||[]).slice(0,10),
   manifestSha256:snapshot.manifestSha256,commit:snapshot.commit,
