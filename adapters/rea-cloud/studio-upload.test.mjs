@@ -96,6 +96,8 @@ test('partial analysis is not mistaken for complete reconstruction',async()=>{
  await until(()=>manager.get(j.id)?.status==='partial');
  const receipt=manager.get(j.id);
  assert.equal(receipt.result.analyzed,1);
+ assert.equal(receipt.result.uninspected,1);
+ assert.equal(receipt.result.processedPending,0);
  assert.deepEqual(receipt.result.sourceSelection.uninspected,['b.ts']);
  assert.equal(receipt.result.results[1].status,'failed');
  assert.equal(receipt.status,'partial');
