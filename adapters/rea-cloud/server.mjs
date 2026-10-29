@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
-import { verifyCoreReadiness } from './readiness.mjs';
+import { verifyCoreReadiness, openVerifiedGateway } from './readiness.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
@@ -36,22 +36,26 @@ upstream.stderr.on('data', (data) => {
 upstream.on('exit', (code, signal) => {
   status.ready = false;
   console.error('REA exited:', code, signal);
-  gateway.close();
+  if(gateway.listening)gateway.close();
   process.exitCode = code || 1;
 });
 // Do not publish HTTP/MCP readiness until the actual MCP initialize,
 // tools/list and an owner-safe tools/call have all succeeded.
-void verifyCoreReadiness({
+void openVerifiedGateway({
+ gateway,port:externalPort,host:'0.0.0.0',isStopped:()=>upstream.exitCode!==null||upstream.killed,
+ proof:verifyCoreReadiness({
  verify:()=>runReaSelfTest(internalPort),
  isStopped:()=>upstream.exitCode!==null||upstream.killed,
  onRetry:(attempt,error)=>{
   if(attempt===1||attempt%10===0)console.warn('[rea-core-readiness]',JSON.stringify({attempt,retry:true,reason:String(error?.message||error).slice(0,140)}));
  }
+})
 }).then(result=>{
  if(upstream.exitCode!==null||upstream.killed)return;
  coreProof={passed:true,tool:'inspect_analysis_settings'};
  status.ready=true;
  console.log('[rea-core-verified]',JSON.stringify(result));
+ console.log('REA gateway listening on '+externalPort+' after tool verification');
  // Owner-requested whole-game source investigation, opt-in and source-bounded.
  // Uses the real internal REA MCP process, never the PixelLab REA dashboard.
  if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'){
@@ -73,10 +77,10 @@ void verifyCoreReadiness({
   }catch(error){console.error('[rea-preview-smoke-error]',String(error.message).slice(0,160));}
  }
 }).catch(error=>console.error('[rea-core-unverified]',String(error.message).slice(0,180)));
-gateway.listen(externalPort, '0.0.0.0', () => console.log('REA gateway listening on ' + externalPort));
+// Render's TCP health check sees the port only after MCP is verified.
 function shutdown(signal) {
   status.ready = false;
-  gateway.close();
+  if(gateway.listening)gateway.close();
   upstream.kill(signal);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));

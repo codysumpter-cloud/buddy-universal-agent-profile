@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {verifyCoreReadiness} from './readiness.mjs';
+import {verifyCoreReadiness,openVerifiedGateway} from './readiness.mjs';
 import {createGateway} from './gateway.mjs';
 const token='owner-'+ 'x'.repeat(45);
 test('REA readiness rejects a reachable socket without verified tool execution',async()=>{
@@ -31,4 +31,22 @@ test('gateway returns 503 until real proof is installed; bearer never bypasses r
   ready=true;
   const healthy=await fetch(base+'/healthz');assert.equal(healthy.status,200);assert.equal((await healthy.json()).ready,true);
  }finally{await new Promise(resolve=>gateway.close(resolve))}
+});
+
+test('Render TCP listener remains closed until REA real proof resolves',async()=>{
+ let resolveProof;
+ const proof=new Promise(resolve=>{resolveProof=resolve});
+ const gateway=createGateway({token});
+ const started=openVerifiedGateway({gateway,port:0,host:'127.0.0.1',proof});
+ assert.equal(gateway.listening,false,'cannot pass TCP health check during MCP verification');
+ resolveProof({initialized:true,toolCallSucceeded:true,called:'inspect_analysis_settings'});
+ const outcome=await started;
+ assert.equal(outcome.called,'inspect_analysis_settings');
+ assert.equal(gateway.listening,true);
+ await new Promise(resolve=>gateway.close(resolve));
+});
+test('Failed proof cannot open the Render TCP listener',async()=>{
+ const gateway=createGateway({token});
+ await assert.rejects(openVerifiedGateway({gateway,port:0,proof:Promise.resolve({initialized:true,toolCallSucceeded:false})}),/proof missing/);
+ assert.equal(gateway.listening,false);
 });

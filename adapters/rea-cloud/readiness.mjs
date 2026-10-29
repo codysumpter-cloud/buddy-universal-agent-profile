@@ -17,3 +17,21 @@ export async function verifyCoreReadiness({verify,isStopped=()=>false,pause=ms=>
  }
  throw Error('REA readiness verification exhausted');
 }
+
+/** Delay the public TCP listener until the real REA MCP handshake is proven.
+ * Render's default TCP health check must not mark an unverified core live. */
+export async function openVerifiedGateway({gateway,proof,port,host='0.0.0.0',isStopped=()=>false}){
+ const result=await proof;
+ if(result?.initialized!==true||result?.toolCallSucceeded!==true||result?.called!=='inspect_analysis_settings')throw Error('REA proof missing before gateway bind');
+ if(isStopped())throw Error('REA process exited before gateway bind');
+ await new Promise((resolve,reject)=>{
+  const fail=error=>{gateway.off('error',fail);reject(error);};
+  gateway.once('error',fail);
+  gateway.listen(port,host,()=>{gateway.off('error',fail);resolve();});
+ });
+ if(isStopped()){
+  await new Promise(resolve=>gateway.close(resolve));
+  throw Error('REA process exited during gateway bind');
+ }
+ return result;
+}
