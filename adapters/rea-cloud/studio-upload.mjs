@@ -103,7 +103,8 @@ export function createUploadAudit({runner=inspectWithRea,maxJobs=20}={}){
      catch{cleaned=false;}
      if(!cleaned)job.error='REA temporary source cleanup failed';
      if(cleaned)job.logs.push({at:new Date().toISOString(),message:'Temporary source bytes deleted.'});
-     job.status=job.error?'failed':'completed';
+     const completed=results.filter(r=>r.status==='completed').length;
+     job.status=job.error||!completed?'failed':completed===files.length?'completed':'partial';
      active=false;
     }
    })();
