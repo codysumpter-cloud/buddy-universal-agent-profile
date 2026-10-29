@@ -6,7 +6,7 @@ import {inflateRawSync} from 'node:zlib';
 import {rpc} from './mcp-selftest.mjs';
 
 // Read-only, source-bounded examination on Render. Never execute target code.
-const URL='https://github.com/s3cond2/worldfall/releases/download/beta-0.9.8.9/Worldfall.zip';
+const SOURCE_URL='https://github.com/s3cond2/worldfall/releases/download/beta-0.9.8.9/Worldfall.zip';
 const ZIP_SHA='29ecd204f6e009a570a121d25455363327957ee2fd6e86bc88190a7270202588';
 const DLL_SHA='6ed462670ced8b33cce6c5a639c50158aac85dc99ff03d0b1b7669302db12770';
 const sha=b=>createHash('sha256').update(b).digest('hex');
@@ -38,7 +38,7 @@ export function selectedZipEntries(buf){
  return result;
 }
 async function download(fetcher){
- const response=await fetcher(URL,{signal:AbortSignal.timeout(90000)});
+ const response=await fetcher(SOURCE_URL,{signal:AbortSignal.timeout(90000)});
  if(!response.ok)throw Error('Official release HTTP '+response.status);
  const host=new URL(response.url).hostname;
  if(!['github.com','release-assets.githubusercontent.com','objects.githubusercontent.com'].includes(host))throw Error('Unexpected release host');
@@ -70,7 +70,7 @@ export async function runWorldfallPerspectiveAudit({fetcher=fetch,call=rpc,log=c
   if(!/copyright|license|licence/i.test(members.get('LICENSE.txt')?.toString('utf8')||''))throw Error('Expected license missing');
   dir=await fs.mkdtemp(path.join(os.tmpdir(),'rea-worldfall-'));
   const file=path.join(dir,'Worldfall.dll');await fs.writeFile(file,dll,{flag:'wx',mode:0o600});
-  log('[rea-worldfall-manifest]',JSON.stringify({version:'0.9.8.9',source:URL,sha256:sha(dll),bytes:dll.length,retention:'ephemeral'}));
+  log('[rea-worldfall-manifest]',JSON.stringify({version:'0.9.8.9',source:SOURCE_URL,sha256:sha(dll),bytes:dll.length,retention:'ephemeral'}));
   stage='initialize';
   const init=await call(8765,{jsonrpc:'2.0',id:701,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'prismtek-worldfall-investigation',version:'1.0'}}},undefined,30000);
   if(!init?.result?.result||!init?.sessionId)throw Error('REA MCP initialize failed');
@@ -87,7 +87,7 @@ export async function runWorldfallPerspectiveAudit({fetcher=fetch,call=rpc,log=c
     log('[rea-worldfall-evidence]',JSON.stringify(note).slice(0,2200));
    }catch(e){const note={tool:name,status:'failed',reason:short(e)};results.push(note);log('[rea-worldfall-coverage]',JSON.stringify(note));}
   }
-  const report={target:'Worldfall 0.9.8.9',source:URL,sha256:sha(dll),analysis:'REA 6.8.0 managed metadata/CIL static',results,
+  const report={target:'Worldfall 0.9.8.9',source:SOURCE_URL,sha256:sha(dll),analysis:'REA 6.8.0 managed metadata/CIL static',results,
    notExamined:['WorldBox host runtime and Unity hooks','actual 3D movement and camera synchronization in-game','Project Viewpoint (different Steam Workshop artifact)']};
   log('[rea-worldfall-result]',JSON.stringify(report).slice(0,8500));return report;
  }catch(e){log('[rea-worldfall-error]',JSON.stringify({stage,error:short(e)}));throw e;}
