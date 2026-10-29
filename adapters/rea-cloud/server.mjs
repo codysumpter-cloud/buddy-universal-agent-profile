@@ -12,6 +12,7 @@ import {runFullBonkAudit} from './full-bonk-audit.mjs';
 import {runWorldfallPerspectiveAudit} from './perspective-mod-audit.mjs';
 import {runArenaModeAudit} from './arena-mode-audit.mjs';
 import {runPerspectiveBridgeAudit} from './perspective-bridge-audit.mjs';
+import {runSafeCrabSourceAudit} from './safe-crab-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -63,6 +64,15 @@ void openVerifiedGateway({
  console.log('[rea-core-verified]',JSON.stringify(result));
  console.log('REA gateway listening on '+externalPort+' after tool verification');
 
+ // Owner-requested Everything is Prismtek analysis uses the EXISTING Render REA MCP core.
+ // Exactly six pinned public reconstruction scripts, sequential, no native binaries/art.
+ // Disabled by default; never race another REA MCP boot audit on 512 MiB free.
+ if(process.env.REA_RUN_SAFE_CRAB_SOURCE_AUDIT==='1'){
+  const competing=['REA_RUN_SAFE_LIVE_STUDIO_AUDIT','REA_RUN_SAFE_ARENA_MODE_AUDIT','REA_RUN_SAFE_PERSPECTIVE_AUDIT','REA_RUN_FULL_BONK_AUDIT','REA_RUN_WORLDFALL_AUDIT','REA_RUN_PREVIEW_SMOKE']
+   .filter(key=>process.env[key]==='1');
+  if(competing.length)console.warn('[rea-crab-deferred]',JSON.stringify({reason:'Other REA boot audit already selected',competing}));
+  else void runSafeCrabSourceAudit().catch(e=>console.error('[rea-crab-error]',String(e?.message||e).slice(0,180)));
+ }
  // One-shot owner opt-in. Two separately bounded, original REA static analyses,
  // not a whole-site audit. Off by default; stop before any concurrent Arena scan.
  if(process.env.REA_RUN_SAFE_LIVE_STUDIO_AUDIT==='1'&&process.env.REA_RUN_SAFE_ARENA_MODE_AUDIT!=='1'){
