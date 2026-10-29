@@ -45,10 +45,10 @@ export async function captureFullBonk({fetcher=fetch,rootPrefix=os.tmpdir()}={})
   const files=[];let total=0;
   for(const name of FILES){
    let data,firstError=null;
-   try{data=await getBounded(ORIGIN+name,{fetcher});}
+   try{data=await getBounded(ORIGIN+(name==='index.html'?'':name),{fetcher});}
    catch(error){firstError=error;}
    if(!data){
-    try{data=await getBounded(FALLBACK_ORIGIN+name,{fetcher});}
+    try{data=await getBounded(FALLBACK_ORIGIN+(name==='index.html'?'':name),{fetcher});}
     catch(error){throw Error('Pinned BONK source unreachable: '+String(firstError?.message||'').slice(0,170)+
      ' / fallback: '+String(error.message).slice(0,170));}
    }
