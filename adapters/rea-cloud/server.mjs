@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
 import {createReaCapabilities} from './capability-bridge.mjs';
+import {detectCgroupMemoryLimit,canRunHeavyBootAudits} from './memory-budget.mjs';
 import { verifyCoreReadiness, openVerifiedGateway } from './readiness.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
@@ -64,14 +65,18 @@ void openVerifiedGateway({
  // restart, causing repeated OOM kills. Heavy boot jobs now require a separate,
  // explicit override; existing opt-in flags alone cannot restart that loop.
  const bootAuditOverride=process.env.REA_ALLOW_BOOT_HEAVY_AUDITS==='1';
- if(!bootAuditOverride&&['REA_RUN_FULL_BONK_AUDIT','REA_RUN_WORLDFALL_AUDIT','REA_RUN_PREVIEW_SMOKE'].some(k=>process.env[k]==='1')){
-  console.warn('[rea-heavy-boot-audits-deferred] Existing on-demand REA tools remain available; set REA_ALLOW_BOOT_HEAVY_AUDITS=1 only on a provisioned, isolated audit host.');
+ const bootAuditMemoryLimit=detectCgroupMemoryLimit();
+ // Even a stale REA_ALLOW_BOOT_HEAVY_AUDITS=1 cannot restart large archive
+ // or decompiler jobs on the 512 MiB Render Free cgroup.
+ const bootAuditAllowed=canRunHeavyBootAudits({explicitEnabled:bootAuditOverride,memoryLimitBytes:bootAuditMemoryLimit});
+ if(!bootAuditAllowed&&['REA_RUN_FULL_BONK_AUDIT','REA_RUN_WORLDFALL_AUDIT','REA_RUN_PREVIEW_SMOKE'].some(k=>process.env[k]==='1')){
+  console.warn('[rea-heavy-boot-audits-deferred]',JSON.stringify({memoryLimitMiB:bootAuditMemoryLimit===null?null:Math.round(bootAuditMemoryLimit/1048576),reason:'Boot audits require explicit opt-in and at least 2 GiB of cgroup RAM; owner REA MCP remains available.'}));
  }
  // Owner-requested whole-game source investigation, opt-in and source-bounded.
  // Uses the real internal REA MCP process, never the PixelLab REA dashboard.
  // REA's stateful MCP is shared. The two audits run sequentially.
  // Each audit uses the actual internal REA tools/call; no model-generated substitute.
- if(bootAuditOverride&&(process.env.REA_RUN_FULL_BONK_AUDIT==='1'||process.env.REA_RUN_WORLDFALL_AUDIT==='1')){
+ if(bootAuditAllowed&&(process.env.REA_RUN_FULL_BONK_AUDIT==='1'||process.env.REA_RUN_WORLDFALL_AUDIT==='1')){
   void(async()=>{
    if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'){
     try{await runFullBonkAudit();}catch(error){console.error('[rea-bonk-audit-failed]',String(error?.message||error).slice(0,350));}
@@ -83,7 +88,7 @@ void openVerifiedGateway({
  }
  // REA Core maintains one stateful MCP session. Do not run the unrelated
  // racing preview smoke alongside the whole BONK analysis.
- if(bootAuditOverride&&process.env.REA_RUN_PREVIEW_SMOKE==='1'&&process.env.REA_RUN_FULL_BONK_AUDIT!=='1'&&process.env.REA_RUN_WORLDFALL_AUDIT!=='1'){
+ if(bootAuditAllowed&&process.env.REA_RUN_PREVIEW_SMOKE==='1'&&process.env.REA_RUN_FULL_BONK_AUDIT!=='1'&&process.env.REA_RUN_WORLDFALL_AUDIT!=='1'){
   try{
    const job=previewAudits.start('racing-game');
    console.log('[rea-preview-smoke-start]',JSON.stringify({id:job.id,slug:job.slug}));
