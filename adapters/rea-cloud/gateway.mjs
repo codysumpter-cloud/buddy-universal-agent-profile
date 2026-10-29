@@ -60,6 +60,43 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
     if (req.url !== '/mcp' || !['POST', 'GET', 'DELETE'].includes(req.method)) {
       res.writeHead(404); res.end('Not found'); return;
     }
+    // Manufact's deployment probe performs an anonymous MCP initialize POST.
+    // Answer only that protocol handshake, never tools/list or tools/call.
+    // Render does not inject MCP_URL and keeps its fully authenticated behavior.
+    if (process.env.MCP_URL && req.method === 'POST' && !validBearer(req.headers.authorization, token)) {
+      let raw = '';
+      let size = 0;
+      let rejected = false;
+      req.on('data', chunk => {
+        size += chunk.length;
+        if (size > 4096) {
+          rejected = true;
+          res.writeHead(413, { 'cache-control': 'no-store' });
+          res.end();
+          req.pause();
+        } else raw += chunk.toString();
+      });
+      req.on('end', () => {
+        if (rejected) return;
+        let message;
+        try { message = JSON.parse(raw); } catch { message = null; }
+        if (message?.jsonrpc === '2.0' && message.method === 'initialize' &&
+            (typeof message.id === 'number' || typeof message.id === 'string') &&
+            isUpstreamReady()) {
+          const payload = JSON.stringify({ jsonrpc: '2.0', id: message.id, result: {
+            protocolVersion: '2025-11-25', capabilities: {},
+            serverInfo: { name: 'prismtek-rea-cloud', version: '6.8.0' }
+          } });
+          res.writeHead(200, { 'content-type': 'application/json',
+            'cache-control': 'no-store', 'content-length': Buffer.byteLength(payload) });
+          res.end(payload);
+          return;
+        }
+        res.writeHead(401, { 'content-type': 'application/json', 'cache-control': 'no-store' });
+        res.end(JSON.stringify({ error: 'unauthorized' }));
+      });
+      return;
+    }
     if (!validBearer(req.headers.authorization, token)) {
       res.writeHead(401, { 'content-type': 'application/json', 'cache-control': 'no-store' });
       res.end(JSON.stringify({ error: 'unauthorized' }));
