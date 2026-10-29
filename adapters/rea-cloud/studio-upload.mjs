@@ -5,7 +5,7 @@ import {createHash, randomUUID} from 'node:crypto';
 import {inspectWithRea} from './studio-audit.mjs';
 
 const MAX_FILE=256*1024;
-const safeName=name=>typeof name==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,100}\.(?:js|mjs)$/.test(name)&&!name.includes('..');
+const safeName=name=>typeof name==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,100}\.(?:js|mjs|ts|tsx|jsx)$/.test(name)&&!name.includes('..');
 const error=(status,message)=>Object.assign(new Error(message),{status});
 
 /** Ephemeral receipts; source bytes are never retained once analysis finishes. */
@@ -20,7 +20,7 @@ export function createUploadAudit({runner=inspectWithRea,maxJobs=20}={}){
   get:id=>jobs.has(id)?view(jobs.get(id)):null,
   remove(id){const job=jobs.get(id);if(!job)return false;if(['queued','running'].includes(job.status))throw error(409,'Analysis still running');return jobs.delete(id);},
   start({name,content,owner,basis,attested}){
-   if(!safeName(name))throw error(415,'Upload one .js or .mjs source file with a safe filename');
+   if(!safeName(name))throw error(415,'Upload one JavaScript or TypeScript source file with a safe filename');
    if(!Buffer.isBuffer(content)||!content.length||content.length>MAX_FILE)throw error(413,'Source file must be 1–256 KiB');
    if(typeof owner!=='string'||!owner.trim()||owner.length>120||typeof basis!=='string'||basis.trim().length<12||basis.length>1000||attested!==true)throw error(400,'Owner, authorization basis and explicit attestation required');
    if(active)throw error(429,'REA upload analysis already running');
