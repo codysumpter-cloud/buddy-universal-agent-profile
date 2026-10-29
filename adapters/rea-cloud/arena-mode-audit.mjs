@@ -10,7 +10,7 @@ import {rpc} from './mcp-selftest.mjs';
  */
 const targets=Object.freeze({
  menu:'arena/src-b87385a6af/escenas/titulo.js',
- arena3d:'arena3d/arena3d.js',
+ arena3d:'arena/pmd3d/arena3d-bridge.js',
  squad:'arena/src-b87385a6af/escenas/squad.js'
 });
 const origin='https://prismtek-poke-arena.pixellab.run/';
