@@ -64,3 +64,26 @@ test('pinned REA capability catalog is served privately and actual tool calls re
   const big=await(await send(large)).json();assert.equal(big.result.content[0].text,'actual REA tool ran');assert.equal(calls,2);
  }finally{await close(gateway);await close(upstream);}
 });
+
+test('Manufact anonymous initialization is read-only; all other MCP methods require bearer',async()=>{
+ const previous=process.env.MCP_URL;
+ process.env.MCP_URL='https://test.run.mcp-use.com/mcp';
+ const gateway=createGateway({token,isUpstreamReady:()=>true});
+ const port=await listen(gateway),base='http://127.0.0.1:'+port+'/mcp';
+ const send=msg=>fetch(base,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(msg)});
+ try{
+  const init=await send({jsonrpc:'2.0',id:7,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{}}});
+  assert.equal(init.status,200);
+  const value=await init.json();
+  assert.equal(value.result.serverInfo.name,'prismtek-rea-cloud');
+  assert.equal(value.id,7);
+  for(const method of ['tools/list','tools/call','prompts/list','notifications/initialized']){
+   const denied=await send({jsonrpc:'2.0',id:8,method});
+   assert.equal(denied.status,401,method);
+  }
+  const deniedGet=await fetch(base);assert.equal(deniedGet.status,401);
+ }finally{
+  await close(gateway);
+  if(previous===undefined)delete process.env.MCP_URL;else process.env.MCP_URL=previous;
+ }
+});
