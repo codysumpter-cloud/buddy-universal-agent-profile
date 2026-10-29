@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const root=import.meta.dirname;
+const fragments=path.join(root,'studio-bundle');
+const output=path.join(root,'studio-public');
+const expected='4ed7c8169e3de506d27488971f5de8d0dcdd630fdadddce0c66a843703d0fa56';
+const parts=fs.readdirSync(fragments).filter(f=>/^part-\d{3}$/.test(f)).sort();
+if(!parts.length)throw Error('GitHub Studio bundle missing');
+const bundle=Buffer.concat(parts.map(f=>fs.readFileSync(path.join(fragments,f))));
+const digest=createHash('sha256').update(bundle).digest('hex');
+if(digest!==expected)throw Error('GitHub Studio bundle integrity mismatch');
+fs.rmSync(output,{recursive:true,force:true});
+fs.mkdirSync(output,{recursive:true});
+const unzip=spawnSync('tar',['-xz','-C',output],{input:bundle,timeout:30000,encoding:'buffer'});
+if(unzip.status!==0||!fs.existsSync(path.join(output,'index.html')))throw Error('Studio bundle could not be unpacked');
+console.log('[studio-bundle]',JSON.stringify({parts:parts.length,bytes:bundle.byteLength,sha256:digest.slice(0,12)}));

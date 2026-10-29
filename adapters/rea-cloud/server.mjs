@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
+import {createStudioHandler} from './studio-web.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -18,7 +19,9 @@ try{
  if(catalog?.info?.version==='6.8.0'&&catalog.tools?.length===229&&catalog.prompts?.length===6)discovery={tools:catalog.tools,prompts:catalog.prompts};
  else console.warn('[rea-discovery] pinned catalog did not match installed core; using normal MCP discovery');
 }catch(e){console.warn('[rea-discovery] pinned catalog unavailable; using normal MCP discovery');}
-const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits),discovery });
+let coreProof=null;
+const studioHandler=createStudioHandler({token,root:new URL('./studio-public/',import.meta.url).pathname,isCoreReady:()=>status.ready,proof:()=>coreProof,audits:previewAudits});
+const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits),discovery,studioHandler });
 const upstream = spawn(process.execPath, [
   'node_modules/rea-agents/scripts/rea.mjs', 'mcp', '--http',
   '--host', '127.0.0.1', '--port', String(internalPort),
@@ -42,6 +45,7 @@ const probe = () => {
     setTimeout(() => {
       runReaSelfTest(internalPort)
         .then(result => {
+          coreProof={passed:true,tool:'inspect_analysis_settings'};
           console.log('[rea-core-verified]', JSON.stringify(result));
           if (process.env.REA_RUN_PREVIEW_SMOKE === '1') {
             try { const job=previewAudits.start('racing-game');

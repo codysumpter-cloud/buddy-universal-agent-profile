@@ -18,7 +18,7 @@ function validBearer(value, secret) {
 
 // Upstream REA has no authentication and can perform stateful operations. Do not
 // expose its internal listener or provide an unauthenticated fallback.
-export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true, auditHandler = null, discovery = null }) {
+export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = () => true, auditHandler = null, discovery = null, studioHandler = null }) {
   if (typeof token !== 'string' || token.length < 32) {
     throw new Error('REA_GATEWAY_TOKEN must be at least 32 characters');
   }
@@ -42,6 +42,8 @@ export function createGateway({ token, upstreamPort = 8765, isUpstreamReady = ()
     };
     res.once('finish', () => report('finished'));
     res.once('close', () => report('closed'));
+    // Owner Studio stays on this Render service, sharing REA's trusted origin.
+    if ((req.url?.startsWith('/studio/') || req.url === '/studio' || req.url?.startsWith('/studio?')) && studioHandler) { Promise.resolve(studioHandler(req,res)).catch(()=>{if(!res.headersSent)res.writeHead(500,{'cache-control':'no-store'});res.end('Studio service unavailable');});return; }
     if (req.url === '/healthz' && req.method === 'GET') {
       const up = isUpstreamReady();
       res.writeHead(up ? 200 : 503, { 'content-type': 'application/json', 'cache-control': 'no-store' });
