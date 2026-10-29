@@ -11,7 +11,7 @@ const SAFE_ID=/^[a-f0-9-]{36}$/i;
 function safePortion(req){return new URL(req.url||'/', 'https://render.internal').pathname;}
 // Public frontend is the same compiled browser code already distributed by the owner PixelLab project;
 // private source packages, user uploads, Warehouse files and source maps are not bundled.
-export function createStudioHandler({token,root,isCoreReady=()=>false,proof=()=>null,audits,uploads,fetcher=fetch}){
+export function createStudioHandler({token,studioProxyToken,root,isCoreReady=()=>false,proof=()=>null,audits,uploads,fetcher=fetch}){
  if(typeof token!=='string'||token.length<32)throw Error('Studio requires existing owner gateway secret');
  const base=path.resolve(root);
  return async(req,res)=>{
@@ -26,7 +26,7 @@ export function createStudioHandler({token,root,isCoreReady=()=>false,proof=()=>
    json(res,200,{ownerAccessConfigured:true,cloudBridgeConfigured:isCoreReady(),privateContentProtected:true,needsOperatorSetup:!isCoreReady(),backend:'Render REA 6.8.0'});return true;
   }
   if(pathname.startsWith('/studio/api/rea/')){
-   if(!bearer(req.headers.authorization,token)){json(res,401,{error:'Owner authentication required'});return true;}
+   if(!bearer(req.headers.authorization,token)&&!bearer(req.headers.authorization,studioProxyToken)){json(res,401,{error:'Owner authentication required'});return true;}
    if(!isCoreReady()){json(res,503,{error:'REA Core starting'});return true;}
    if(pathname==='/studio/api/rea/health'&&req.method==='GET'){
     const result=proof();
