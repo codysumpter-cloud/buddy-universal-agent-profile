@@ -35,14 +35,14 @@ export function createUploadAudit({runner=inspectWithRea,maxJobs=20}={}){
      await fs.writeFile(path.join(root,name),content,{flag:'wx',mode:0o600});
      job.result=await runner({root,sourcePaths:[name],files:[{path:name,sha256,bytes:content.length}]});
      if(!job.result?.rawResultPresent)throw Error('REA returned no inspectable result');
-     job.status='completed';
+     // Publish completion only after temporary source deletion.
      job.findings=[{id:'rea-result',title:'REA Core analysis receipt',
        evidence:JSON.stringify({statistics:job.result.statistics||{},coverage:job.result.coverage||'partial'}).slice(0,1200),
        citation:job.result.evidenceId?'REA evidence '+job.result.evidenceId:'SHA-256 '+sha256,
        note:'Render REA analyzed one owner-authorized source file. Results may have partial coverage.'}];
      job.logs=[{at:new Date().toISOString(),message:'REA analysis completed; source bytes discarded.'}];
-    }catch(e){job.status='failed';job.error=String(e?.message||e).slice(0,180);job.logs=[{at:new Date().toISOString(),message:'REA analysis failed; upload bytes discarded.'}];}
-    finally{if(root)await fs.rm(root,{recursive:true,force:true}).catch(()=>{});active=false;}
+    }catch(e){job.error=String(e?.message||e).slice(0,180);job.logs=[{at:new Date().toISOString(),message:'REA analysis failed; upload bytes discarded.'}];}
+    finally{let cleared=true;try{if(root)await fs.rm(root,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{cleared=false;}if(!cleared)job.error='REA temporary source cleanup failed';job.status=job.error?'failed':'completed';active=false;}
    })();return view(job);
   }
  };
