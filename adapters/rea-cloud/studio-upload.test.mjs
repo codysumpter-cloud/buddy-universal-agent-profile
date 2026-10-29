@@ -22,7 +22,7 @@ test('runner receives temporary file; source is deleted afterward',async()=>{
 });
 test('rejects unauthorized input and filenames',()=>{
  const jobs=createUploadAudit({runner:async()=>({rawResultPresent:true})});
- for(const name of ['../evil.js','evil.ts','evil/abc.js','a..b.js'])assert.throws(()=>jobs.start({...item,name}));
+ for(const name of ['../evil.js','evil.exe','evil/abc.js','a..b.js'])assert.throws(()=>jobs.start({...item,name}));
  assert.throws(()=>jobs.start({...item,attested:false}),/attestation/);
  assert.throws(()=>jobs.start({...item,basis:'short'}),/authorization basis/);
  assert.throws(()=>jobs.start({...item,content:Buffer.alloc(262145)}),/256 KiB/);
@@ -37,4 +37,13 @@ test('only one active upload; metadata does not retain source',async()=>{
  resolve({rawResultPresent:true,evidenceId:'e2'});
  await until(()=>jobs.get(job.id)?.status==='completed');
  assert.equal(JSON.stringify(jobs.get(job.id)).includes('const x=42'),false);
+});
+
+test('Render REA accepts original TypeScript modules for analysis',async()=>{
+ let received;
+ const manager=createUploadAudit({runner:async input=>{received=input.sourcePaths;return{rawResultPresent:true,evidenceId:'ev-ts',statistics:{parsed_javascript_files:1}};}});
+ const job=manager.start({...item,name:'editor.ts',content:Buffer.from('export const scene = 1;')});
+ await until(()=>manager.get(job.id)?.status==='completed');
+ assert.deepEqual(received,['editor.ts']);
+ assert.equal(manager.get(job.id)?.result?.evidenceId,'ev-ts');
 });
