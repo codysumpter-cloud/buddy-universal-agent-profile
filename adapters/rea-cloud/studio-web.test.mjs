@@ -7,7 +7,7 @@ import path from 'node:path';
 import {createGateway} from './gateway.mjs';
 import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
-const TOKEN='r'.repeat(48);
+const TOKEN='r'.repeat(48),STUDIO_PROXY_TOKEN='s'.repeat(48);
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rea-studio-test-'));
 fs.mkdirSync(path.join(tmp,'assets'));fs.writeFileSync(path.join(tmp,'index.html'),'<html>Owner Studio</html>');fs.writeFileSync(path.join(tmp,'assets','app.js'),'export const studio=true;');
 const audits={
@@ -17,7 +17,7 @@ const audits={
 };
 async function host(){
  const uploads=createUploadAudit({runner:async()=>({rawResultPresent:true,evidenceId:'ev-upload',statistics:{files:1},coverage:'partial'})});
- const studioHandler=createStudioHandler({token:TOKEN,root:tmp,isCoreReady:()=>true,proof:()=>({passed:true,tool:'inspect_analysis_settings'}),audits,uploads,fetcher:async()=>new Response('none',{status:404})});
+ const studioHandler=createStudioHandler({token:TOKEN,studioProxyToken:STUDIO_PROXY_TOKEN,root:tmp,isCoreReady:()=>true,proof:()=>({passed:true,tool:'inspect_analysis_settings'}),audits,uploads,fetcher:async()=>new Response('none',{status:404})});
  const gateway=createGateway({token:TOKEN,isUpstreamReady:()=>true,studioHandler});
  await new Promise(r=>gateway.listen(0,'127.0.0.1',r));
  return {gateway,url:'http://127.0.0.1:'+gateway.address().port};
@@ -77,5 +77,18 @@ test('private browser file uploads execute through Render REA job manager, not W
   assert.equal((await fetch(url+'/studio/api/rea/jobs/'+job.id,{headers})).status,404);
   const bad=new FormData();bad.set('file',new Blob(['bad']),'unsupported.exe');bad.set('owner','Prismtek');bad.set('basis','Owner original JavaScript source analysis');bad.set('attest','true');
   assert.equal((await fetch(url+'/studio/api/rea/jobs',{method:'POST',headers,body:bad})).status,415);
+ }finally{gateway.closeAllConnections();await new Promise(r=>gateway.close(r));}
+});
+
+test('first-party website proxy uses a distinct Studio bearer and preserves MCP gateway protection',async()=>{
+ const {gateway,url}=await host();
+ try{
+  const studioHeaders={authorization:'Bearer '+STUDIO_PROXY_TOKEN};
+  const authorized=await fetch(url+'/studio/api/rea/health',{headers:studioHeaders});
+  assert.equal(authorized.status,200);
+  const denied=await fetch(url+'/studio/api/rea/health',{headers:{authorization:'Bearer '+'x'.repeat(48)}});
+  assert.equal(denied.status,401);
+  const upstreamMcp=await fetch(url+'/mcp',{headers:studioHeaders});
+  assert.equal(upstreamMcp.status,401);
  }finally{gateway.closeAllConnections();await new Promise(r=>gateway.close(r));}
 });
