@@ -11,6 +11,7 @@ import {createUploadAudit} from './studio-upload.mjs';
 import {runFullBonkAudit} from './full-bonk-audit.mjs';
 import {runWorldfallPerspectiveAudit} from './perspective-mod-audit.mjs';
 import {runArenaModeAudit} from './arena-mode-audit.mjs';
+import {runPerspectiveBridgeAudit} from './perspective-bridge-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -100,6 +101,18 @@ void openVerifiedGateway({
  // Automatic whole-game audits were previously retriggered after every Render
  // restart, causing repeated OOM kills. Heavy boot jobs now require a separate,
  // explicit override; existing opt-in flags alone cannot restart that loop.
+ // Owner-opt-in, small REA static audit of the checked-in Perspective Bridge PR.
+ // Strictly one immutable source at a time. Never combine with other scans
+ // or escalate to memory-heavy boot audits on the free instance.
+ if(process.env.REA_RUN_SAFE_PERSPECTIVE_AUDIT==='1'){
+  if(process.env.REA_RUN_SAFE_LIVE_STUDIO_AUDIT==='1'||process.env.REA_RUN_SAFE_ARENA_MODE_AUDIT==='1'){
+   console.warn('[rea-perspective-deferred] Another safe startup audit is selected.');
+  }else{
+   void runPerspectiveBridgeAudit()
+    .catch(e=>console.warn('[rea-perspective-audit-failed]',String(e?.message||e).slice(0,180)));
+  }
+ }
+
  const bootAuditOverride=process.env.REA_ALLOW_BOOT_HEAVY_AUDITS==='1';
  const bootAuditMemoryLimit=detectCgroupMemoryLimit();
  // Even a stale REA_ALLOW_BOOT_HEAVY_AUDITS=1 cannot restart large archive
