@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process';
-import http from 'node:http';
 import {readFileSync} from 'node:fs';
 import { createGateway } from './gateway.mjs';
 import { runReaSelfTest } from './mcp-selftest.mjs';
+import { verifyCoreReadiness } from './readiness.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
@@ -38,33 +38,34 @@ upstream.on('exit', (code, signal) => {
   gateway.close();
   process.exitCode = code || 1;
 });
-let retries = 0;
-const probe = () => {
-  if (status.ready || upstream.exitCode !== null) return;
-  const req = http.request({ hostname: '127.0.0.1', port: internalPort, path: '/mcp', method: 'GET', timeout: 500 }, (res) => {
-    res.resume(); status.ready = true;
-    // Run a real, read-only REA tool call on the Render host, not the user's computer.
-    setTimeout(() => {
-      runReaSelfTest(internalPort)
-        .then(result => {
-          coreProof={passed:true,tool:'inspect_analysis_settings'};
-          console.log('[rea-core-verified]', JSON.stringify(result));
-          if (process.env.REA_RUN_PREVIEW_SMOKE === '1') {
-            try { const job=previewAudits.start('racing-game');
-              console.log('[rea-preview-smoke-start]', JSON.stringify({id:job.id,slug:job.slug}));
-              const check=setInterval(()=>{const current=previewAudits.get(job.id);if(!current||current.status==='completed'||current.status==='failed'){clearInterval(check);console.log('[rea-preview-smoke-end]',JSON.stringify({status:current?.status,evidenceId:current?.result?.evidenceId||null,statistics:current?.result?.statistics||null,error:current?.error||null}));}},3000);
-              check.unref();
-            } catch(error){console.error('[rea-preview-smoke-error]',String(error.message).slice(0,160));}
-          }
-        })
-        .catch(error => console.error('[rea-core-unverified]', String(error.message).slice(0, 160)));
-    }, 500);
-  });
-  req.on('error', () => { if (++retries < 120) setTimeout(probe, 1000); });
-  req.on('timeout', () => req.destroy());
-  req.end();
-};
-probe();
+// Do not publish HTTP/MCP readiness until the actual MCP initialize,
+// tools/list and an owner-safe tools/call have all succeeded.
+void verifyCoreReadiness({
+ verify:()=>runReaSelfTest(internalPort),
+ isStopped:()=>upstream.exitCode!==null||upstream.killed,
+ onRetry:(attempt,error)=>{
+  if(attempt===1||attempt%10===0)console.warn('[rea-core-readiness]',JSON.stringify({attempt,retry:true,reason:String(error?.message||error).slice(0,140)}));
+ }
+}).then(result=>{
+ if(upstream.exitCode!==null||upstream.killed)return;
+ coreProof={passed:true,tool:'inspect_analysis_settings'};
+ status.ready=true;
+ console.log('[rea-core-verified]',JSON.stringify(result));
+ if(process.env.REA_RUN_PREVIEW_SMOKE==='1'){
+  try{
+   const job=previewAudits.start('racing-game');
+   console.log('[rea-preview-smoke-start]',JSON.stringify({id:job.id,slug:job.slug}));
+   const check=setInterval(()=>{
+    const current=previewAudits.get(job.id);
+    if(!current||current.status==='completed'||current.status==='failed'){
+     clearInterval(check);
+     console.log('[rea-preview-smoke-end]',JSON.stringify({status:current?.status,evidenceId:current?.result?.evidenceId||null,statistics:current?.result?.statistics||null,error:current?.error||null}));
+    }
+   },3000);
+   check.unref();
+  }catch(error){console.error('[rea-preview-smoke-error]',String(error.message).slice(0,160));}
+ }
+}).catch(error=>console.error('[rea-core-unverified]',String(error.message).slice(0,180)));
 gateway.listen(externalPort, '0.0.0.0', () => console.log('REA gateway listening on ' + externalPort));
 function shutdown(signal) {
   status.ready = false;
