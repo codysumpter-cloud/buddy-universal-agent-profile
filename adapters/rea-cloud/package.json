@@ -8,9 +8,9 @@
     "node": ">=24.22.1 <25"
   },
   "scripts": {
-    "prestart": "node --check server.mjs && node --check studio-web.mjs && node --check studio-upload.mjs && node --check full-bonk-audit.mjs && node --test full-bonk-audit.test.mjs && node --check perspective-mod-audit.mjs && node --test perspective-mod-audit.test.mjs",
+    "prestart": "node --check server.mjs && node --check capability-bridge.mjs && node --check studio-web.mjs && node --check studio-upload.mjs && node --check full-bonk-audit.mjs && node --test full-bonk-audit.test.mjs && node --check perspective-mod-audit.mjs && node --test perspective-mod-audit.test.mjs",
     "start": "node unpack-studio.mjs && node server.mjs",
-    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs studio-web.test.mjs readiness.test.mjs full-bonk-audit.test.mjs studio-upload.test.mjs perspective-mod-audit.test.mjs"
+    "test": "node --test gateway.test.mjs mcp-selftest.test.mjs studio-audit.test.mjs studio-web.test.mjs readiness.test.mjs full-bonk-audit.test.mjs studio-upload.test.mjs perspective-mod-audit.test.mjs capability-bridge.test.mjs capability-api.test.mjs"
   },
   "dependencies": {
     "rea-agents": "6.8.0"
