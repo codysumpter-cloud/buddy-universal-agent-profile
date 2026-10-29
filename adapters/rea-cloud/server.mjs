@@ -73,7 +73,7 @@ void openVerifiedGateway({
  }
  // REA Core maintains one stateful MCP session. Do not run the unrelated
  // racing preview smoke alongside the whole BONK analysis.
- if(process.env.REA_RUN_PREVIEW_SMOKE==='1'&&process.env.REA_RUN_FULL_BONK_AUDIT!=='1'){
+ if(process.env.REA_RUN_PREVIEW_SMOKE==='1'&&process.env.REA_RUN_FULL_BONK_AUDIT!=='1'&&process.env.REA_RUN_WORLDFALL_AUDIT!=='1'){
   try{
    const job=previewAudits.start('racing-game');
    console.log('[rea-preview-smoke-start]',JSON.stringify({id:job.id,slug:job.slug}));
