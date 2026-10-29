@@ -22,7 +22,7 @@ try{
  else console.warn('[rea-discovery] pinned catalog did not match installed core; using normal MCP discovery');
 }catch(e){console.warn('[rea-discovery] pinned catalog unavailable; using normal MCP discovery');}
 let coreProof=null;
-const studioHandler=createStudioHandler({token,root:new URL('./studio-public/',import.meta.url).pathname,isCoreReady:()=>status.ready,proof:()=>coreProof,audits:previewAudits,uploads:uploadAudits});
+const studioHandler=createStudioHandler({token,studioProxyToken:process.env.REA_STUDIO_PROXY_TOKEN,root:new URL('./studio-public/',import.meta.url).pathname,isCoreReady:()=>status.ready,proof:()=>coreProof,audits:previewAudits,uploads:uploadAudits});
 const gateway = createGateway({ token, upstreamPort: internalPort, isUpstreamReady: () => status.ready, auditHandler:createAuditHandler(previewAudits),discovery,studioHandler });
 const upstream = spawn(process.execPath, [
   'node_modules/rea-agents/scripts/rea.mjs', 'mcp', '--http',
