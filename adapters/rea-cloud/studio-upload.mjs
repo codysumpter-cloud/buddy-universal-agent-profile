@@ -79,7 +79,7 @@ export function createUploadAudit({runner=inspectWithRea,maxJobs=20}={}){
       // The private receipt contains metadata only, updated for owner polling.
       job.result={tool:'analyze_javascript_application',fileCount:files.length,
        analyzed:results.filter(r=>r.status==='completed').length,processed,
-       uninspected:files.length-processed,results:[...results],
+       uninspected:files.length-results.filter(r=>r.status==='completed').length,processedPending:files.length-processed,results:[...results],
        sourceSelection:{analyzed:results.filter(r=>r.status==='completed').map(r=>r.path),
         uninspected:files.filter(f=>!results.some(r=>r.path===f.path&&r.status==='completed')).map(f=>f.path)},
        rawResultPresent:results.some(r=>r.status==='completed'),
