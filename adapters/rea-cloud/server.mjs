@@ -6,6 +6,7 @@ import { verifyCoreReadiness } from './readiness.mjs';
 import {createPreviewAudit,createAuditHandler} from './studio-audit.mjs';
 import {createStudioHandler} from './studio-web.mjs';
 import {createUploadAudit} from './studio-upload.mjs';
+import {runFullBonkAudit} from './full-bonk-audit.mjs';
 
 const token = process.env.REA_GATEWAY_TOKEN;
 const externalPort = Number(process.env.PORT || 10000);
@@ -51,6 +52,12 @@ void verifyCoreReadiness({
  coreProof={passed:true,tool:'inspect_analysis_settings'};
  status.ready=true;
  console.log('[rea-core-verified]',JSON.stringify(result));
+ // Owner-requested whole-game source investigation, opt-in and source-bounded.
+ // Uses the real internal REA MCP process, never the PixelLab REA dashboard.
+ if(process.env.REA_RUN_FULL_BONK_AUDIT==='1'){
+  void runFullBonkAudit().catch(error=>
+   console.error('[rea-bonk-audit-failed]',String(error?.message||error).slice(0,350)));
+ }
  if(process.env.REA_RUN_PREVIEW_SMOKE==='1'){
   try{
    const job=previewAudits.start('racing-game');
