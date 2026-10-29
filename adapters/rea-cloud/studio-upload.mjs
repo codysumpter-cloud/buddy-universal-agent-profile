@@ -85,5 +85,29 @@ export function createUploadAudit({runner=inspectWithRea,maxJobs=20}={}){
        rawResultPresent:results.some(r=>r.status==='completed'),
        ...(files.length===1?{evidenceId:results[0]?.evidenceId||null,statistics:results[0]?.statistics||{},coverage:results[0]?.coverage||'partial'}:{})};
      }
-     if(!results.some(r=>r.status==='completed'))throw Error('REA did not analyze any submitted source
-…(truncated — 7259 chars total; log/return less)
+
+     if(!results.some(r=>r.status==='completed'))throw Error('REA did not analyze any submitted source');
+     job.findings=results.map((r,index)=>({
+      id:'rea-source-'+(index+1),title:r.path,
+      evidence:JSON.stringify({statistics:r.statistics||{},coverage:r.coverage||'partial',error:r.error||null}).slice(0,1000),
+      citation:r.evidenceId?'REA evidence '+r.evidenceId:'SHA-256 '+r.sha256,
+      note:r.status==='completed'?'Render REA analyzed this source':'Source analysis failed'
+     }));
+     job.logs=[{at:new Date().toISOString(),message:'REA source analysis processed '+processed+' files; cleanup pending.'}];
+    }catch(e){
+     job.error=String(e?.message||e).slice(0,180);
+     job.logs=[{at:new Date().toISOString(),message:'REA source analysis failed; cleanup pending.'}];
+    }finally{
+     let cleaned=true;
+     try{if(root)await fs.rm(root,{recursive:true,force:true,maxRetries:3,retryDelay:100});}
+     catch{cleaned=false;}
+     if(!cleaned)job.error='REA temporary source cleanup failed';
+     if(cleaned)job.logs.push({at:new Date().toISOString(),message:'Temporary source bytes deleted.'});
+     job.status=job.error?'failed':'completed';
+     active=false;
+    }
+   })();
+   return view(job);
+  }
+ };
+}
