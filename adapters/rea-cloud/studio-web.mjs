@@ -70,5 +70,81 @@ export function createStudioHandler({token,studioProxyToken,root,isCoreReady=()=
     if(!type.startsWith('multipart/form-data;')){json(res,415,{error:'Multipart file required'});return true;}
     let total=0;const parts=[];
     try{for await(const chunk of req){total+=chunk.length;if(total>1150*1024){json(res,413,{error:'Upload exceeds 1150 KiB envelope'});return true;}parts.push(chunk);}}
-    catch{jso
-…(truncated — 12212 chars total; log/return less)
+    catch{json(res,400,{error:'Invalid upload stream'});return true;}
+    let form;
+    try{form=await new Request('http://localhost/rea-upload',{method:'POST',headers:{'content-type':type},body:Buffer.concat(parts)}).formData();}
+    catch{json(res,400,{error:'Malformed multipart upload'});return true;}
+    if([...form.keys()].some(k=>!['file','owner','basis','attest','paths'].includes(k))||
+       form.getAll('owner').length!==1||form.getAll('basis').length!==1||
+       form.getAll('attest').length!==1||form.getAll('paths').length>1){
+      json(res,400,{error:'Unexpected or duplicate upload fields'});return true;
+    }
+    const files=form.getAll('file'),owner=form.get('owner'),basis=form.get('basis'),attest=form.get('attest');
+    if(!files.length||files.length>24||files.some(file=>typeof file==='string'||typeof file.arrayBuffer!=='function')||
+       typeof owner!=='string'||typeof basis!=='string'||attest!=='true'){
+      json(res,400,{error:'1–24 source files, owner, basis and attestation required'});return true;
+    }
+    if(files.some(file=>file.size<1||file.size>256*1024)||
+       files.reduce((sum,file)=>sum+file.size,0)>1024*1024){json(res,413,{error:'Source batch exceeds size limits'});return true;}
+    let paths;
+    if(form.has('paths')){
+     try{paths=JSON.parse(form.get('paths'))}catch{json(res,400,{error:'Malformed relative paths JSON'});return true;}
+     if(!Array.isArray(paths)||paths.length!==files.length||paths.some(p=>typeof p!=='string')){
+      json(res,400,{error:'Source path manifest does not match selected files'});return true;
+     }
+    }else paths=files.map(file=>file.name);
+    try{
+     const input=files.length===1&&!form.has('paths')?
+      {name:files[0].name,content:Buffer.from(await files[0].arrayBuffer()),owner,basis,attested:true}:
+      {files:await Promise.all(files.map(async(file,i)=>({path:paths[i],content:Buffer.from(await file.arrayBuffer())}))),owner,basis,attested:true};
+     const job=uploads.start(input);
+     json(res,202,{job,status:'configured-unverified',coreVerified:false,scope:'Sequential, evidence-backed per-source REA analysis; incomplete files stay explicit.'});
+    }catch(e){json(res,e.status||400,{error:String(e.message||e).slice(0,180)});}
+    return true;
+   }
+   const uploadId=pathname.match(/^\/studio\/api\/rea\/jobs\/([a-f0-9-]{36})$/);
+   if(uploadId&&req.method==='GET'){const job=uploads?.get(uploadId[1]);json(res,job?200:404,job?{job}:{error:'Job not found'});return true;}
+   if(uploadId&&req.method==='DELETE'){
+    if(!uploads){json(res,503,{error:'Upload service unavailable'});return true;}
+    try{json(res,uploads.remove(uploadId[1])?200:404,{deleted:!uploads.get(uploadId[1])});}
+    catch(e){json(res,e.status||400,{error:String(e.message||e).slice(0,180)});}
+    return true;
+   }
+   if(pathname==='/studio/api/rea/cloud-scans'&&req.method==='GET'){json(res,200,{scans:audits.list(),note:'Render owns these bounded REA evidence receipts; process memory is ephemeral.'});return true;}
+   if(pathname==='/studio/api/rea/cloud-scans'&&req.method==='POST'){
+    if(!String(req.headers['content-type']||'').startsWith('application/json')){json(res,415,{error:'JSON required'});return true;}
+    let bytes=0,body='';for await(const chunk of req){bytes+=chunk.length;if(bytes>512){json(res,413,{error:'Request too large'});return true;}body+=chunk;}
+    let value;try{value=JSON.parse(body)}catch{json(res,400,{error:'Malformed JSON'});return true;}
+    if(!value||Object.keys(value).length!==1||typeof value.slug!=='string'){json(res,400,{error:'Choose one authorized owner project'});return true;}
+    try{const scan=audits.start(value.slug);json(res,202,{scan,coreTool:'analyze_javascript_application',scope:'bounded public preview; original private source not examined'});}
+    catch(e){json(res,e.status||400,{error:String(e.message||e).slice(0,180)});}
+    return true;
+   }
+   const id=pathname.match(/^\/studio\/api\/rea\/cloud-scans\/([a-f0-9-]{36})$/);
+   if(id&&req.method==='GET'){const scan=audits.get(id[1]);json(res,scan?200:404,scan?{scan,retained:false}:{error:'Unknown REA scan'});return true;}
+   json(res,503,{error:'Private source-library transfer or file intake is not configured on Render; use local import in Studio.'});return true;
+  }
+  if(req.method!=='GET'){json(res,405,{error:'Read-only Studio assets'});return true;}
+  const rel=pathname==='/studio/'?'index.html':pathname.slice('/studio/'.length);
+  if(!/^[a-zA-Z0-9_./-]+$/.test(rel)||rel.includes('..')){json(res,400,{error:'Invalid asset path'});return true;}
+  const target=path.resolve(base,rel);
+  if(!target.startsWith(base+path.sep)){json(res,403,{error:'Invalid path'});return true;}
+  if(fs.existsSync(target)&&fs.statSync(target).isFile()){
+   const ext=path.extname(target).toLowerCase();
+   if(!mime[ext]){json(res,415,{error:'Unsupported asset'});return true;}
+   res.writeHead(200,{'content-type':mime[ext], 'cache-control':rel==='index.html'?'no-store':'public, max-age=3600','x-content-type-options':'nosniff'});
+   fs.createReadStream(target).pipe(res);return true;
+  }
+  // Existing publicly distributed image/atlas data is fetched from the unchanged owner preview.
+  // Never proxy arbitrary URLs, private APIs, source maps or non-media files.
+  if(!allowedMedia.test(pathname)){json(res,404,{error:'Not found'});return true;}
+  try{
+   const upstream=await fetcher('https://rea.pixellab.run/'+rel,{redirect:'error',headers:{accept:'image/*,application/json,font/*'},signal:AbortSignal.timeout(12000)});
+   const ext=path.extname(rel).toLowerCase();const size=Number(upstream.headers.get('content-length')||0);
+   if(!upstream.ok||size>2*1024*1024){json(res,502,{error:'Original public image unavailable'});return true;}
+   const chunks=[];let count=0;for await(const chunk of Readable.fromWeb(upstream.body)){count+=chunk.length;if(count>2*1024*1024){json(res,413,{error:'Image exceeds proxy limit'});return true;}chunks.push(chunk);}
+   res.writeHead(200,{'content-type':mime[ext]||'application/octet-stream','cache-control':'public, max-age=300','x-content-type-options':'nosniff'});res.end(Buffer.concat(chunks));
+  }catch{json(res,502,{error:'Public asset retrieval unavailable'});}
+  return true;
+ };
+}
