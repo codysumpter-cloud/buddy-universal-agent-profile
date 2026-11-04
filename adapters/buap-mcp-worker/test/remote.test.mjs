@@ -21,7 +21,7 @@ test("remote streamable MCP initialize, tool discovery, and metadata calls",asyn
   const l=await worker.fetch(post(rpc(2,"tools/list")),env);const tools=(await l.json()).result.tools.map(x=>x.name);
   assert(tools.includes("buap_self_test"));assert(tools.includes("buap_manifest"));assert(tools.includes("buap_capabilities"));
   assert(tools.includes("buap_github_repo"));assert(!tools.includes("buap_github_create_pr"));
-  assert.equal(remoteToolDefinitions().length,3);
+  assert.equal(remoteToolDefinitions().length,5);
   const manifest=await worker.fetch(post(rpc(3,"tools/call",{name:"buap_manifest",arguments:{}})),env);
   assert.equal(JSON.parse((await manifest.json()).result.content[0].text).profile_contract,"contracts/prismtek-agent-profile-v1.md");
   const st=await worker.fetch(post(rpc(4,"tools/call",{name:"buap_self_test",arguments:{}})),env);
