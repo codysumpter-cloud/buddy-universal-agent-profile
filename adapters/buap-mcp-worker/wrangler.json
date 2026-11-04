@@ -5,9 +5,9 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": false,
+  "workers_dev": true,
   "preview_urls": false,
   "vars": {
-    "BUAP_GITHUB_REPOS": "codysumpter-cloud/buddy-universal-agent-profile"
+    "BUAP_GITHUB_REPOS": "codysumpter-cloud/buddy-universal-agent-profile,codysumpter-cloud/prismtek-site"
   }
 }
