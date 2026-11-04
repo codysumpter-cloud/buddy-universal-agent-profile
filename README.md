@@ -12,10 +12,10 @@
   </a>
 </p>
 <p align="center">
+  <a href="#install-the-buap-plugin-mcp-and-api-client">Plugin + MCP + API</a> ·
   <a href="#mission-control-for-real-agentic-work">Mission Control</a> ·
-  <a href="#hermes-execution-parity-opt-in">Hermes</a> ·
   <a href="integrations/xerj-reference-retrieval.md">XERJ</a> ·
-  <a href="runbooks/agentic-mission-control.md">Agentic Runbook</a>
+  <a href="#hermes-execution-parity-opt-in">Hermes</a>
 </p>
 
 A portable, tool-agnostic agent behavior standard for the Prismtek / Buddy ecosystem
@@ -41,6 +41,37 @@ BUAP also defines **first-class Agent Profiles**: persistent, host-portable agen
 objects with identity, mission, memory namespace, execution targets, capability
 bindings, autonomy, approval rules, schedules, pause state, and activity history.
 See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
+
+## Install the BUAP plugin, MCP, and API client
+
+**BUAP is an installable developer-agent package, not a Vercel website.** It ships
+three connected but distinct components:
+
+| Component | Real implementation | Entry point |
+|---|---|---|
+| Claude Code plugin | Marketplace manifest, Lil' Buddy worker, skills, commands, and safety hooks | [Plugin setup](plugins/buap/README.md) |
+| Native MCP server | Node.js stdio JSON-RPC server exposing allowlisted GitHub tools | [MCP setup](plugins/buap/mcp/github/README.md) |
+| GitHub API adapter | Real authenticated requests to `api.github.com`, used by the MCP server | [API source](plugins/buap/mcp/github/api.mjs) |
+
+Install the Claude Code plugin from this public repository:
+
+```text
+/plugin marketplace add codysumpter-cloud/buddy-universal-agent-profile
+/plugin install buap@buap
+```
+
+The plugin auto-registers the bundled MCP server through
+[`plugins/buap/.mcp.json`](plugins/buap/.mcp.json). In your MCP client, verify
+`buap_github_health`, then configure a host-side `BUAP_GITHUB_REPOS` allowlist
+and scoped authentication to use live GitHub tools. It does **not** inherit the
+ChatGPT GitHub connector's credentials.
+
+Codex users can start with the
+[Codex plugin manifest](plugins/buap/.codex-plugin/plugin.json) and
+[GitHub MCP host template](adapters/codex-buap-github-mcp.template.toml).
+For Xcode and ACP, see the [BUAP ACP agent](packages/buap-acp-agent/README.md).
+The API adapter is a **local library, not a deployed public BUAP HTTP API**;
+the repository has no requirement to deploy to REA Cloud or Vercel.
 
 ## Mission Control for real agentic work
 
