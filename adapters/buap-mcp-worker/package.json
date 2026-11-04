@@ -1,0 +1,10 @@
+{
+  "name": "@prismtek/buap-mcp-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build": "node --check index.mjs && node --check ../../plugins/buap/mcp/github/server.mjs"
+  }
+}
