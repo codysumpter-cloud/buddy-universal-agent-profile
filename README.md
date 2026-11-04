@@ -44,14 +44,17 @@ See `docs/agent-profiles.md` and `contracts/prismtek-agent-profile-v1.md`.
 
 ## Install the BUAP plugin, MCP, and API client
 
-**BUAP is an installable developer-agent package, not a Vercel website.** It ships
-three connected but distinct components:
+**BUAP is the portable agent-profile, plugin, and MCP stack.** It ships
+an installable developer plugin, two native MCP transports, and a reusable
+GitHub API adapter. A separately hosted runtime adapter does not define the
+BUAP repository's identity or homepage.
 
 | Component | Real implementation | Entry point |
 |---|---|---|
-| Claude Code plugin | Marketplace manifest, Lil' Buddy worker, skills, commands, and safety hooks | [Plugin setup](plugins/buap/README.md) |
-| Native MCP server | Node.js stdio JSON-RPC server exposing allowlisted GitHub tools | [MCP setup](plugins/buap/mcp/github/README.md) |
-| GitHub API adapter | Real authenticated requests to `api.github.com`, used by the MCP server | [API source](plugins/buap/mcp/github/api.mjs) |
+| Developer plugin | Claude Code and Codex manifests, Lil' Buddy worker, skills, commands, and safety hooks | [Plugin setup](plugins/buap/README.md) |
+| Local BUAP MCP | Node.js stdio JSON-RPC server with allowlisted GitHub tools | [Local MCP setup](plugins/buap/mcp/github/README.md) |
+| **Remote BUAP MCP** | Production Cloudflare Worker behind owner-only OAuth; 11 read-only BUAP tools including live GitHub probes and PR readiness checks | [Remote MCP source and security](adapters/buap-mcp-worker/README.md) |
+| GitHub API adapter | Scoped requests to `api.github.com`, shared by both MCP transports | [API source](plugins/buap/mcp/github/api.mjs) |
 
 Install the Claude Code plugin from this public repository:
 
@@ -70,8 +73,14 @@ Codex users can start with the
 [Codex plugin manifest](plugins/buap/.codex-plugin/plugin.json) and
 [GitHub MCP host template](adapters/codex-buap-github-mcp.template.toml).
 For Xcode and ACP, see the [BUAP ACP agent](packages/buap-acp-agent/README.md).
-The API adapter is a **local library, not a deployed public BUAP HTTP API**;
-the repository has no requirement to deploy to REA Cloud or Vercel.
+The GitHub API adapter is a **library, not an unauthenticated public REST API**.
+The dedicated remote BUAP MCP is served through the **owner-only** portal
+`https://buap-mcp.prismtek.dev/mcp`. Its production Worker has 11 read-only
+BUAP tools; the portal also exposes nine separately approved Mac tools, with
+the other Mac operations disabled through that portal. A Ready MCP registry
+status does not by itself verify an end-user OAuth tool call. Private GitHub
+repos require a separately scoped BUAP credential; allowlisting alone is not
+authentication.
 
 ## Mission Control for real agentic work
 
