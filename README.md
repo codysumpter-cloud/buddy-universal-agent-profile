@@ -5,6 +5,12 @@
 </p>
 
 <p align="center"><strong>Persistent identity · Safe delegation · Verified agentic missions</strong></p>
+
+<p align="center">
+  <a href="https://hub.xerj.org/contributors/codysumpter-cloud">
+    <img src="https://hub.xerj.org/contributors/codysumpter-cloud/badge.svg" alt="XERJ Corpus Hub contributor badge for codysumpter-cloud">
+  </a>
+</p>
 <p align="center">
   <a href="#mission-control-for-real-agentic-work">Mission Control</a> ·
   <a href="#hermes-execution-parity-opt-in">Hermes</a> ·
