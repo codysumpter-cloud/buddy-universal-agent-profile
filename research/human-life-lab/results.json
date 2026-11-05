@@ -1,0 +1,86 @@
+{
+  "experiment": "REA Human Life Lab E001",
+  "provenance": "manually transcribed from source CellML MathML indexed page; original CellML was NOT executed",
+  "source": "https://models.physiomeproject.org/workspace/57f/file/b7ace28cd8fc53c71b668914616b34538812f126/brown_choe_shanahan_czeisler_1997.cellml",
+  "simulation": "single nonperiodic synthesis pulse; not a direct light-exposure response",
+  "solver": "fixed-step classical RK4; dt=0.25 minute; samples every 1 minute",
+  "duration_min": 2400,
+  "scenarios": {
+    "baseline": {
+      "parameters": {
+        "t_on": 1316.0,
+        "t_off": 1792.0,
+        "A_max": 6.51,
+        "tau_I": 2.82,
+        "tau_C": 23.67,
+        "tau_alpha": 25.92,
+        "tau_lambda": 24.04,
+        "H1_0": 0.05,
+        "H2_0": 1.0
+      },
+      "peak_plasma_pM": 222.303922,
+      "peak_at_minute": 1792,
+      "peak_clock_label": "day 1, 05:52",
+      "plasma_AUC_pM_minutes": 106457.2122,
+      "final_plasma_pM": 0.0002
+    },
+    "synthesis_delayed_120min": {
+      "parameters": {
+        "t_on": 1436.0,
+        "t_off": 1912.0,
+        "A_max": 6.51,
+        "tau_I": 2.82,
+        "tau_C": 23.67,
+        "tau_alpha": 25.92,
+        "tau_lambda": 24.04,
+        "H1_0": 0.05,
+        "H2_0": 1.0
+      },
+      "peak_plasma_pM": 222.303922,
+      "peak_at_minute": 1912,
+      "peak_clock_label": "day 1, 07:52",
+      "plasma_AUC_pM_minutes": 106457.0452,
+      "final_plasma_pM": 0.004527
+    },
+    "faster_clearance_2x": {
+      "parameters": {
+        "t_on": 1316.0,
+        "t_off": 1792.0,
+        "A_max": 6.51,
+        "tau_I": 2.82,
+        "tau_C": 11.835,
+        "tau_alpha": 25.92,
+        "tau_lambda": 24.04,
+        "H1_0": 0.05,
+        "H2_0": 1.0
+      },
+      "peak_plasma_pM": 111.153516,
+      "peak_at_minute": 1792,
+      "peak_clock_label": "day 1, 05:52",
+      "plasma_AUC_pM_minutes": 53228.6123,
+      "final_plasma_pM": 2e-05
+    },
+    "slower_clearance_2x": {
+      "parameters": {
+        "t_on": 1316.0,
+        "t_off": 1792.0,
+        "A_max": 6.51,
+        "tau_I": 2.82,
+        "tau_C": 47.34,
+        "tau_alpha": 25.92,
+        "tau_lambda": 24.04,
+        "H1_0": 0.05,
+        "H2_0": 1.0
+      },
+      "peak_plasma_pM": 443.719166,
+      "peak_at_minute": 1793,
+      "peak_clock_label": "day 1, 05:53",
+      "plasma_AUC_pM_minutes": 212904.7363,
+      "final_plasma_pM": 0.142011
+    }
+  },
+  "medical_or_human_validation": "none",
+  "model_source_simulator_verified": false,
+  "paper_figure_reproduced": false,
+  "chart": "melatonin_scenarios.png"
+}
