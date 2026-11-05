@@ -1,6 +1,6 @@
 {
   "schema": "prismtek.rea-human-life-research.v0",
-  "status": "planned_not_executed",
+  "status": "equation_port_locally_verified_upstream_model_pending",
   "id": "rea-human-life-circadian-001",
   "title": "Independent reproduction of a published human melatonin model",
   "owner_repo": "codysumpter-cloud/buddy-universal-agent-profile",
@@ -82,5 +82,22 @@
     "no_unreviewed_host_effects": true,
     "clinical_use": false,
     "claims_require_independent_validation": true
+  },
+  "derived_experiment": {
+    "source": "research/human-life-lab/experiment.py",
+    "basis": "source-page MathML equation transcription, not original CellML runner",
+    "local_unit_tests": {
+      "pass": 6,
+      "total": 6
+    },
+    "independent_solver": {
+      "method": "SciPy DOP853 vs pure-Python RK4",
+      "passed": true,
+      "max_abs_plasma_pM": 1.6122442575428053e-07
+    },
+    "simulation_scenarios": 4,
+    "original_cellml_run": false,
+    "rea_mcp_run": false,
+    "published_paper_validation": false
   }
 }
