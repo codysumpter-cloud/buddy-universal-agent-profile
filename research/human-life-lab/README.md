@@ -1,6 +1,6 @@
 # REA Human Life Lab — evidence-led research mission
 
-Status: **research design / no simulated human or REA investigation has been completed**.
+Status: **equation-level E001 experiment locally verified; upstream CellML simulation and REA MCP investigation not completed**.
 Owner: Prismtek / Buddy; research home: `buddy-universal-agent-profile`. Runtime integration target, **only after validation**: the existing Prismtek Engine / WorldSim in `prismtek-site`.
 Date: 2026-11-05.
 
@@ -45,7 +45,7 @@ Do not infer model validity from import success, a pretty visualization, REA's t
 | Social and ecological context | Agent-based experiments with documented assumptions | Comparative experiments against reference patterns, not fabricated realism |
 | Engine integration | Existing WorldSim and native game entities | Same ID/state, deterministic save/replay, off by default, no effect on one-click human spawn |
 
-## Experiment 001 — circadian biomarker (selected, not yet executed)
+## Experiment 001 — circadian biomarker (transcribed equations executed; source-model comparison pending)
 
 **Question:** Can a published dynamical model reproduce the characteristic rise/fall of human plasma melatonin over a day under its documented assumptions?
 
@@ -59,7 +59,7 @@ Procedure:
 5. Vary documented parameters to map model sensitivity. Report what this model does *not* include: complete human sleep, cognition, immune response, development or consciousness.
 6. Only after numerical reproduction, expose a small opt-in read-only state bridge to the existing WorldSim human entity; no health claims and no user data.
 
-**Current status:** Sources identified; actual CellML source acquisition and source-model numerical replication **not yet verified**. HTTP requests from this tool environment to the raw PhysioMe source did not succeed. No REA MCP job has run.
+**Current status:** The source model’s *indexed MathML page* exposed the original equations/parameter values; we transcribed and ran them as Python with 6 passing unit checks, four parameter perturbations, and an independent SciPy DOP853 cross-check. **Raw CellML download, unchanged-source execution, model-output comparison against CellML, comparison with paper figures, and REA MCP investigation remain unverified.** Direct raw-file retrieval was blocked in the container; Mac remote terminal calls reached a session limit. See [E001-REPORT.md](E001-REPORT.md).
 
 ## Target and source registry
 
@@ -72,8 +72,14 @@ Procedure:
 
 Source-specific licenses and human-data access rules take precedence over open-source assumptions. Human Cell Atlas data is not uniformly unrestricted; check each project's data-use terms. Do not collect personal medical or genomic data, perform human-subject experiments, or make diagnostic decisions.
 
+## Executed derived numerical experiment (2026-11-05)
+
+See [`experiment.py`](experiment.py), [`test_experiment.py`](test_experiment.py), [`validate_scipy.py`](validate_scipy.py), [`results.json`](results.json), [`independent-check.json`](independent-check.json), and [`E001-REPORT.md`](E001-REPORT.md). For the first four scenarios (40 h, RK4 0.25-min steps), modeled plasma peaks were 222.304 pM baseline, 222.304 pM with the synthetic secretion window shifted +120 min, 111.154 pM with 2x faster clearance, and 443.719 pM with 2x slower clearance. The two integrators agreed to less than 0.00000017 pM in plasma state over one-minute samples.
+
+**These are predictions of the prescribed two-compartment model, not measured human responses.** The source model prescribes melatonin synthesis onset/offset; it does not directly calculate how light exposure changes the circadian pacemaker. No individual physiological or medical inference is made.
+
 ## Concrete next gate
 
-**REA connection gate:** the user-owned private REA Cloud portal's in-chat MCP tool list must show callable tools and one owner-approved safe read-only probe must succeed. The currently accessible GitHub/Render connectors verify repository/service configuration but do NOT prove REA MCP availability here. The Mac Remote Desktop connector also returned internal errors during planning.
+**REA connection gate:** the user-owned private REA Cloud portal's in-chat MCP tool list must show callable tools and one owner-approved safe read-only probe must succeed. The currently accessible GitHub/Render connectors verify repository/service configuration but do NOT prove REA MCP availability here. Mac Remote Desktop later returned an online status; its process-start operation hit a session limit. This does not establish a REA run.
 
 **Scientific execution gate:** obtain and run the real source CellML model, reproduce and compare traces, attach logs and model hashes. Until then Experiment 001 is **queued**, not implemented.
