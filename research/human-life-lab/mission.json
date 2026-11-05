@@ -1,0 +1,86 @@
+{
+  "schema": "prismtek.rea-human-life-research.v0",
+  "status": "planned_not_executed",
+  "id": "rea-human-life-circadian-001",
+  "title": "Independent reproduction of a published human melatonin model",
+  "owner_repo": "codysumpter-cloud/buddy-universal-agent-profile",
+  "runtime_owner": "codysumpter-cloud/prismtek-site",
+  "intent": "Evidence-led computational reconstruction of limited human physiological phenomena",
+  "non_goals": [
+    "Decompiling a human being",
+    "Asserting artificial consciousness",
+    "Diagnosis or treatment",
+    "Collecting identifiable genomic, medical or biometric records",
+    "Creating an alternative Prismtek Engine or agent scheduler"
+  ],
+  "model": {
+    "name": "Brown-Choe-Shanahan-Czeisler 1997 plasma melatonin model",
+    "source_page": "https://models.physiomeproject.org/exposure/1f40088c3eb67895ff8dcc5010d62bf1",
+    "source_file_page": "https://models.physiomeproject.org/workspace/57f/file/b7ace28cd8fc53c71b668914616b34538812f126/brown_choe_shanahan_czeisler_1997.cellml",
+    "source_content_sha256": null,
+    "model_reproduction_verified": false,
+    "original_paper_comparison_verified": false
+  },
+  "steps": [
+    {
+      "id": "S1",
+      "action": "Verify REA connection and safe local/cloud target availability",
+      "requires": [],
+      "done": false
+    },
+    {
+      "id": "S2",
+      "action": "Retrieve exact CellML source and verify rights, provenance, units and checksum",
+      "requires": [],
+      "done": false
+    },
+    {
+      "id": "S3",
+      "action": "Run unchanged original model with recorded solver and settings",
+      "requires": [
+        "S2"
+      ],
+      "done": false
+    },
+    {
+      "id": "S4",
+      "action": "Inspect optional simulator software using REA when authorized and necessary",
+      "requires": [
+        "S1",
+        "S2"
+      ],
+      "done": false
+    },
+    {
+      "id": "S5",
+      "action": "Independently reproduce model outputs and quantify numerical differences",
+      "requires": [
+        "S3"
+      ],
+      "done": false
+    },
+    {
+      "id": "S6",
+      "action": "Assess uncertainty and compare with published reference figures",
+      "requires": [
+        "S5"
+      ],
+      "done": false
+    },
+    {
+      "id": "S7",
+      "action": "Propose optional, nonclinical versioned WorldSim read-only state bridge",
+      "requires": [
+        "S6"
+      ],
+      "done": false
+    }
+  ],
+  "safety": {
+    "only_public_or_authorized_artifacts": true,
+    "no_personal_health_data": true,
+    "no_unreviewed_host_effects": true,
+    "clinical_use": false,
+    "claims_require_independent_validation": true
+  }
+}
