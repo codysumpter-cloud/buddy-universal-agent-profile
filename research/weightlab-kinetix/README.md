@@ -44,3 +44,7 @@ from the earlier exact-weight replay.
 The v0.4 GitHub workflow also applies a separate fail-closed performance gate:
 **64 episodes per actor**, patched success **>= 95%**, baseline success **<= 5%**.
 Its signed-by-nobody JSON digest is an integrity checksum, not authorization.
+
+## v0.5: prospective physics-parameter generalization
+
+The independent `generalization.py` uses Kinetix's actual `base_friction`, `base_motor_power` and gravity to prospectively evaluate six predeclared conditions with baseline and patched policy controls. The new workflow `weightlab-kinetix-generalization.yml` uploads complete rows plus a **separate** data-completeness and candidate-robustness verdict. It **does not** automatically promote models or claim robustness if a condition fails. See [GENERALIZATION_README.md](GENERALIZATION_README.md) for exact parameters and evaluation scope.
