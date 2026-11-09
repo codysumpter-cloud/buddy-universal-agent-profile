@@ -39,6 +39,9 @@ jobs:
         run: python research/weightlab-kinetix/repair_experiment.py --stage search --seed 3101 --output kinetix-repair-development.json --candidate kinetix-repair-candidate.json
       - name: Open reserved holdout once, for selected candidate only
         run: python research/weightlab-kinetix/repair_experiment.py --stage holdout --seed 3101 --candidate kinetix-repair-candidate.json --output kinetix-repair-holdout.json
+      - name: Independently verify candidate selection, complete evidence, and holdout isolation
+        run: |
+          python research/weightlab-kinetix/repair_gate.py --diagnostics kinetix-repair-diagnostics.json --development kinetix-repair-development.json --candidate kinetix-repair-candidate.json --holdout kinetix-repair-holdout.json --output kinetix-repair-gate.json
       - name: Preserve success or failure reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -49,5 +52,6 @@ jobs:
             kinetix-repair-development.json
             kinetix-repair-candidate.json
             kinetix-repair-holdout.json
+            kinetix-repair-gate.json
           if-no-files-found: warn
           retention-days: 30
