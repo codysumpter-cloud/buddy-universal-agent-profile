@@ -1,0 +1,49 @@
+name: WeightLab Kinetix Physics Evaluation
+on:
+  pull_request:
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-physics.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-physics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physics-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JAX_PLATFORM_NAME: cpu
+      JAX_PLATFORMS: cpu
+      XLA_PYTHON_CLIENT_PREALLOCATE: 'false'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      SDL_VIDEODRIVER: dummy
+      XLA_FLAGS: '--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned public Kinetix simulator
+        run: python -m pip install 'kinetix-env==3.0.2' 'numpy==2.3.4'
+      - name: Test physics adapter and original numeric reproduction
+        run: python -m unittest discover -v -s research/weightlab-kinetix/test
+      - name: Run published car-ramp level with baseline vs edited actor
+        run: python research/weightlab-kinetix/physics_rollout.py --episodes 64 --seed 101 --mode sample --output kinetix-physics-evidence.json
+      - name: Enforce independent physics success gate
+        run: python research/weightlab-kinetix/physics_gate.py --input kinetix-physics-evidence.json --output kinetix-physics-gate.json
+      - name: Upload independent physics proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetix-physics-evidence
+          path: |
+            kinetix-physics-evidence.json
+            kinetix-physics-gate.json
+          if-no-files-found: warn
+          retention-days: 30

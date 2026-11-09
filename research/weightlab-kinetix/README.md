@@ -31,3 +31,16 @@ Offline reruns: pass `--cache DIR --offline` after obtaining the verified source
 ## Licenses
 
 Check upstream original source/license before rehosting. The code herein is a separate implementation; it fetches data from the source without vendoring the original binaries into BUAP. Retain citations to original researchers; do not claim independent reproduction of physics success until independently running the environment.
+
+## Optional independent Kinetix physics gate (v0.4)
+
+See [PHYSICS_README.md](PHYSICS_README.md) and
+[physics_rollout.py](physics_rollout.py) for a separate actual-JAX
+`l/h2_car_ramp` evaluation. It has its **own** CI workflow and does not
+change the numeric-only release's evidence status. A valid physics result
+requires the new workflow to execute successfully; it must not be inferred
+from the earlier exact-weight replay.
+
+The v0.4 GitHub workflow also applies a separate fail-closed performance gate:
+**64 episodes per actor**, patched success **>= 95%**, baseline success **<= 5%**.
+Its signed-by-nobody JSON digest is an integrity checksum, not authorization.
