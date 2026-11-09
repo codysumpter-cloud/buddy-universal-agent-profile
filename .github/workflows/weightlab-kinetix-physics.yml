@@ -34,12 +34,16 @@ jobs:
       - name: Test physics adapter and original numeric reproduction
         run: python -m unittest discover -v -s research/weightlab-kinetix/test
       - name: Run published car-ramp level with baseline vs edited actor
-        run: python research/weightlab-kinetix/physics_rollout.py --episodes 2 --seed 101 --mode sample --output kinetix-physics-evidence.json
+        run: python research/weightlab-kinetix/physics_rollout.py --episodes 64 --seed 101 --mode sample --output kinetix-physics-evidence.json
+      - name: Enforce independent physics success gate
+        run: python research/weightlab-kinetix/physics_gate.py --input kinetix-physics-evidence.json --output kinetix-physics-gate.json
       - name: Upload independent physics proof
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: kinetix-physics-evidence
-          path: kinetix-physics-evidence.json
+          path: |
+            kinetix-physics-evidence.json
+            kinetix-physics-gate.json
           if-no-files-found: warn
           retention-days: 30

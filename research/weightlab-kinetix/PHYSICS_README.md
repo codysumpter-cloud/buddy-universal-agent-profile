@@ -22,3 +22,16 @@ The `weightlab-kinetix-physics.yml` GitHub Actions workflow executes the same ph
 ## Result status
 
 **Pending GitHub runner execution.** No environment success rate can be claimed until that exact workflow passes.
+
+## Independent promotion gate
+
+GitHub's CPU workflow now runs **64 paired baseline/patched episodes**, requires
+at least **95% patched success** and at most **5% baseline success** on those
+same fixed-level episode IDs, and rejects malformed/missing/duplicate episode
+records. This requirement is declared before the 64-episode run, and failures
+are preserved as evidence, not swept into a cherry-picked set.
+
+`physics_gate.py` validates the record and emits a SHA-256-bound report, then
+exits nonzero if performance thresholds are missed. These checks are **not**
+an authenticated signature and not permission to deploy/modify production
+models. The 64 episodes differ by RNG/action samples, **not by level geometry**.

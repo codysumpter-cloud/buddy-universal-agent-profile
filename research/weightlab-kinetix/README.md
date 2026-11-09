@@ -40,3 +40,7 @@ See [PHYSICS_README.md](PHYSICS_README.md) and
 change the numeric-only release's evidence status. A valid physics result
 requires the new workflow to execute successfully; it must not be inferred
 from the earlier exact-weight replay.
+
+The v0.4 GitHub workflow also applies a separate fail-closed performance gate:
+**64 episodes per actor**, patched success **>= 95%**, baseline success **<= 5%**.
+Its signed-by-nobody JSON digest is an integrity checksum, not authorization.
