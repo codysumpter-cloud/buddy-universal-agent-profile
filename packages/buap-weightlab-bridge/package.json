@@ -1,0 +1,18 @@
+{
+  "name": "@prismtek/buap-weightlab-bridge",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Host-gated neural patch evidence bridge for BUAP Mission Control and Agent Life",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./local-evaluator": "./src/local-evaluator.mjs"
+  },
+  "scripts": {
+    "test": "node --test",
+    "verify:fixture": "node scripts/evaluate-fixture.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
