@@ -1,0 +1,57 @@
+name: WeightLab Kinetix Bounded Neural Repair
+on:
+  pull_request:
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-repair.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  repair-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JAX_PLATFORM_NAME: cpu
+      JAX_PLATFORMS: cpu
+      XLA_PYTHON_CLIENT_PREALLOCATE: 'false'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      SDL_VIDEODRIVER: dummy
+      XLA_FLAGS: '--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned published Kinetix simulator
+        run: python -m pip install 'kinetix-env==3.0.2' 'numpy==2.3.4'
+      - name: Unit tests including candidate safety and holdout isolation
+        run: python -m unittest discover -v -s research/weightlab-kinetix/test
+      - name: Trace real failure states for diagnostics
+        run: python research/weightlab-kinetix/repair_experiment.py --stage diagnostic --seed 3101 --output kinetix-repair-diagnostics.json
+      - name: Score bounded prospective numeric proposals on known development conditions
+        run: python research/weightlab-kinetix/repair_experiment.py --stage search --seed 3101 --output kinetix-repair-development.json --candidate kinetix-repair-candidate.json
+      - name: Open reserved holdout once, for selected candidate only
+        run: python research/weightlab-kinetix/repair_experiment.py --stage holdout --seed 3101 --candidate kinetix-repair-candidate.json --output kinetix-repair-holdout.json
+      - name: Independently verify candidate selection, complete evidence, and holdout isolation
+        run: |
+          python research/weightlab-kinetix/repair_gate.py --diagnostics kinetix-repair-diagnostics.json --development kinetix-repair-development.json --candidate kinetix-repair-candidate.json --holdout kinetix-repair-holdout.json --output kinetix-repair-gate.json
+      - name: Preserve success or failure reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetix-repair-experiment-evidence
+          path: |
+            kinetix-repair-diagnostics.json
+            kinetix-repair-development.json
+            kinetix-repair-candidate.json
+            kinetix-repair-holdout.json
+            kinetix-repair-gate.json
+          if-no-files-found: warn
+          retention-days: 30
