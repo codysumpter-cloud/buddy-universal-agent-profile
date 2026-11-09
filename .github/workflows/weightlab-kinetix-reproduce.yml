@@ -1,0 +1,38 @@
+name: WeightLab Kinetix Reproduction
+
+on:
+  pull_request:
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-reproduce.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-reproduce.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weight-reproduction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical dependency
+        run: python -m pip install numpy==2.3.4
+      - name: Test safe edit interpreter
+        run: python -m unittest discover -v -s research/weightlab-kinetix/test
+      - name: Reconstruct published Kinetix actor (no physics rollout)
+        run: python research/weightlab-kinetix/reproduce.py --output kinetix-reproduction.json
+      - name: Save independent evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetix-weight-reproduction
+          path: kinetix-reproduction.json
+          retention-days: 30
