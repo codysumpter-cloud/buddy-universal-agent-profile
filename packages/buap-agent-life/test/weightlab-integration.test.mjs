@@ -4,6 +4,10 @@ import { AgentLifeRuntime } from '../src/index.mjs';
 import { AgentProfileRuntime } from '../../buap-agent-profile/src/index.mjs';
 import { MissionControl } from '../../buap-mission-control/src/index.mjs';
 import { evaluateAndPromoteWeightPatch } from '../../buap-weightlab-bridge/src/index.mjs';
+import { evaluateLocalWeightLabFiles } from '../../buap-weightlab-bridge/src/local-evaluator.mjs';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join, dirname } from 'node:path';
 
 const profile = {
   schema: 'prismtek-agent-profile-v1', id: 'atlas', display_name: 'Atlas',
@@ -26,18 +30,12 @@ const lifeProfile = {
   relationships: { enabled: false },
   development: { initial_stage: 'apprentice', stages: [] },
 };
-const source = '1'.repeat(64), target = '2'.repeat(64);
-const patch = {
-  protocol: 'prismtek-sparse-weight-patch-v1', parameter_count: 226, changed_count: 1,
-  source_sha256: source, target_sha256: target,
-  edits: [{ tensor: 'w1', index: [0, 1], before: 0, after: 2 }],
-};
-function scoring(split, seed_namespace, seeds, wins) {
-  return { baseline: { split, seed_namespace, seeds, wins: 0, success_rate: 0, model_sha256: source },
-    patched: { split, seed_namespace, seeds, wins, success_rate: wins / seeds, model_sha256: target } };
-}
-const report = { source_sha256: source, target_sha256: target, changed_parameters: 1, separate_seed_namespaces: true,
-  scores: { train: scoring('train', 1000, 64, 64), heldout: scoring('heldout', 2000, 256, 256), stress: scoring('stress', 3000, 256, 253) } };
+const fixture = join(dirname(fileURLToPath(import.meta.url)), '../../buap-weightlab-bridge/fixtures/blind-ramp-v2');
+const beforePath = join(fixture, 'blind_ramp_before.json');
+const afterPath = join(fixture, 'blind_ramp_after.json');
+const patchPath = join(fixture, 'blind_ramp_patch.json');
+const patch = JSON.parse(readFileSync(patchPath, 'utf8'));
+const trustedEvaluator = () => evaluateLocalWeightLabFiles({ beforePath, afterPath, patchPath });
 function make() {
   const agent = new AgentProfileRuntime(profile);
   const mission = new MissionControl(agent, {
@@ -51,7 +49,7 @@ function make() {
   return { agent, mission, life };
 }
 const args = ({ mission, life }) => ({ mission, life, stepId: 'repair', patch,
-  evaluator: async () => ({ report, rollback_verified: true, model_hashes_verified: true, artifact_sha256: 'a'.repeat(64) }),
+  evaluator: trustedEvaluator,
   modelId: 'vehicle-ramp', resultRef: 'test:weightlab-run', rollbackRef: 'test:inverse-patch',
   verifierId: 'ci-verifier', occurredAt: '2026-11-09T16:00:00.000Z', sources: ['test:weightlab-v02'],
   usage: { tokens: 0, cost_cents: 0 } });
@@ -65,6 +63,9 @@ test('actual BUAP runtimes gate weight repairs and preserve constitution', async
   assert.deepEqual(state.life.constitution, before);
   assert.equal(state.life.snapshot().applied_event_ids.length, 1);
   assert.equal(result.memory_event.authority.kind, 'verifier');
+  assert.equal(result.gate.heldout_success, 1);
+  assert.equal(result.gate.stress_success, 254/256);
+  assert.equal(result.approved_target_sha256, patch.target_sha256);
 });
 
 test('unconnected capability blocks evaluation and learning', async () => {
@@ -72,5 +73,20 @@ test('unconnected capability blocks evaluation and learning', async () => {
   const result = await evaluateAndPromoteWeightPatch(args(state));
   assert.equal(result.promoted, false);
   assert.equal(result.decision, 'missing_capabilities');
+  assert.equal(state.life.snapshot().applied_event_ids.length, 0);
+});
+
+test('tampered source model fails and does not reward Agent Life', async () => {
+  const state = make();
+  state.agent.bindCapability('github', { evidence_ref: 'test:capability-probed' });
+  const evaluator = async () => {
+    const before = JSON.parse(readFileSync(beforePath, 'utf8'));
+    const after = JSON.parse(readFileSync(afterPath, 'utf8'));
+    before.weights.b1[0] = 99; // SHA no longer matches
+    const { evaluateLocalWeightLabModels } = await import('../../buap-weightlab-bridge/src/local-evaluator.mjs');
+    return evaluateLocalWeightLabModels(before, after, patch);
+  };
+  await assert.rejects(evaluateAndPromoteWeightPatch({...args(state), evaluator}), /fingerprint/);
+  assert.equal(state.mission.status('repair'), 'failed');
   assert.equal(state.life.snapshot().applied_event_ids.length, 0);
 });

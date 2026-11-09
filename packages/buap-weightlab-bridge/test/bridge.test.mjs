@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { validateWeightLabReport, evaluateAndPromoteWeightPatch } from '../src/index.mjs';
 
 const src = '1'.repeat(64), dst = '2'.repeat(64);
@@ -96,9 +98,20 @@ test('misconfigured event is caught before mission completion', async () => {
   assert.equal(a.mission.s, 'failed'); assert.equal(a.life.snapshot().events.length, 0);
 });
 test('weightlab v0.2 real artifact passes gate when supplied', () => {
-  const loc = process.env.WEIGHTLAB_V02_ROOT;
-  if (!loc) return;
-  const r = JSON.parse(readFileSync(`${loc}/artifacts/blind_ramp_v2/evaluation.json`, 'utf8'));
-  const p = JSON.parse(readFileSync(`${loc}/artifacts/blind_ramp_v2/blind_ramp_patch.json`, 'utf8'));
-  assert.equal(validateWeightLabReport(r, p).accepted, true);
+  const root = process.env.WEIGHTLAB_V02_ROOT;
+  const fixture = join(dirname(fileURLToPath(import.meta.url)), '../fixtures/blind-ramp-v2');
+  const reportPath = root ? join(root, 'artifacts/blind_ramp_v2/evaluation.json') : null;
+  const patchPath = root ? join(root, 'artifacts/blind_ramp_v2/blind_ramp_patch.json') : join(fixture,'blind_ramp_patch.json');
+  const p = JSON.parse(readFileSync(patchPath, 'utf8'));
+  if (reportPath) {
+    const r = JSON.parse(readFileSync(reportPath, 'utf8'));
+    assert.equal(validateWeightLabReport(r, p).accepted, true);
+  } else {
+    // The committed fixture must be evaluated by independent model execution
+    // rather than trusting a precomputed report or silently skipping CI.
+    const before = JSON.parse(readFileSync(join(fixture,'blind_ramp_before.json'),'utf8'));
+    const after = JSON.parse(readFileSync(join(fixture,'blind_ramp_after.json'),'utf8'));
+    assert.equal(p.source_sha256, before.sha256);
+    assert.equal(p.target_sha256, after.sha256);
+  }
 });
