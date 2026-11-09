@@ -1,0 +1,70 @@
+name: WeightLab Kinetix Sensor-Conditioned Weight Edits
+on:
+  pull_request:
+    paths:
+      - 'research/weightlab-kinetix/sensor_search.py'
+      - 'research/weightlab-kinetix/sensor_gate.py'
+      - 'research/weightlab-kinetix/test/test_sensor_search.py'
+      - 'research/weightlab-kinetix/SENSOR_README.md'
+      - '.github/workflows/weightlab-kinetix-sensor-search.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/weightlab-kinetix/sensor_search.py'
+      - 'research/weightlab-kinetix/sensor_gate.py'
+      - 'research/weightlab-kinetix/test/test_sensor_search.py'
+      - 'research/weightlab-kinetix/SENSOR_README.md'
+      - '.github/workflows/weightlab-kinetix-sensor-search.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sensor-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      JAX_PLATFORM_NAME: cpu
+      JAX_PLATFORMS: cpu
+      XLA_PYTHON_CLIENT_PREALLOCATE: 'false'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      SDL_VIDEODRIVER: dummy
+      XLA_FLAGS: '--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official Kinetix simulator
+        run: python -m pip install 'kinetix-env==3.0.2' 'numpy==2.3.4'
+      - name: Test numerical provenance, edit safety and holdout isolation
+        run: python -m unittest discover -v -s research/weightlab-kinetix/test
+      - name: Evaluate 85 bounded neural sensor rewires on development conditions
+        run: >-
+          python research/weightlab-kinetix/sensor_search.py --stage search
+          --output kinetix-sensor-development.json
+          --selected-file kinetix-sensor-selected.json
+      - name: Preserve reserve unless a development candidate strictly improves
+        run: >-
+          python research/weightlab-kinetix/sensor_search.py --stage holdout
+          --selected-file kinetix-sensor-selected.json
+          --output kinetix-sensor-holdout.json
+      - name: Independently gate full evidence and policy selection
+        run: >-
+          python research/weightlab-kinetix/sensor_gate.py
+          --development kinetix-sensor-development.json
+          --selection kinetix-sensor-selected.json
+          --holdout kinetix-sensor-holdout.json
+          --output kinetix-sensor-gate.json
+      - name: Publish complete run including negative results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kinetix-sensor-search-evidence
+          path: |
+            kinetix-sensor-development.json
+            kinetix-sensor-selected.json
+            kinetix-sensor-holdout.json
+            kinetix-sensor-gate.json
+          if-no-files-found: warn
+          retention-days: 30

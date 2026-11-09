@@ -52,3 +52,7 @@ The independent `generalization.py` uses Kinetix's actual `base_friction`, `base
 ## v0.6: Bounded candidate repair
 
 See [REPAIR_README.md](REPAIR_README.md) for the bounded, assistant-authored bias search, real failure telemetry, prospectively reserved physical conditions, and honest model-evidence boundaries. Candidates are **not** automatically promoted.
+
+## v0.7: input-conditioned weight surgery (opt-in)
+
+See [SENSOR_README.md](SENSOR_README.md). `sensor_search.py` and `sensor_gate.py` evaluate 85 direct neural weight edits including vertical state feedback; they preserve reserved physics conditions until a true development success is observed. This is research, not an automatic BUAP brain change.
