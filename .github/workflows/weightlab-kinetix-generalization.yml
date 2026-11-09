@@ -1,0 +1,49 @@
+name: WeightLab Kinetix Parameter Generalization
+on:
+  pull_request:
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-generalization.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/weightlab-kinetix/**'
+      - '.github/workflows/weightlab-kinetix-generalization.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generalization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JAX_PLATFORM_NAME: cpu
+      JAX_PLATFORMS: cpu
+      XLA_PYTHON_CLIENT_PREALLOCATE: 'false'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      SDL_VIDEODRIVER: dummy
+      XLA_FLAGS: '--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned Kinetix
+        run: python -m pip install 'kinetix-env==3.0.2' 'numpy==2.3.4'
+      - name: Run all physics and gate unit tests
+        run: python -m unittest discover -v -s research/weightlab-kinetix/test
+      - name: Evaluate six prospective parameter changes in real physics
+        run: python research/weightlab-kinetix/generalization.py --episodes 8 --seed 1901 --output kinetix-generalization-evidence.json
+      - name: Independently validate complete evidence and classify robustness
+        run: python research/weightlab-kinetix/generalization_gate.py --input kinetix-generalization-evidence.json --output kinetix-generalization-gate.json
+      - name: Upload complete results, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetix-generalization-evidence
+          path: |
+            kinetix-generalization-evidence.json
+            kinetix-generalization-gate.json
+          if-no-files-found: warn
+          retention-days: 30
