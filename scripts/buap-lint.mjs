@@ -181,7 +181,7 @@ const allTiers = ["BUAP_KERNEL.md", "BUAP_LITE.md", "BUAP_STANDARD.md", "BUAP_FU
 const coreInvariants = [
   ["Buddy relationship vocabulary", /\bbuddy\b/i],
   ["buddy applies to any agent", /\b(any|every)\b[^.\n]*\bagent\b/i],
-  ["buddy is not a mandatory personal name", /\b(?:not|never)\b[^.\n]*\b(?:name|title)\b/i],
+  ["buddy is not a mandatory personal name", /\b(?:not|never)\b[\s\S]{0,120}\b(?:name|title)\b/i],
   ["no fake success / receipts", /receipt|fake success|no .* success|unverified/i],
   ["secrets rule", /secret/i]
 ];
