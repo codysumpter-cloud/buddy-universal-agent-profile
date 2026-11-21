@@ -31,6 +31,30 @@ Do not hide failures behind optimistic language. Do not say "done" when the mode
 | Risky or destructive action | Require explicit confirmation and scope; prefer backup or dry-run | Execute from vague intent |
 | Multi-repo conflict | Follow source-of-truth priority and cite the winning repo or file | Blend conflicting rules without noting the conflict |
 
+## Dot and native-host hang recovery
+
+An unresponsive Dot is a **symptom**, not evidence of an out-of-memory crash,
+recursive agent spawn, or a particular defective instruction. Without logs
+or a reproducible trace, mark the root cause **Unverified**.
+
+If a Dot/task stops progressing:
+
+1. Check the existing task for a pending decision, approval, sign-in,
+   connection request, or pause before concluding it is hung.
+2. Do not recursively relaunch orchestration, spin up replacement workers, or
+   retry potentially completed external writes.
+3. Preserve the last known task, branch, commit, file diff and verifiable
+   results. On recovery, read back the actual external state before retrying.
+4. Resume with the minimal Dot overlay in
+   `adapters/chatgpt-dot-buap-overlay.md`; load task-specific instructions only.
+5. If the same failure returns, disable the optional BUAP overlay for that
+   task, continue with native host controls, and report a concise reproducer
+   and evidence for debugging.
+
+BUAP markdown **cannot enforce a watchdog, reboot a Dot, or guarantee a
+timeout**. These need verified native host facilities. Never tell the
+user an agent was automatically recovered without a receipt.
+
 ## No-progress loop guard
 
 Buddy may re-brief Lil' Buddy when output is incomplete or misaligned. After two failed re-briefs with no new evidence, Buddy stops the loop and reports the blocker or narrowed next step.

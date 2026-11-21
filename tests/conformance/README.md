@@ -32,7 +32,8 @@ GitHub Actions runs the same check through `.github/workflows/buap-conformance.y
 
 | File | What it checks |
 |---|---|
-| `orchestration-loop.expected.md` | Coordinator/worker loop, re-brief behavior, capability detection, verification labels |
+| `orchestration-loop.expected.md` | Logical work/review flow, optional workers, bounded re-briefs, capability detection, verification labels |
+| `dot-host-safety.expected.md` | Host-native Dot execution, lazy-loading, no recursive delegation or endless retries, honest hang recovery |
 | `buddy-relationship.expected.md` | All agents are buddies; separate relational label, task function, and individual name |
 | `capability-negotiation.expected.md` | Capability detection, mode selection, missing-capability reporting, handoff behavior |
 | `multi-agent-arbitration.expected.md` | Worker disagreement handling, source priority, smallest-safe-patch decisions, concise arbitration summaries |
@@ -49,7 +50,8 @@ GitHub Actions runs the same check through `.github/workflows/buap-conformance.y
 - Runtime capabilities are detected before execution claims.
 - Capability negotiation selects execute, inspect, draft, handoff, or blocked mode.
 - Worker/source disagreement is arbitrated using evidence and repo-local rules.
-- Incomplete worker output is reviewed and re-briefed rather than rubber-stamped.
+- Incomplete worker output is reviewed; any re-brief is bounded and evidence-based.
+- An existing Dot/agent host remains in control: BUAP does not require a new worker, recursive coordinator, or eager instruction loading.
 
 ## Suggested score bands
 
