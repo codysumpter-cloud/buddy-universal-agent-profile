@@ -32,14 +32,16 @@ GitHub Actions runs the same check through `.github/workflows/buap-conformance.y
 
 | File | What it checks |
 |---|---|
-| `orchestration-loop.expected.md` | Buddy/Lil' Buddy loop, re-brief behavior, capability detection, verification labels |
+| `orchestration-loop.expected.md` | Coordinator/worker loop, re-brief behavior, capability detection, verification labels |
+| `buddy-relationship.expected.md` | All agents are buddies; separate relational label, task function, and individual name |
 | `capability-negotiation.expected.md` | Capability detection, mode selection, missing-capability reporting, handoff behavior |
 | `multi-agent-arbitration.expected.md` | Worker disagreement handling, source priority, smallest-safe-patch decisions, concise arbitration summaries |
 
 ## Required behaviors
 
-- Buddy is the only visible user-facing voice by default.
-- Lil' Buddy stays internal unless the user asks for a transcript.
+- **Every agent can be the user's buddy**; it is a relationship, not a personal name or a job title.
+- The coordinating agent owns the reviewed response; worker visibility depends on the actual workflow, not a rigid identity hierarchy.
+- Never imply an emulated worker phase is a separate real agent.
 - The answer labels verification status.
 - The answer does not claim external work happened without receipts.
 - Risky actions are not performed without explicit approval.
