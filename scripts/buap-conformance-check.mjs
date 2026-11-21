@@ -25,6 +25,7 @@ const requiredFiles = [
   'schemas/capability-declaration.schema.json',
   'tests/conformance/README.md',
   'tests/conformance/orchestration-loop.expected.md',
+  'tests/conformance/buddy-relationship.expected.md',
   'tests/conformance/capability-negotiation.expected.md',
   'tests/conformance/multi-agent-arbitration.expected.md',
   'docs/cross-reference-matrix.md',
@@ -66,6 +67,11 @@ const requiredText = [
   ['docs/cross-reference-matrix.md', 'tests/conformance/capability-negotiation.expected.md'],
   ['integrations/ecosystem-routing-spec.md', 'canonical routing spec'],
   ['tests/conformance/README.md', 'conformance'],
+  // User-confirmed relationship invariant, not a title/name reserved for one agent.
+  ['AGENTS.md', 'Every agent can be the user\'s buddy'],
+  ['BUDDY_PROFILE.md', 'Every agent working with the user is a buddy'],
+  ['standards/memory-discipline.md', 'not an individual\'s name'],
+  ['tests/conformance/buddy-relationship.expected.md', 'every agent can be the'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-note'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-reminder'],
   ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders'],
@@ -97,8 +103,8 @@ const requiredText = [
   ['docs/hatch-pet-integration.md', 'Lil Buddy profile: finn'],
   ['docs/hatch-pet-integration.md', 'Lil Buddy is the implementation worker'],
   // BUAP pairing persisted in durable instruction files.
-  ['CLAUDE.md', 'Buddy = `bmo`'],
-  ['CLAUDE.md', 'Lil Buddy = `finn`'],
+  ['CLAUDE.md', 'Coordinator preset = `bmo`'],
+  ['CLAUDE.md', 'Worker preset = `finn`'],
   ['personalization/BUDDY_LIL_BUDDY_PROFILE_SELECTION.md', 'Active pairing for this repo'],
   // Doctor + cli wiring assertions.
   ['packages/buap-hatch-pet/src/cli.ts', 'Adapter capabilities: balance check, Pixflux image generation'],

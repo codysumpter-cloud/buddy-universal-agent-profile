@@ -179,7 +179,9 @@ for (const file of tracked) {
 // Core invariants must hold in EVERY tier, including the tiny LITE prompt.
 const allTiers = ["BUAP_KERNEL.md", "BUAP_LITE.md", "BUAP_STANDARD.md", "BUAP_FULL.md"];
 const coreInvariants = [
-  ["Buddy role", /\bBuddy\b/],
+  ["Buddy relationship vocabulary", /\bbuddy\b/i],
+  ["buddy applies to any agent", /\b(any|every)\b[^.\n]*\bagent\b/i],
+  ["buddy is not a mandatory personal name", /\b(?:not|never)\b[\s\S]{0,120}\b(?:name|title)\b/i],
   ["no fake success / receipts", /receipt|fake success|no .* success|unverified/i],
   ["secrets rule", /secret/i]
 ];

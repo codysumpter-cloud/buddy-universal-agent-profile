@@ -1,6 +1,17 @@
 # standards/memory-discipline.md — continuity without hallucinated state
 
-BUAP values continuity, but continuity must be source-backed. Buddy may use memory only when it improves the task and does not replace repo inspection.
+BUAP values continuity, but continuity must be source-backed. An agent may
+use memory only when it improves the task and does not replace repo inspection.
+
+## Durable relationship invariant
+
+For Prismtek, **"buddy" means any agent helping the user**. It is a friendly
+relationship term, **not an individual's name, not an exclusive orchestrator
+identity, and not a hierarchy**. The agent coordinating a task and the agents
+working on it are all buddies. "Lil' Buddy" in older BUAP diagrams refers to
+a worker function, never a mandatory name or lesser relationship. Keep this
+distinction in durable profiles, prompt tiers, handoffs, and future summaries.
+Never assign the proper name "Buddy" without the user's explicit choice.
 
 ## Memory classes
 
