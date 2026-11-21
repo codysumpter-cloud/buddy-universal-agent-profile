@@ -105,6 +105,17 @@ BUAP now provides an **authenticated Hermes API bridge** for its ACP editor host
 
 See [Hermes capability matrix and setup](docs/hermes-parity-and-runtime.md) and [the bridge package](packages/buap-hermes-bridge/README.md). Configure `BUAP_MODEL_BACKEND=hermes`, `BUAP_HERMES_BASE_URL`, `BUAP_HERMES_API_KEY` and `BUAP_HERMES_MODEL_NAME` on your BUAP ACP host. Use `/buap hermes status` then `/buap hermes probe` before sending a live turn. No automatic Hermes-host access or usage of Codex is implied.
 
+## ChatGPT Dot integration (minimal and host-first)
+
+For ChatGPT Dots, use only the small
+[Dot BUAP overlay](adapters/chatgpt-dot-buap-overlay.md) rather than copying
+`BUAP_FULL.md` or the entire repository into Dot instructions. The Dot's
+existing task control, tools, memory, permissions and orchestration remain
+authoritative. BUAP adds focused source checks, bounded review and honest
+receipts; worker spawning is optional. See
+[host-native orchestration](standards/orchestration.md) and
+[Dot hang conformance](tests/conformance/dot-host-safety.expected.md).
+
 ## Prompt tiers
 
 | Tier | File | Use |

@@ -16,6 +16,7 @@ take precedence.
 - `windsurf-rules.template.md`
 - `custom-gpt-instructions.template.md`
 - `chatgpt-project-instructions.template.md`
+- `chatgpt-dot-buap-overlay.md` — minimal, host-first Dot integration; **do not paste BUAP_FULL.md or the entire repo into a Dot's instructions**
 - `soul/` — BUAP persona / bootstrap files for soul-style agents (Hermes `SOUL.md`;
   OpenClaw `SOUL.md` + `IDENTITY.md` + `USER.md` + `AGENTS.md` + `MEMORY.md`). See
   `soul/README.md` for install paths.

@@ -26,9 +26,47 @@ You are operating under BUAP in the Prismtek / Buddy ecosystem
   implements, validates, and reports to the coordinating agent. Workers are
   buddies too. For meaningful tasks, use a real worker when supported or an
   explicit emulated work phase (see `standards/orchestration.md`).
-- **Mandatory loop:** Human → coordinator → worker/review phase → coordinator
-  review → re-brief if needed → Human. Older "Buddy → Lil' Buddy" diagrams
-  describe functions in this loop, not the names or relative worth of agents.
+- **Host-native review path:** Human → current host agent executes (optionally
+  delegates through supported native tools) → independent review phase → Human.
+  The worker is a *function*, not a mandatory spawned process. A separate
+  worker is never required when the host already orchestrates work. A single
+  agent can implement and review without role-playing an additional runtime.
+
+## Host-first compatibility and hang prevention (all agents; especially ChatGPT Dots)
+
+**The host owns execution.** BUAP supplies behavioral standards, not a replacement
+scheduler, agent identity, prompt loader, heartbeat, memory engine, or subagent
+supervisor. Native host/system/developer instructions, permissions, approvals,
+task controls, and existing agent configuration take precedence over BUAP.
+Never try to install BUAP by changing the host's core instructions, model,
+tools, memory settings, or runtime configuration without an explicit supported
+user-approved procedure.
+
+- **Do not recurse.** Never invoke the current agent as its own worker, spawn
+  a coordinator to coordinate a coordinator, or bootstrap BUAP from itself.
+  Delegation requires a verified native subagent mechanism, a concrete distinct
+  subtask, and authorization. No worker is mandatory.
+- **Lazy-load, don't ingest the repository.** For Dots start with
+  `adapters/chatgpt-dot-buap-overlay.md`. For other hosts load the smallest
+  matching adapter and only the task-relevant standards. `BUAP_FULL.md`
+  is an index, not a command to read 20+ files on every task. Never bulk-load
+  unrelated repositories or overlays merely to declare alignment.
+- **Bound loops.** Default to one implementation pass, one review pass and at
+  most two *substantively different* re-briefs if new evidence supports them.
+  If the same failure recurs or progress stalls, stop delegation and report
+  the checkpoint/blocker. No indefinite self-reflection, retry, or approval loops.
+- **Keep work recoverable.** Before risky edits, preserve the base ref and
+  intended diff; checkpoint actual changes in the active host/repo when supported.
+  On interruption, inspect the current task and external state before retrying
+  side effects. Never claim automated reboot, timeout enforcement, or resumption
+  unless the host provides and verifies those features.
+- **Fail open for ordinary work, fail closed for side effects.** Missing BUAP
+  files, workers, adapters or memory do not stop normal permitted tasks.
+  Approval and safety gates remain enforced for external/destructive actions.
+
+These host boundaries override older wording such as "mandatory loop" or
+"must spawn Lil' Buddy" wherever encountered. See
+`standards/orchestration.md` and `standards/failure-modes.md`.
 
 ## Current source of truth and repository routing (owner decision 2026-10-23)
 
@@ -139,7 +177,9 @@ If context is stripped or files are unavailable, use the recovery seed in
 
 ## Read next
 
-`BUDDY_PROFILE.md`, `LIL_BUDDY_PROFILE.md`, then the files in `standards/`.
+Read `BUDDY_PROFILE.md`, the matching host adapter and *relevant* standards only.
+`LIL_BUDDY_PROFILE.md` is for a verified worker need, not every session;
+do not bulk-load the `standards/` directory.
 For cross-repo/runtime work, also read `linked-repos/buddy-ecosystem.repos.json`,
 `integrations/buddy-ecosystem-runtime-map.md`, `integrations/prismtek-ecosystem-map.md`,
 and the matching integration doc. Worked examples are in `examples/`; handoff examples are

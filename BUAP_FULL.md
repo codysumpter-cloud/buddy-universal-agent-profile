@@ -4,28 +4,29 @@ Use this when the AI environment can read repos/files, edit files, run commands,
 GitHub, or coordinate project work. This file is a portable top-level index that points
 agents at the complete BUAP source set.
 
-## Read order
+## Safe read order — host-first, selective
 
-1. `AGENTS.md`
-2. `BUDDY_PROFILE.md`
-3. `LIL_BUDDY_PROFILE.md`
-4. `linked-repos/buddy-ecosystem.repos.json`
-5. `integrations/buddy-ecosystem-runtime-map.md`
-6. `integrations/prismtek-ecosystem-map.md`
-7. `integrations/local-first-runtime.md`
-8. `standards/orchestration.md`
-9. `standards/repository-discovery.md`
-10. `standards/capability-detection.md`
-11. `standards/runtime-contract.md`
-12. `standards/memory-discipline.md`
-13. `standards/multi-agent-negotiation.md`
-14. `standards/failure-modes.md`
-15. `standards/safety.md`
-16. `standards/validation.md`
-17. `standards/response-format.md`
-18. `standards/universal-agent-fingerprint.md` when context may be stripped
-19. Task-specific runbook under `runbooks/`
-20. Capability-specific adapter under `adapters/`
+This is a **reference index**, not a startup checklist. Do not eagerly ingest
+all BUAP documentation or create new agents just to comply with it.
+
+1. Preserve the host's native task model, system/developer instructions, tool
+   permissions, approvals, and any already-running work.
+2. Read `AGENTS.md` and the smallest matching adapter. **For ChatGPT Dots
+   read `adapters/chatgpt-dot-buap-overlay.md` first.**
+3. Read `BUDDY_PROFILE.md` for role semantics; read
+   `standards/orchestration.md` only when delegation/review is relevant.
+4. Read `standards/runtime-contract.md`,
+   `standards/capability-detection.md` and `standards/failure-modes.md`
+   when the task calls for capability negotiation or recovery.
+5. Read the actual active repository's instructions, task-specific runbook
+   and other standards **on demand**. `LIL_BUDDY_PROFILE.md`, all linked
+   repo maps, optional overlays and mission-control modules are never
+   automatic startup dependencies.
+
+A host without worker spawning uses one native agent with an implementation
+pass and a review pass; it does **not** simulate or start a second agent.
+No recursive orchestration, unconditional batch loading, or unbounded retries.
+See `standards/orchestration.md` for the bounded protocol.
 
 ## Full contract
 
@@ -40,10 +41,11 @@ Persist chosen names when supported. A worker researches, implements, and valida
 as a real worker when the runtime supports one, or as an internal work phase
 when it does not. The current coordinating agent reviews results before delivery.
 
-If worker output is incomplete, misaligned, unsafe, or insufficiently verified,
-the coordinating agent re-briefs the worker with the exact gap and definition of done. The loop ends
-only when the task is satisfied, honestly partially complete, or blocked with a useful
-handoff.
+If output is incomplete, misaligned, unsafe, or insufficiently verified,
+the coordinating agent may make up to two substantive, evidence-informed
+re-briefs; repeated failure or no progress must end the loop with an honest
+partial result or useful blocker. Never require a worker process when the host
+has no suitable native delegation facility.
 
 ## Execution requirements
 
