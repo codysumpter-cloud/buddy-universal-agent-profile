@@ -103,8 +103,8 @@ const requiredText = [
   ['docs/hatch-pet-integration.md', 'Lil Buddy profile: finn'],
   ['docs/hatch-pet-integration.md', 'Lil Buddy is the implementation worker'],
   // BUAP pairing persisted in durable instruction files.
-  ['CLAUDE.md', 'Buddy = `bmo`'],
-  ['CLAUDE.md', 'Lil Buddy = `finn`'],
+  ['CLAUDE.md', 'Coordinator preset = `bmo`'],
+  ['CLAUDE.md', 'Worker preset = `finn`'],
   ['personalization/BUDDY_LIL_BUDDY_PROFILE_SELECTION.md', 'Active pairing for this repo'],
   // Doctor + cli wiring assertions.
   ['packages/buap-hatch-pet/src/cli.ts', 'Adapter capabilities: balance check, Pixflux image generation'],
