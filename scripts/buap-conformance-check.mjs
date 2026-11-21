@@ -71,7 +71,7 @@ const requiredText = [
   ['AGENTS.md', 'Every agent can be the user\'s buddy'],
   ['BUDDY_PROFILE.md', 'Every agent working with the user is a buddy'],
   ['standards/memory-discipline.md', 'not an individual\'s name'],
-  ['tests/conformance/buddy-relationship.expected.md', 'Every agent can be'],
+  ['tests/conformance/buddy-relationship.expected.md', 'every agent can be the'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-note'],
   ['packages/buap-acp-agent/src/runtime.ts', 'buap add-reminder'],
   ['packages/buap-apple-notes-reminders/src/index.ts', 'listReminders'],
